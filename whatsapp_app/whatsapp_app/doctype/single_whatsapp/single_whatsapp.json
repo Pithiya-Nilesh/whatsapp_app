@@ -1,0 +1,79 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "Single_BULK.#######",
+ "creation": "2022-08-24 12:11:17.011868",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "send_to",
+  "create_receiver_list",
+  "receiver_list",
+  "column_break_4",
+  "select_template",
+  "demo_of_template",
+  "send_template"
+ ],
+ "fields": [
+  {
+   "fieldname": "send_to",
+   "fieldtype": "Select",
+   "label": "Send To",
+   "options": "\nAll Lead (Open)"
+  },
+  {
+   "fieldname": "create_receiver_list",
+   "fieldtype": "Button",
+   "label": "Create Receiver List",
+   "options": "create_receiver_list"
+  },
+  {
+   "fieldname": "receiver_list",
+   "fieldtype": "Small Text",
+   "label": "Receiver List"
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "select_template",
+   "fieldtype": "Link",
+   "label": "Select Template",
+   "options": "Templates"
+  },
+  {
+   "fieldname": "demo_of_template",
+   "fieldtype": "Small Text",
+   "label": "Demo Of Template"
+  },
+  {
+   "fieldname": "send_template",
+   "fieldtype": "Button",
+   "label": "Send Template"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2022-08-24 12:16:56.276301",
+ "modified_by": "Administrator",
+ "module": "Whatsapp App",
+ "name": "Single_whatsapp",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

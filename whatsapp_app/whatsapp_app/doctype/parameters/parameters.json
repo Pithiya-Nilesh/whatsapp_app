@@ -1,0 +1,37 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2022-08-09 18:14:09.055333",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "name_in_wati",
+  "name_in_doctype"
+ ],
+ "fields": [
+  {
+   "fieldname": "name_in_wati",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Name In Wati"
+  },
+  {
+   "fieldname": "name_in_doctype",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Name in Doctype"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2022-08-09 18:14:29.084829",
+ "modified_by": "Administrator",
+ "module": "Whatsapp App",
+ "name": "Parameters",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

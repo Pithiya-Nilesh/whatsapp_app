@@ -1,0 +1,86 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2022-11-24 13:36:58.673257",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "disabled",
+  "access_token",
+  "api_endpoint",
+  "version",
+  "name_type",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "default": "0",
+   "fieldname": "disabled",
+   "fieldtype": "Check",
+   "label": "Disabled"
+  },
+  {
+   "fieldname": "access_token",
+   "fieldtype": "Small Text",
+   "in_list_view": 1,
+   "label": "Access Token",
+   "read_only_depends_on": "eval:doc.disabled==1",
+   "reqd": 1
+  },
+  {
+   "fieldname": "api_endpoint",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "API Endpoint",
+   "read_only_depends_on": "eval:doc.disabled==1",
+   "reqd": 1
+  },
+  {
+   "fieldname": "version",
+   "fieldtype": "Data",
+   "label": "Version ",
+   "read_only_depends_on": "eval:doc.disabled==1",
+   "reqd": 1
+  },
+  {
+   "fieldname": "name_type",
+   "fieldtype": "Data",
+   "label": "Name Type",
+   "read_only_depends_on": "eval:doc.disabled==1",
+   "reqd": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "WhatsApp KEYS",
+   "print_hide": 1,
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2022-11-24 13:49:08.497354",
+ "modified_by": "Administrator",
+ "module": "Whatsapp App",
+ "name": "WhatsApp Api",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

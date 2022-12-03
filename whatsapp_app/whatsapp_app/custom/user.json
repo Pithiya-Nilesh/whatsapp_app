@@ -1,0 +1,8 @@
+{
+ "custom_fields": [{
+   "fieldname": "send_welcome_message_on_whatsapp",
+   "fieldtype": "Check",
+   "label": "Send Welcome Message on WhatsApp"
+  }
+ ]
+}

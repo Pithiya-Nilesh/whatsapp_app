@@ -1,0 +1,90 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "BULK.#######",
+ "creation": "2022-08-24 10:22:43.663673",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "send_to",
+  "create_receiver_list",
+  "receiver_list",
+  "hidden_list",
+  "column_break_4",
+  "select_template",
+  "demo_of_template",
+  "send_template"
+ ],
+ "fields": [
+  {
+   "fieldname": "send_to",
+   "fieldtype": "Select",
+   "label": "Send To",
+   "options": "\nAll Lead (Lead)\nAll Lead (Open)\nAll Lead (Opportunity)\nAll Lead (Quotation)"
+  },
+  {
+   "fieldname": "create_receiver_list",
+   "fieldtype": "Button",
+   "label": "Create Receiver List",
+   "options": "create_receiver_list"
+  },
+  {
+   "fieldname": "receiver_list",
+   "fieldtype": "Small Text",
+   "label": "Receiver List"
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "select_template",
+   "fieldtype": "Link",
+   "label": "Select Template",
+   "options": "Templates"
+  },
+  {
+   "fetch_from": "select_template.sample",
+   "fetch_if_empty": 1,
+   "fieldname": "demo_of_template",
+   "fieldtype": "Small Text",
+   "in_list_view": 1,
+   "label": "Demo Of Template",
+   "read_only": 1
+  },
+  {
+   "fieldname": "send_template",
+   "fieldtype": "Button",
+   "label": "Send Template"
+  },
+  {
+   "fieldname": "hidden_list",
+   "fieldtype": "Small Text",
+   "label": "Hidden List"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2022-08-24 15:50:10.027253",
+ "modified_by": "Administrator",
+ "module": "Whatsapp App",
+ "name": "WhatsApp Bulk Template Messages",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}
