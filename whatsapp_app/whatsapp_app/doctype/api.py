@@ -173,14 +173,7 @@ def send_messages(l_mobile=0, template='welcome_to_new_customer_default_template
 
 @frappe.whitelist(allow_guest=True)
 def send(name='', number='', requesttype='', equipment='', textarea=''):
-    print("\n\n okey method called \n\n")
-    print("\n\n name", name, "\n\n")
-    print("\n\n req ty", requesttype, "\n\n")
-    print("\n\n equpment", equipment, "\n\n")
-    print("\n\n textarea", textarea, "\n\n")
-
-    template = 'welcome_to_new_customer_default_template_v2'
-    template1 = 'shopify_default_ordershipment_tracking_url_v5'
+    template = 'new_chat_v1'
     number = int(number)
     access_token, api_endpoint, name_type, version = whatsapp_keys_details()
     headers = {
