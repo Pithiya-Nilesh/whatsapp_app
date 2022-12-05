@@ -1,0 +1,63 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2022-12-02 12:04:33.231769",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "message",
+  "select_day",
+  "lead_status",
+  "for_campaign"
+ ],
+ "fields": [
+  {
+   "fieldname": "message",
+   "fieldtype": "Data",
+   "label": "message"
+  },
+  {
+   "fieldname": "select_day",
+   "fieldtype": "Select",
+   "label": "send after",
+   "options": "starting\nafter 5 day\nafter 10 day"
+  },
+  {
+   "fieldname": "lead_status",
+   "fieldtype": "Select",
+   "label": "lead status",
+   "options": "Lead\nOpen\nReplied\nOpportunity\nQuotation\nLost Quotation\nInterested\nConverted\nDo Not Contact"
+  },
+  {
+   "fieldname": "for_campaign",
+   "fieldtype": "Select",
+   "label": "for campaign",
+   "options": "Campaign"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2022-12-02 12:13:40.117566",
+ "modified_by": "Administrator",
+ "module": "Whatsapp App",
+ "name": "template for automation",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
