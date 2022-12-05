@@ -14,31 +14,27 @@ def bulk_templates(template, l_mobile):
     h = template
     values = {'name': h}
     # this was the basic formula for inner join For the offical usage 
-    value2 = frappe.db.sql(
-        """SELECT p.name_in_doctype  FROM `tabParameters`p INNER JOIN `tabTemplates`t ON p.parent = %(name)s and t.name = %(name)s;""",
-        values=values)
-    value2_n = frappe.db.sql(
-        """SELECT p.name_in_wati  FROM `tabParameters`p INNER JOIN `tabTemplates`t ON p.parent = %(name)s and t.name = %(name)s;""",
-        values=values)
-    value_v = []
-    if len(value2) > 0:
+    value2 = frappe.db.sql("""SELECT p.name_in_doctype  FROM `tabParameters`p INNER JOIN `tabTemplates`t ON p.parent = %(name)s and t.name = %(name)s;""",values=values)
+    value2_n = frappe.db.sql("""SELECT p.name_in_wati  FROM `tabParameters`p INNER JOIN `tabTemplates`t ON p.parent = %(name)s and t.name = %(name)s;""",values=values)
+    value_v=[]
+    if len(value2)>0:
         for i in value2:
             for i1 in i:
                 value_v.append(i1)
                 # print(i1)
     else:
-        value_v = ["value"]
+        value_v=["value"]
 
-    value_n = []
-    if len(value2_n) > 0:
+    value_n=[]
+    if len(value2_n)>0:
         for i in value2_n:
             for i1 in i:
                 value_n.append(i1)
                 # print(i1)
     else:
-        value_n = ["name"]
-
-    final_values = []
+        value_n=["name"]
+    
+    final_values =[]
     for i in value_v:
         # print(i)
         if i == 'value':
@@ -46,10 +42,10 @@ def bulk_templates(template, l_mobile):
             final_values.append('value')
         else:
             if i == 'lead_name':
-                f = int(l_mobile)
+                f=int(l_mobile)
                 print(f)
                 print(type(f))
-                values = {'name': f}
+                values = {'name': f }
                 v = frappe.db.sql("""select lead_name from `tabLead` where mobile_no= %(name)s;""", values=values)
                 print("This is lead_name")
                 print(v)
@@ -58,8 +54,8 @@ def bulk_templates(template, l_mobile):
                 print(v2)
                 final_values.append(v2)
             if i == 'company':
-                f = int(l_mobile)
-                values = {'name': f}
+                f=int(l_mobile)
+                values = {'name': f }
                 v = frappe.db.sql("""select company from `tabLead` where mobile_no= %(name)s;""", values=values)
                 print("This is company")
                 v1 = v[0]
@@ -68,8 +64,8 @@ def bulk_templates(template, l_mobile):
                 final_values.append(v2)
                 # print("welcome")
             if i == 'company_name':
-                f = int(l_mobile)
-                values = {'name': f}
+                f=int(l_mobile)
+                values = {'name': f }
                 v = frappe.db.sql("""select company_name from `tabLead` where mobile_no= %(name)s;""", values=values)
                 print("This is company_name")
                 v1 = v[0]
@@ -77,8 +73,8 @@ def bulk_templates(template, l_mobile):
                 print(v)
                 final_values.append(v2)
             if i == 'territory':
-                f = int(l_mobile)
-                values = {'name': f}
+                f=int(l_mobile)
+                values = {'name': f }
                 v = frappe.db.sql("""select territory from `tabLead` where mobile_no= %(name)s;""", values=values)
                 print("This is territory")
                 v1 = v[0]
@@ -86,8 +82,8 @@ def bulk_templates(template, l_mobile):
                 print(v)
                 final_values.append(v2)
             if i == 'source':
-                f = int(l_mobile)
-                values = {'name': f}
+                f=int(l_mobile)
+                values = {'name': f }
                 v = frappe.db.sql("""select source from `tabLead` where mobile_no= %(name)s;""", values=values)
                 print("This is source")
                 v1 = v[0]
@@ -95,8 +91,8 @@ def bulk_templates(template, l_mobile):
                 print(v)
                 final_values.append(v2)
             if i == 'lead_owner':
-                f = int(l_mobile)
-                values = {'name': f}
+                f=int(l_mobile)
+                values = {'name': f }
                 v = frappe.db.sql("""select lead_owner from `tabLead` where mobile_no= %(name)s;""", values=values)
                 print("This is lead_owner")
                 v1 = v[0]
@@ -104,8 +100,8 @@ def bulk_templates(template, l_mobile):
                 print(v)
                 final_values.append(v2)
             if i == 'gender':
-                f = int(l_mobile)
-                values = {'name': f}
+                f=int(l_mobile)
+                values = {'name': f }
                 v = frappe.db.sql("""select gender from `tabLead` where mobile_no= %(name)s;""", values=values)
                 print("This is gender")
                 v1 = v[0]
@@ -120,9 +116,11 @@ def bulk_templates(template, l_mobile):
         list.append(dict)
     print(list)
     print(type(list))
+    
     print("this is values of value_v")
     print(value_v)
     print("\n\n list", list, "\n\n")
+            
     return list
 
 
@@ -136,8 +134,7 @@ def whatsapp_keys_details():
 
 # whatsapp_app.whatsapp_app.doctype.api.bulk_messages
 @frappe.whitelist()
-def send_messages(l_mobile=0, template='welcome_to_new_customer_default_template_v2', l_name='', is_template=True,
-                  message='Hello'):
+def send_messages(l_mobile=0, template='welcome_to_new_customer_default_template_v2', l_name='', is_template=True, message='Hello'):
     if l_name:
         l_mobile = frappe.db.get_value("Lead", f"{l_name}", "phone")
 
@@ -150,7 +147,6 @@ def send_messages(l_mobile=0, template='welcome_to_new_customer_default_template
         "Authorization": access_token
     }
     mobile_nos = " ".join(l_mobile.split()).split()
-    print("\n\n mobile no", mobile_nos, "\n\n")
     for mobile in mobile_nos:
         mobile = int(mobile)
         if is_template:
@@ -158,14 +154,15 @@ def send_messages(l_mobile=0, template='welcome_to_new_customer_default_template
             bt = bulk_templates(template, l_mobile=mobile)
             print("\n\n bt", bt, "\n\n")
             payload = {
-                "parameters": bt,
-                "broadcast_name": template,
-                "template_name": template
-            }
+                    "parameters": bt,
+                    "broadcast_name": template,
+                    "template_name": template
+                }
             response = requests.post(url, json=payload, headers=headers)
         else:
-            url = f"{api_endpoint}/{name_type}/{version}/sendSessionMessage/{mobile}?messageText={message}"
+            url = f"{api_endpoint}/{name_type}/{version}/sendSessionMessage/whatsappNumber={mobile}?messageText={message}"
             response = requests.post(url, headers=headers)
+
 
         print("\n\n response sdfgaf ", response, "\n\n")
     return response
@@ -173,7 +170,14 @@ def send_messages(l_mobile=0, template='welcome_to_new_customer_default_template
 
 @frappe.whitelist(allow_guest=True)
 def send(name='', number='', requesttype='', equipment='', textarea=''):
-    template = 'new_chat_v1'
+    print("\n\n okey method called \n\n")
+    print("\n\n name", name, "\n\n")
+    print("\n\n req ty", requesttype, "\n\n")
+    print("\n\n equpment", equipment, "\n\n")
+    print("\n\n textarea", textarea, "\n\n")
+
+    template = 'welcome_to_new_customer_default_template_v2'
+    template1 = 'shopify_default_ordershipment_tracking_url_v5'
     number = int(number)
     access_token, api_endpoint, name_type, version = whatsapp_keys_details()
     headers = {
@@ -385,7 +389,8 @@ def get_method(mobile):
     # # print("\n\n statusstring", data[0]['statusstring'], "\n\n")
     # # print("\n\n data", data['messages']['items'], "\n\n")
 
-    # ************************************* below code for load data ***********************************************************
+
+# ************************************* below code for load data ***********************************************************
 
     # name = frappe.db.get_list("Lead", filters={"phone": mobile}, fields=["name"])
     # chat = frappe.db.get_value("wati call message log", filters={'phone': mobile}, fieldname=["data"])
@@ -397,30 +402,22 @@ def get_method(mobile):
     # print("\n\n deta1 ", type(demo), "\n\n")
     # print("\n\n deta1 ", demo, "\n\n")
 
-    # ****************************************************************************
-    # wa_data = {"id": "message.Id", "waId": "917990915950", }
-    #
-    # se_mo = wa_data["waId"]
-    # f_data, name = frappe.db.get_value("wati call message log", filters={"phone": f"{se_mo}"},
-    #                                    fieldname=["data", "name"])
-    #
-    # if f_data is not None:
-    #     raw_data = json.loads(f_data)
-    #     raw_data['data'].append(wa_data)
-    #     data = json.dumps(raw_data)
-    #     frappe.db.set_value('wati call message log', f'{name}', 'data', f'{data}')
-    # else:
-    #     data = {"data": []}
-    #     data['data'].append(wa_data)
-    #     data = json.dumps(data)
-    #     frappe.db.set_value('wati call message log', f'{name}', 'data', f'{data}')
-    pass
 
+# ****************************************************************************
 
-def send_report_on_whatsapp():
-    data = frappe.get_doc("wati call message log")
-    data.first_name = "nilesh"
-    data.insert()
-    frappe.db.commit()
-    print("\n\n okey its run")
+    wa_data = {"id": "message.Id", "waId": "918690396934", }
 
+    se_mo = wa_data["waId"]
+    f_data, name = frappe.db.get_value("wati call message log", filters={"phone": f"{se_mo}"}, fieldname=["data", "name"])
+
+    if f_data is not None:
+        data = json.loads(f_data)
+        data['data'].append(data)
+        # frappe.db.set_value('wati call message log', f'{name}', 'data', f'{data}')
+    else:
+        data = {"data": []}
+        data['data'].append(wa_data)
+        data = json.dumps(data)
+        print("\n\n type", type(data))
+        frappe.db.sql(f'update `tabwati call message log` set data = {data} where name="{name}"')
+        # frappe.db.set_value('wati call message log', f'{name}', 'data', f'{data}')
