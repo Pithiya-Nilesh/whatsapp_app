@@ -101,7 +101,7 @@ def send_messages(l_mobile=0, template='new_chat_v1', l_name='', is_template=Tru
     for mobile in mobile_nos:
         mobile = int(mobile)
         if is_template:
-            url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber={mobile}"
+            url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{mobile}"
             bt = bulk_templates(template, l_mobile=mobile)
             print("\n\n bt", bt, "\n\n")
             payload = {
@@ -111,7 +111,7 @@ def send_messages(l_mobile=0, template='new_chat_v1', l_name='', is_template=Tru
             }
             response = requests.post(url, json=payload, headers=headers)
         else:
-            url = f"{api_endpoint}/{name_type}/{version}/sendSessionMessage/{mobile}?messageText={message}"
+            url = f"{api_endpoint}/{name_type}/{version}/sendSessionMessage/91{mobile}?messageText={message}"
             response = requests.post(url, headers=headers)
 
         print("\n\n response sdfgaf ", response, "\n\n")
@@ -147,11 +147,18 @@ def send(name='', number='', requesttype='', equipment='', textarea=''):
 
 @frappe.whitelist(allow_guest=True)
 def send_register_message(name='', number='', type=''):
+    # global template
+    from frappe.utils import now
+    # wa_data = {'created': frappe.utils.now(), 'text': message, 'timestamp': frappe.utils.now(), 'eventType': 'message',
+    #            'waId': number}
+    wa_name = ''
+    wa_data = {}
     if type == 'supplier':
-        template = 'supplier_registration_template'
+        template = 'register_template_for_suplier'
+        wa_name = 'supplier_name'
     elif type == 'customer':
         template = 'customer_registration_template'
-    print("\n\n template", template)
+        wa_name = 'name'
     number = int(number)
     access_token, api_endpoint, name_type, version = whatsapp_keys_details()
     headers = {
@@ -159,35 +166,58 @@ def send_register_message(name='', number='', type=''):
         "Authorization": access_token
     }
     url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{number}"
-    print("\n\n url", url)
-    print("api", api_endpoint)
+    # f_data = frappe.db.get_value("wati call message log", f"{number}", "data")
+    # if f_data is not None:
+    #     raw_data = json.loads(f_data)
+    #     raw_data['data'].append(wa_data)
+    #     data = json.dumps(raw_data)
+    #     frappe.db.set_value('wati call message log', f'{number}', {'data': f'{data}'})
+    # else:
+    #     data = {"data": []}
+    #     data['data'].append(wa_data)
+    #     data = json.dumps(data)
+    #     doc = frappe.get_doc({"doctype": "wati call message log", "phone": f"{number}", "data": f"{data}"})
+    #     doc.insert()
+    #     frappe.db.commit()
     payload = {
         "parameters": [
             {
-                "name": "name",
-                "value": name
+                "name": wa_name,
+                "value":  name
             },
         ],
         "broadcast_name": template,
         "template_name": template
     }
-    print("\n\n before")
     response = requests.post(url, json=payload, headers=headers)
-    print("\n\n after")
 
 
 @frappe.whitelist()
 def send_whatsapp_message(number, message=''):
     # number = int(number)
+    from frappe.utils import now
+    wa_data = {'created': frappe.utils.now(),'text': message,'timestamp':frappe.utils.now(),'eventType':'message','waId':number}
     access_token, api_endpoint, name_type, version = whatsapp_keys_details()
     headers = {
         "Content-Type": "text/json",
         "Authorization": access_token
     }
-    url = f"{api_endpoint}/{name_type}/{version}/sendSessionMessage/91{number}?messageText={message}"
+    url = f"{api_endpoint}/{name_type}/{version}/sendSessionMessage/{number}?messageText={message}"
+    f_data = frappe.db.get_value("wati call message log", f"{number}", "data")
+    if f_data is not None:
+        raw_data = json.loads(f_data)
+        raw_data['data'].append(wa_data)
+        data = json.dumps(raw_data)
+        frappe.db.set_value('wati call message log', f'{number}', {'data': f'{data}'})
+    else:
+        data = {"data": []}
+        data['data'].append(wa_data)
+        data = json.dumps(data)
+        doc = frappe.get_doc({"doctype": "wati call message log", "phone": f"{number}", "data": f"{data}"})
+        doc.insert()
+        frappe.db.commit()
     response = requests.post(url, headers=headers)
     return response
-
 
 
 @frappe.whitelist()
@@ -233,10 +263,10 @@ def get_method(mobile):
     pass
 
 
-def send_report_on_whatsapp():
-    data = frappe.get_doc("wati call message log")
-    data.first_name = "nilesh"
-    data.insert()
-    frappe.db.commit()
-    print("\n\n okey its run")
+# def send_report_on_whatsapp():
+#     data = frappe.get_doc("wati call message log")
+#     data.first_name = "nilesh"
+#     data.insert()
+#     frappe.db.commit()
+#     print("\n\n okey its run")
 
