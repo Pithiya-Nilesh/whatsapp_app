@@ -11,3 +11,8 @@ class waticallmessagelog(Document):
 		pass
 		# print("\n\n data", data, "\n\n")
 		# print("\n\n data type", type(data), "\n\n")
+
+	@frappe.whitelist()
+	def send_message(self):
+		from whatsapp_app.whatsapp_app.doctype.api import send_whatsapp_message
+		send_whatsapp_message(self.phone, self.message)

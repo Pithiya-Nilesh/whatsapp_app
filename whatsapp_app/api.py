@@ -23,18 +23,20 @@ def set_data(first_name, mobile):
 def data(**kwargs):
     wa_data = frappe.local.form_dict
     se_mo = wa_data["waId"]
-    f_data, name = frappe.db.get_value("wati call message log", filters={"phone": f"{se_mo}"},
-                                       fieldname=["data", "name"])
+    f_data = frappe.db.get_value("wati call message log", f"{se_mo}")
     if f_data is not None:
         raw_data = json.loads(f_data)
         raw_data['data'].append(wa_data)
         data = json.dumps(raw_data)
-        frappe.db.set_value('wati call message log', f'{name}', 'data', f'{data}')
+        frappe.db.set_value('wati call message log', f'{se_mo}', {'data': f'{data}', "read": 0 })
     else:
         data = {"data": []}
         data['data'].append(wa_data)
         data = json.dumps(data)
-        frappe.db.set_value('wati call message log', f'{name}', 'data', f'{data}')
+        doc = frappe.get_doc({"doctype": "wati call message log", "phone": f"{se_mo}", "data": f"{data}", "read": 0})
+        doc.insert()
+        frappe.db.commit()
+        # frappe.db.set_value("wati call message log", f'{se_mo}', "read", 0)
     return 'success'
 
 @frappe.whitelist(allow_guest=True)
