@@ -1,6 +1,9 @@
+import datetime
 import json
 
+
 import frappe
+from frappe.utils import now
 
 
 @frappe.whitelist(allow_guest=True)
@@ -22,18 +25,18 @@ def set_data(first_name, mobile):
 
 def data(**kwargs):
     wa_data = frappe.local.form_dict
-    se_mo = wa_data["waId"]
-    f_data = frappe.db.get_value("wati call message log", f"{se_mo}")
+    se_mo = wa_data["waId"][-10:]
+    f_data = frappe.db.get_value("wati call message log", f"{se_mo}", "data")
     if f_data is not None:
         raw_data = json.loads(f_data)
         raw_data['data'].append(wa_data)
         data = json.dumps(raw_data)
-        frappe.db.set_value('wati call message log', f'{se_mo}', {'data': f'{data}', "read": 0 })
+        frappe.db.set_value('wati call message log', f'{se_mo}', {'data': f'{data}', "read": 0, "time": now()})
     else:
         data = {"data": []}
         data['data'].append(wa_data)
         data = json.dumps(data)
-        doc = frappe.get_doc({"doctype": "wati call message log", "phone": f"{se_mo}", "data": f"{data}", "read": 0})
+        doc = frappe.get_doc({"doctype": "wati call message log", "phone": f"{se_mo}", "data": f"{data}", "read": 0, "time": now()})
         doc.insert()
         frappe.db.commit()
         # frappe.db.set_value("wati call message log", f'{se_mo}', "read", 0)
@@ -41,11 +44,7 @@ def data(**kwargs):
 
 @frappe.whitelist(allow_guest=True)
 def wati_webhooks():
-
     data1 = frappe.call(data, **frappe.form_dict)
-    # data1 = frappe.local.form_dict
-    # user = frappe.get_doc(doctype='wati call message log', first_name='asdfleshdsfgsfd')
-    # user.insert()
     return data1
 
 
@@ -55,3 +54,28 @@ def wati_webhooks():
 #     data.insert()
 #     frappe.db.commit()
 #     print("\n\n okey its run")
+
+@frappe.whitelist(allow_guest=True)
+def comment():
+    activity = frappe.get_doc(
+        {"doctype": "Comment", "comment_type": "Info", "comment_email": "nilesh@sanskartechnolab.com",
+         "reference_doctype": "Lead", "reference_name": "CRM-LEAD-2022-00045",
+         "content": "hello this is demo message", "owner": "nilesh@sanskartechnolab.com", "modified_by": "nilesh@sanskartechnoab.com" })
+    activity.insert()
+    frappe.db.commit()
+    return 'okey'
+
+
+# **************************************************
+# def get_linked_call_logs(doctype, docname):
+#
+#
+#     timeline_contents = [{
+#         "icon": "call",
+#         "is_card": True,
+#         "creation": now(),
+#         "template": "call_link",
+#         "template_data": "asfasf",
+#     }]
+#
+#     return timeline_contents

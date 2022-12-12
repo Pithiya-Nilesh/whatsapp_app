@@ -7,13 +7,14 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
+  "read",
+  "time",
   "phone",
   "data",
   "section_break_3",
   "message",
   "column_break_5",
-  "send_message",
-  "read"
+  "send_message"
  ],
  "fields": [
   {
@@ -54,11 +55,17 @@
    "in_standard_filter": 1,
    "label": "Read",
    "read_only": 1
+  },
+  {
+   "fieldname": "time",
+   "fieldtype": "Datetime",
+   "label": "Time",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-12-06 18:56:53.063970",
+ "modified": "2022-12-09 15:38:06.417743",
  "modified_by": "Administrator",
  "module": "Whatsapp App",
  "name": "wati call message log",
