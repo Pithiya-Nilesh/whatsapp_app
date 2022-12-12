@@ -21,18 +21,15 @@
    "fieldname": "send_to",
    "fieldtype": "Select",
    "label": "Send To",
-   "options": "\nAll Lead (Lead)\nAll Lead (Open)\nAll Lead (Opportunity)\nAll Lead (Quotation)",
-   "reqd": 1
+   "options": "\nAll Lead (Lead)\nAll Lead (Open)\nAll Lead (Opportunity)\nAll Lead (Quotation)"
   },
   {
-   "allow_in_quick_entry": 1,
    "fieldname": "create_receiver_list",
    "fieldtype": "Button",
    "label": "Create Receiver List",
    "options": "create_receiver_list"
   },
   {
-   "allow_in_quick_entry": 1,
    "fieldname": "receiver_list",
    "fieldtype": "Small Text",
    "label": "Receiver List"
@@ -45,8 +42,7 @@
    "fieldname": "select_template",
    "fieldtype": "Link",
    "label": "Select Template",
-   "options": "Templates",
-   "reqd": 1
+   "options": "Templates"
   },
   {
    "fetch_from": "select_template.sample",
@@ -55,8 +51,7 @@
    "fieldtype": "Small Text",
    "in_list_view": 1,
    "label": "Demo Of Template",
-   "read_only": 1,
-   "reqd": 1
+   "read_only": 1
   },
   {
    "fieldname": "send_template",
@@ -71,11 +66,10 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-12-09 12:26:41.247474",
+ "modified": "2022-08-24 15:50:10.027253",
  "modified_by": "Administrator",
  "module": "Whatsapp App",
  "name": "WhatsApp Bulk Template Messages",
- "naming_rule": "Expression (old style)",
  "owner": "Administrator",
  "permissions": [
   {
@@ -91,8 +85,6 @@
    "write": 1
   }
  ],
- "quick_entry": 1,
  "sort_field": "modified",
- "sort_order": "DESC",
- "states": []
+ "sort_order": "DESC"
 }
