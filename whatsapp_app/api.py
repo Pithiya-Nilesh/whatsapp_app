@@ -50,10 +50,10 @@ def comment(**kwargs):
     lead_name = frappe.db.get_value('Lead', filters={"whatsapp_no": se_mo}, fieldname=["lead_name"])
     s_name = frappe.db.get_value('Supplier', filters={"whatsapp_no": se_mo}, fieldname=["name"])
     supplier_name = frappe.db.get_value('Supplier', filters={"whatsapp_no": se_mo}, fieldname=["supplier_name"])
-    o_name = frappe.db.get_value('Opportunity', filters={"whatsapp_no": se_mo}, fieldname=["name"])
-    opportunity_name = frappe.db.get_value('Opportunity', filters={"whatsapp_no": se_mo}, fieldname=["title"])
+    o_name = frappe.db.get_value('Opportunity', filters={"whatsapp": se_mo}, fieldname=["name"])
+    opportunity_name = frappe.db.get_value('Opportunity', filters={"whatsapp": se_mo}, fieldname=["title"])
 
-    content = f"<div class='card'><b style='color: green' class='px-2 pt-2'>Whatsapp Message Received: </b> <span class='px-2 pb-2'>{message}</span></div>"
+    content = f"<div class='card'><b style='color:orange' class='px-2 pt-2'>Whatsapp Message Received: </b> <span class='px-2 pb-2'>{message}</span></div>"
 
     if l_name:
         set_comment('Lead', l_name, lead_name, content)

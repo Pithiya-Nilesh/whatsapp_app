@@ -43,6 +43,9 @@ def bulk_templates(template, l_mobile, doctype=''):
         # print(i)
         if i == 'value':
             return 'Terminate'
+        elif doctype == 'Opportunity':
+            final_values.append(
+                frappe.db.get_value(f"{doctype}", filters={'whatsapp': l_mobile}, fieldname=[f'{i}']))
         else:
             final_values.append(frappe.db.get_value(f"{doctype}", filters={'whatsapp_no': l_mobile}, fieldname=[f'{i}']))
     for i in range(0, len(final_values)):
@@ -306,8 +309,12 @@ def send_bulk_whatsapp_message(template_name, doctype, name):
         return 'Your WhatsApp api key is not set or may be disabled'
     name = json.loads(name)
     number = []
-    for i in name:
-        number.append(frappe.db.get_value(doctype, i, ["whatsapp_no"]))
+    if doctype == 'Opportunity':
+        for i in name:
+            number.append(frappe.db.get_value(doctype, i, ["whatsapp"]))
+    else:
+        for i in name:
+            number.append(frappe.db.get_value(doctype, i, ["whatsapp_no"]))
     number = list(filter(lambda item: item is not None, number))
     access_token, api_endpoint, name_type, version = whatsapp_keys_details()
     headers = {
