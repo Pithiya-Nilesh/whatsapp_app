@@ -1,6 +1,9 @@
+import datetime
 import json
 
+
 import frappe
+from frappe.utils import now
 
 
 @frappe.whitelist(allow_guest=True)
@@ -22,28 +25,61 @@ def set_data(first_name, mobile):
 
 def data(**kwargs):
     wa_data = frappe.local.form_dict
-    se_mo = wa_data["waId"]
-    f_data, name = frappe.db.get_value("wati call message log", filters={"phone": f"{se_mo}"},
-                                       fieldname=["data", "name"])
+    se_mo = wa_data["waId"][-10:]
+    f_data = frappe.db.get_value("wati call message log", f"{se_mo}", "data")
     if f_data is not None:
         raw_data = json.loads(f_data)
         raw_data['data'].append(wa_data)
         data = json.dumps(raw_data)
-        frappe.db.set_value('wati call message log', f'{name}', 'data', f'{data}')
+        frappe.db.set_value('wati call message log', f'{se_mo}', {'data': f'{data}', "read": 0, "time": now()})
     else:
         data = {"data": []}
         data['data'].append(wa_data)
         data = json.dumps(data)
-        frappe.db.set_value('wati call message log', f'{name}', 'data', f'{data}')
+        doc = frappe.get_doc({"doctype": "wati call message log", "phone": f"{se_mo}", "data": f"{data}", "read": 0, "time": now()})
+        doc.insert()
+        frappe.db.commit()
+        # frappe.db.set_value("wati call message log", f'{se_mo}', "read", 0)
     return 'success'
+
+def comment(**kwargs):
+    wa_data = frappe.local.form_dict
+    se_mo = wa_data["waId"][-10:]
+    message = wa_data["text"]
+    l_name = frappe.db.get_value('Lead', filters={"whatsapp_no": se_mo}, fieldname=["name"])
+    lead_name = frappe.db.get_value('Lead', filters={"whatsapp_no": se_mo}, fieldname=["lead_name"])
+    s_name = frappe.db.get_value('Supplier', filters={"whatsapp_no": se_mo}, fieldname=["name"])
+    supplier_name = frappe.db.get_value('Supplier', filters={"whatsapp_no": se_mo}, fieldname=["supplier_name"])
+    o_name = frappe.db.get_value('Opportunity', filters={"whatsapp_no": se_mo}, fieldname=["name"])
+    opportunity_name = frappe.db.get_value('Opportunity', filters={"whatsapp_no": se_mo}, fieldname=["title"])
+
+    content = f"<div class='card'><b style='color: green' class='px-2 pt-2'>Whatsapp Message Received: </b> <span class='px-2 pb-2'>{message}</span></div>"
+
+    if l_name:
+        set_comment('Lead', l_name, lead_name, content)
+    if s_name is not None:
+        set_comment('Supplier', s_name, supplier_name, content)
+    if o_name:
+        set_comment('Opportunity', o_name, opportunity_name, content)
+
+    return 'okey'
+
+def set_comment(doctype, r_name, owner, content):
+    activity = frappe.get_doc(
+        {"doctype": "Comment", "comment_type": "Info",
+         "reference_doctype": doctype, "reference_name": r_name,
+         "content": content})
+    activity.insert()
+    frappe.db.commit()
+
+    comment = frappe.get_last_doc('Comment')
+    frappe.db.set_value('Comment', f'{comment.name}', {"owner": owner})
+    frappe.db.commit()
 
 @frappe.whitelist(allow_guest=True)
 def wati_webhooks():
-
     data1 = frappe.call(data, **frappe.form_dict)
-    # data1 = frappe.local.form_dict
-    # user = frappe.get_doc(doctype='wati call message log', first_name='asdfleshdsfgsfd')
-    # user.insert()
+    frappe.call(comment, **frappe.form_dict)
     return data1
 
 
@@ -53,3 +89,22 @@ def wati_webhooks():
 #     data.insert()
 #     frappe.db.commit()
 #     print("\n\n okey its run")
+
+
+@frappe.whitelist(allow_guest=True)
+def message_received():
+    return frappe.call(comment, **frappe.form_dict)
+
+# **************************************************
+# def get_linked_call_logs(doctype, docname):
+#
+#
+#     timeline_contents = [{
+#         "icon": "call",
+#         "is_card": True,
+#         "creation": now(),
+#         "template": "call_link",
+#         "template_data": "asfasf",
+#     }]
+#
+#     return timeline_contents

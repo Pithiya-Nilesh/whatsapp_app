@@ -1,38 +1,75 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "field:phone",
  "creation": "2022-11-25 13:16:35.649475",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "first_name",
+  "read",
+  "time",
   "phone",
-  "data"
+  "data",
+  "section_break_3",
+  "message",
+  "column_break_5",
+  "send_message"
  ],
  "fields": [
   {
-   "fieldname": "first_name",
-   "fieldtype": "Data",
-   "label": "first name"
-  },
-  {
    "fieldname": "phone",
    "fieldtype": "Data",
-   "label": "phone"
+   "label": "phone",
+   "unique": 1
   },
   {
    "fieldname": "data",
    "fieldtype": "JSON",
    "label": "data"
+  },
+  {
+   "fieldname": "section_break_3",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "message",
+   "fieldtype": "Data",
+   "label": "Send Message"
+  },
+  {
+   "fieldname": "column_break_5",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "send_message",
+   "fieldtype": "Button",
+   "label": "Send",
+   "options": "send_message"
+  },
+  {
+   "default": "0",
+   "fieldname": "read",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Read",
+   "read_only": 1
+  },
+  {
+   "fieldname": "time",
+   "fieldtype": "Datetime",
+   "label": "Time",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-12-02 15:23:15.025441",
+ "modified": "2022-12-09 15:38:06.417743",
  "modified_by": "Administrator",
  "module": "Whatsapp App",
  "name": "wati call message log",
+ "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [
   {
@@ -44,6 +81,18 @@
    "read": 1,
    "report": 1,
    "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Guest",
    "share": 1,
    "write": 1
   }
