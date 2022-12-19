@@ -42,6 +42,7 @@ def data(**kwargs):
         # frappe.db.set_value("wati call message log", f'{se_mo}', "read", 0)
     return 'success'
 
+
 def comment(**kwargs):
     wa_data = frappe.local.form_dict
     se_mo = wa_data["waId"][-10:]
@@ -53,33 +54,58 @@ def comment(**kwargs):
     o_name = frappe.db.get_value('Opportunity', filters={"whatsapp": se_mo}, fieldname=["name"])
     opportunity_name = frappe.db.get_value('Opportunity', filters={"whatsapp": se_mo}, fieldname=["title"])
 
-    content = f"<div class='card'><b style='color:orange' class='px-2 pt-2'>Whatsapp Message Received: </b> <span class='px-2 pb-2'>{message}</span></div>"
+    content = f"<div class='card'><b style='color:orange' class='px-2 pt-2'><i class='fa fa-whatsapp' aria-hidden='true'> Whatsapp Message Received: </i></b> <span class='px-2 pb-2'>{message}</span></div>"
 
     if l_name:
         set_comment('Lead', l_name, lead_name, content)
+        set_notification_log('Lead', l_name, lead_name, message)
     if s_name is not None:
         set_comment('Supplier', s_name, supplier_name, content)
-    if o_name:
+        set_notification_log('Supplier', s_name, supplier_name, message)
+    if o_name is not None:
         set_comment('Opportunity', o_name, opportunity_name, content)
+        set_notification_log('Opportunity', o_name, opportunity_name, message)
 
     return 'okey'
+
 
 def set_comment(doctype, r_name, owner, content):
     activity = frappe.get_doc(
         {"doctype": "Comment", "comment_type": "Info",
          "reference_doctype": doctype, "reference_name": r_name,
          "content": content})
-    activity.insert()
+    activity.insert(ignore_permissions=True)
     frappe.db.commit()
 
     comment = frappe.get_last_doc('Comment')
     frappe.db.set_value('Comment', f'{comment.name}', {"owner": owner})
     frappe.db.commit()
 
+
+def set_notification_log(doctype, doctype_name, name, content):
+
+    name1 = frappe.db.get_value("Notification Log", filters={"document_type": doctype, "document_name": doctype_name, "type": "Alert", "read": 0}, fieldname=["name"])
+    subject = frappe.db.get_value("Notification Log", filters={"document_type": doctype, "document_name": doctype_name, "type": "Alert", "read": 0}, fieldname=["subject"])
+    if name1 is not None:
+        frappe.db.set_value("Notification Log", name1, "subject", f"{subject}<br>{content}")
+    else:
+        data = frappe.get_doc({
+            "doctype": "Notification Log",
+            "subject": f"New <b style='color:green'><i class='fa fa-whatsapp' aria-hidden='true'></i> Whatsapp</b> Message From <b style='color:green'>{name}</b><br>{content}",
+            "for_user": "nilesh@sanskartechnolab.com",
+            "type": "Alert",
+            "document_type": doctype,
+            "document_name": doctype_name
+        })
+        data.insert(ignore_permissions=True)
+        frappe.db.commit()
+
+
 @frappe.whitelist(allow_guest=True)
 def wati_webhooks():
     data1 = frappe.call(data, **frappe.form_dict)
     frappe.call(comment, **frappe.form_dict)
+    # frappe.call(notification_log, **frappe.form_dict)
     return data1
 
 

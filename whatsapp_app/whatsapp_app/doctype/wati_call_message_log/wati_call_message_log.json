@@ -10,11 +10,7 @@
   "read",
   "time",
   "phone",
-  "data",
-  "section_break_3",
-  "message",
-  "column_break_5",
-  "send_message"
+  "data"
  ],
  "fields": [
   {
@@ -29,32 +25,12 @@
    "label": "data"
   },
   {
-   "fieldname": "section_break_3",
-   "fieldtype": "Section Break"
-  },
-  {
-   "fieldname": "message",
-   "fieldtype": "Data",
-   "label": "Send Message"
-  },
-  {
-   "fieldname": "column_break_5",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "send_message",
-   "fieldtype": "Button",
-   "label": "Send",
-   "options": "send_message"
-  },
-  {
    "default": "0",
    "fieldname": "read",
    "fieldtype": "Check",
    "in_list_view": 1,
    "in_standard_filter": 1,
-   "label": "Read",
-   "read_only": 1
+   "label": "Read"
   },
   {
    "fieldname": "time",
@@ -65,7 +41,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-12-09 15:38:06.417743",
+ "modified": "2022-12-17 11:43:06.723334",
  "modified_by": "Administrator",
  "module": "Whatsapp App",
  "name": "wati call message log",

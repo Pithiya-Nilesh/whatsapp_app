@@ -1,6 +1,9 @@
+import json
+
 import requests
 
 import frappe
+from whatsapp_app.whatsapp_app.doctype.api import set_data_in_wati_call_log, comment
 
 
 def whatsapp_keys_details():
@@ -152,6 +155,80 @@ def whatsapp_schedule():
     replied = (frappe.db.get_list("Lead", filters={'status': 'Replied'}, fields=['phone'], pluck='phone'))
 
 
+#  ************************************************************** #
 
+@frappe.whitelist(allow_guest=True)
+def send_register_message():
+    # global template
+    if frappe.db.get_single_value('WhatsApp Api', 'disabled'):
+        return 'Your WhatsApp api key is not set or may be disabled'
+    wa_name = ''
+
+    data = frappe.db.get_list("Whatsapp Queue", filters={"status": "Pending"}, fields=["name1", "number", "type"])
+    if data:
+        names = []
+        numbers = []
+        types = []
+
+        for i in range(0, len(data)):
+            names.append(data[i]["name1"])
+        numbers.clear()
+        for i in range(0, len(data)):
+            numbers.append(data[i]["number"])
+        for i in range(0, len(data)):
+            types.append(data[i]["type"])
+
+        for i in range(0, len(numbers)):
+            number = numbers[i]
+            name1 = names[i]
+            type1 = types[i]
+            name = frappe.db.get_value("Whatsapp Queue", filters={"number": number}, fieldname=['name'])
+            frappe.set_value("Whatsapp Queue", name, "status", "In Progress")
+
+            if type1 == 'supplier':
+                template = 'register_template_for_suplier'
+                wa_name = 'supplier_name'
+            elif type1 == 'customer':
+                template = 'customer_registration_template'
+                wa_name = 'name'
+            number = int(number)
+            bt = [{"name": wa_name, "value": name1}]
+            access_token, api_endpoint, name_type, version = whatsapp_keys_details()
+            headers = {
+                "Content-Type": "text/json",
+                "Authorization": access_token
+            }
+            url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{number}"
+            payload = {
+                "parameters": bt,
+                "broadcast_name": template,
+                "template_name": template
+            }
+            response = requests.post(url, json=payload, headers=headers)
+            set_data_in_wati_call_log(number, response)
+            comment(number, template_name=template, bt=bt)
+            data = json.loads(response.text)
+            type1 = ''
+            name = frappe.db.get_value("Whatsapp Queue", filters={"number": number}, fieldname=['name'])
+            if data['validWhatsAppNumber']:
+                frappe.set_value("Whatsapp Queue", name, "status", "Sent")
+                doctypes = ["Opportunity", "Lead", "Supplier"]
+                for doctype in doctypes:
+                    if doctype == 'Supplier':
+                        name1 = frappe.db.get_value("Supplier", filters={'phone_no': number}, fieldname=["name"])
+                        frappe.db.set_value("Supplier", name1, "whatsapp_no", number)
+                        frappe.db.commit()
+                    if doctype == 'Opportunity':
+                        name1 = frappe.db.get_value("Opportunity", filters={'mobile_no': number}, fieldname=["name"])
+                        frappe.db.set_value("Opportunity", name1, "whatsapp", number)
+                        frappe.db.commit()
+                    if doctype == 'Lead':
+                        name1 = frappe.db.get_value("Lead", filters={'mobile_no': number}, fieldname=["name"])
+                        frappe.db.set_value("Lead", name1, "whatsapp_no", number)
+                        frappe.db.commit()
+            elif not data['validWhatsAppNumber']:
+                frappe.set_value("Whatsapp Queue", name, "status", "Not Valid")
+
+    # return data['validWhatsAppNumber'], number, template, bt
 
 

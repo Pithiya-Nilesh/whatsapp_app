@@ -43,9 +43,6 @@ def bulk_templates(template, l_mobile, doctype=''):
         # print(i)
         if i == 'value':
             return 'Terminate'
-        elif doctype == 'Opportunity':
-            final_values.append(
-                frappe.db.get_value(f"{doctype}", filters={'whatsapp': l_mobile}, fieldname=[f'{i}']))
         else:
             final_values.append(frappe.db.get_value(f"{doctype}", filters={'whatsapp_no': l_mobile}, fieldname=[f'{i}']))
     for i in range(0, len(final_values)):
@@ -270,7 +267,7 @@ def comment(number, message='', template_name='', bt='', bt1=''):
             list1.append(bt[i]["value"])
         res = dict(map(lambda i, j: (i, j), keysList, list1))
         formatted = sample.format(**res)
-        content = f"<div class='card'><b style='color: green' class='px-2 pt-2'>Whatsapp Template Sent: </b> <a href='/app/templates/{template_name}' class='px-2 pb-2'>{formatted}</a></div>"
+        content = f"<div class='card'><b style='color: green' class='px-2 pt-2'><i class='fa fa-whatsapp' aria-hidden='true'> Whatsapp Template Sent: </i></b> <a href='/app/templates/{template_name}' class='px-2 pb-2'>{formatted}</a></div>"
 
     if l_name:
         set_comment('Lead', l_name, name, content)
@@ -294,6 +291,7 @@ def set_comment(doctype, r_name, owner, content):
     frappe.db.set_value('Comment', f'{comment.name}', {"owner": owner})
     frappe.db.commit()
 
+
 @frappe.whitelist(allow_guest=True)
 def contact_us_message(mobile, doctype):
     name = frappe.db.get_value(doctype, filters={'mobile_no': mobile}, fieldname=["name"])
@@ -302,6 +300,7 @@ def contact_us_message(mobile, doctype):
     frappe.db.set_value(doctype, name, "whatsapp_no", mobile)
     frappe.db.commit()
     return "okey"
+
 
 @frappe.whitelist(allow_guest=True)
 def send_bulk_whatsapp_message(template_name, doctype, name):
@@ -344,4 +343,18 @@ def send_bulk_whatsapp_message(template_name, doctype, name):
         else:
             url = f"{api_endpoint}/{name_type}/{version}/sendSessionMessage/91{mobile}?messageText={message}"
             response = requests.post(url, headers=headers)
-    return response
+    # return response
+
+
+@frappe.whitelist(allow_guest=True)
+def queue_whatsapp(name, number, types):
+    whatsapp_queue = frappe.get_doc(
+        {"doctype": "Whatsapp Queue", "name1": name,
+         "number": number, "type": types, "status": "Pending"})
+    whatsapp_queue.insert()
+    frappe.db.commit()
+
+
+@frappe.whitelist(allow_guest=True)
+def get_unread_message_number():
+    return frappe.db.get_all("wati call message log", filters={'read': 0}, fields=["name"], pluck="name")

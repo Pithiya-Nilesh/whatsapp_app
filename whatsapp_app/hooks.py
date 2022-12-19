@@ -2,7 +2,7 @@ from . import __version__ as app_version
 
 app_name = "whatsapp_app"
 app_title = "Whatsapp App"
-app_publisher = "Srushti Shah And Foram Shah"
+app_publisher = "Nilesh Pithiya"
 app_description = "This App Can send whatsapp messages "
 app_icon = "octicon octicon-file-directory"
 app_color = "grey"
@@ -108,11 +108,16 @@ app_license = "MIT"
 # ---------------
 
 scheduler_events = {
-    "whatsapp_message_report": {
-        "* * * * *": [
-            "whatsapp_app.task.send_report_on_whatsapp"
-        ]
-    }
+    # "whatsapp_message_report": {
+    #     "* * * * *": [
+    #         "whatsapp_app.task.send_report_on_whatsapp"
+    #     ]
+    # },
+    # "whatsapp_queue_message": {
+    #     "* * * * *": [
+    #         "whatsapp_app.task.send_register_message"
+    #     ]
+    # }
 
     # 	"all": [
     # 		"whatsapp_app.tasks.all"
