@@ -77,35 +77,56 @@ def set_data_in_wati_call_log(number, response):
         frappe.db.commit()
 
 @frappe.whitelist(allow_guest=True)
-def send_register_message(name='', number='', types=''):
+def send_register_message(name='', number='', types='', equipment_name=''):
     global template
     if frappe.db.get_single_value('WhatsApp Api', 'disabled'):
         return 'Your WhatsApp api key is not set or may be disabled'
     wa_name = ''
+    wa_name1 = ''
+    wa_name2 = ''
     if types == 'supplier':
         template = 'register_template_for_suplier'
         wa_name = 'supplier_name'
     elif types == 'customer':
         template = 'customer_registration_template'
         wa_name = 'name'
+    elif types == 'inquiry':
+        template = 'equipment_inquiry'
+        wa_name1 = 'name'
+        wa_name2 = 'equipment_name'
+
+
     number = int(number)
     bt = [{"name": wa_name, "value": name}]
+    bt1 = [{"name": wa_name1, "value": name}, {"name": wa_name2, "value": equipment_name}]
     access_token, api_endpoint, name_type, version = whatsapp_keys_details()
     headers = {
         "Content-Type": "text/json",
         "Authorization": access_token
     }
     url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{number}"
-    payload = {
-        "parameters": bt,
-        "broadcast_name": template,
-        "template_name": template
-    }
-    response = requests.post(url, json=payload, headers=headers)
-    set_data_in_wati_call_log(number, response)
-    # comment(number, template_name=template, bt=bt)
-    data = json.loads(response.text)
-    return data['validWhatsAppNumber'], number, template, bt
+    if types == 'inquiry':
+        payload = {
+            "parameters": bt1,
+            "broadcast_name": template,
+            "template_name": template
+        }
+        response = requests.post(url, json=payload, headers=headers)
+        set_data_in_wati_call_log(number, response)
+        # comment(number, template_name=template, bt=bt)
+        data = json.loads(response.text)
+        return data['validWhatsAppNumber'], number, template, bt1
+    else:
+        payload = {
+            "parameters": bt,
+            "broadcast_name": template,
+            "template_name": template
+        }
+        response = requests.post(url, json=payload, headers=headers)
+        set_data_in_wati_call_log(number, response)
+        # comment(number, template_name=template, bt=bt)
+        data = json.loads(response.text)
+        return data['validWhatsAppNumber'], number, template, bt
 
 # whatsapp_app.whatsapp_app.doctype.api.bulk_messages
 @frappe.whitelist()
