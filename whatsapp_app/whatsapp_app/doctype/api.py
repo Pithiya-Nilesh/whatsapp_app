@@ -390,8 +390,8 @@ def send_insurance_expiry_reminder_notification():
         return 'Your WhatsApp api key is not set or may be disabled'
     else:
         date = add_to_date(datetime.now(), days=15, as_string=True)
-        data1 = frappe.db.get_list("Item", fields=["supplier_name", "supplier_number", "register_no", "equipment_model_no"], filters={"insurance_date": date})
-        if data1:
+        data1 = frappe.db.get_list("Item", fields=["supplier_name", "whatsapp_no", "register_no", "equipment_model_no"], filters={"insurance_date": date})
+        if data1 and data1['whatsapp_no']:
             template = 'insuranse_expiry_reminder'
             for i in data1:
                 supplier_name = i['supplier_name']
@@ -425,9 +425,9 @@ def send_fitness_expiry_reminder_notification():
         return 'Your WhatsApp api key is not set or may be disabled'
     else:
         date = add_to_date(datetime.now(), days=15, as_string=True)
-        data1 = frappe.db.get_list("Item", fields=["supplier_name", "supplier_number", "register_no",
+        data1 = frappe.db.get_list("Item", fields=["supplier_name", "whatsapp_no", "register_no",
                                                    "equipment_model_no"], filters={"fitness_dt": date})
-        if data1:
+        if data1 and data1['whatsapp_no']:
             template = 'fitness_certificate_notification'
             for i in data1:
                 supplier_name = i['supplier_name']
