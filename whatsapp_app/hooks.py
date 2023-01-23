@@ -114,17 +114,19 @@ scheduler_events = {
     #     ]
     # },
     # "whatsapp_queue_message": {
-    #     "* * * * *": [
-    #         "whatsapp_app.task.send_register_message"
+    #     "* 12 * * *": [
+    #         # "whatsapp_app.task.send_register_message"
+    #         "whatsapp_app.whatsapp_app.doctype.api.send_insurance_expiry_reminder_notification"
     #     ]
-    # }
+    # },
 
     # 	"all": [
     # 		"whatsapp_app.tasks.all"
     # 	],
-    # 	"daily": [
-    # 		"whatsapp_app.tasks.daily"
-    # 	],
+    	"daily": [
+    		"whatsapp_app.whatsapp_app.doctype.api.send_insurance_expiry_reminder_notification",
+   		"whatsapp_app.whatsapp_app.doctype.api.send_fitness_expiry_reminder_notification",
+    	]
     # 	"hourly": [
     # 		"whatsapp_app.tasks.hourly"
     # 	],

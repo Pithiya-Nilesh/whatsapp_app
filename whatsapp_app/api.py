@@ -53,6 +53,8 @@ def comment(**kwargs):
     supplier_name = frappe.db.get_value('Supplier', filters={"whatsapp_no": se_mo}, fieldname=["supplier_name"])
     o_name = frappe.db.get_value('Opportunity', filters={"whatsapp": se_mo}, fieldname=["name"])
     opportunity_name = frappe.db.get_value('Opportunity', filters={"whatsapp": se_mo}, fieldname=["title"])
+    r_name = frappe.db.get_value('Raw Data', filters={"whatsapp_no": se_mo}, fieldname=["name"])
+    raw_name = frappe.db.get_value('Raw Data', filters={"whatsapp_no": se_mo}, fieldname=["full_name"])
 
     content = f"<div class='card'><b style='color:orange' class='px-2 pt-2'><i class='fa fa-whatsapp' aria-hidden='true'> Whatsapp Message Received: </i></b> <span class='px-2 pb-2'>{message}</span></div>"
 
@@ -65,6 +67,9 @@ def comment(**kwargs):
     if o_name is not None:
         set_comment('Opportunity', o_name, opportunity_name, content)
         set_notification_log('Opportunity', o_name, opportunity_name, message)
+    if r_name is not None:
+        set_comment('Raw Data', r_name, raw_name, content)
+        set_notification_log('Raw Data', r_name, raw_name, message)
 
     return 'okey'
 
@@ -107,6 +112,7 @@ def wati_webhooks():
     frappe.call(comment, **frappe.form_dict)
     # frappe.call(notification_log, **frappe.form_dict)
     return data1
+
 
 
 # def send_report_on_whatsapp():
