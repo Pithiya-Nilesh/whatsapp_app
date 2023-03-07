@@ -510,3 +510,30 @@ def send_daily_mail_report():
         subject='Daily Report',
         message=message
     )
+@frappe.whitelist(allow_guest=True)
+def send_expo_form_template(name, number, equipment):
+    if frappe.db.get_single_value('WhatsApp Api', 'disabled'):
+        return 'Your WhatsApp api key is not set or may be disabled'
+    template = 'hire_expo_form'
+    number = int(number)
+    access_token, api_endpoint, name_type, version = whatsapp_keys_details()
+    headers = {
+        "Content-Type": "text/json",
+        "Authorization": access_token
+    }
+    url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{number}"
+    payload = {
+        "parameters": [
+            {
+                "name": "c_name",
+                "value": name
+            },
+            {
+                "name": "equipment_name",
+                "value": equipment
+            }
+        ],
+        "broadcast_name": template,
+        "template_name": template
+    }
+    response = requests.post(url, json=payload, headers=headers)
