@@ -1,7 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "field:template_name",
+ "autoname": "format:{template_name}-{##}",
  "creation": "2022-08-09 17:48:21.233413",
  "doctype": "DocType",
  "editable_grid": 1,
@@ -29,24 +29,23 @@
    "description": "copy and paste same template name as per wati.",
    "fieldname": "template_name",
    "fieldtype": "Data",
-   "label": "Template Name",
-   "unique": 1
+   "label": "Template Name"
   },
   {
    "fieldname": "template_doctype",
    "fieldtype": "Select",
    "label": "Doctype",
-   "options": "Lead\nSupplier\nOpportunity"
+   "options": "Lead\nSupplier\nOpportunity\nCustomer"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-12-08 16:17:54.153114",
+ "modified": "2023-03-09 16:35:41.643004",
  "modified_by": "Administrator",
  "module": "Whatsapp App",
  "name": "Templates",
  "name_case": "Title Case",
- "naming_rule": "By fieldname",
+ "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
   {
