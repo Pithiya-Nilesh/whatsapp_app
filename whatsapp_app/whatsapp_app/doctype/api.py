@@ -43,6 +43,8 @@ def bulk_templates(template, l_mobile, doctype=''):
         # print(i)
         if i == 'value':
             return 'Terminate'
+        elif doctype =='Opportunity':
+            final_values.append(frappe.db.get_value(f"{doctype}", filters={'whatsapp': l_mobile}, fieldname=[f'{i}']))
         else:
             final_values.append(frappe.db.get_value(f"{doctype}", filters={'whatsapp_no': l_mobile}, fieldname=[f'{i}']))
     for i in range(0, len(final_values)):
@@ -329,7 +331,9 @@ def send_bulk_whatsapp_message(template_name, doctype, name):
         mobile = int(mobile)
         url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{mobile}"
         if template_name1 != '':
+            print("\n\n template1", template_name1, "\n\n")
             bt = bulk_templates(template=template_name, l_mobile=mobile, doctype=doctype)
+            print("\n\n bt", bt, "\n\n")
             if bt == 'Terminate':
                 payload = {
                     "broadcast_name": template_name1,
@@ -342,6 +346,7 @@ def send_bulk_whatsapp_message(template_name, doctype, name):
                     "template_name": template_name1
                 }
             response = requests.post(url, json=payload, headers=headers)
+            print("\n\n response", response, "\n\n")
             set_data_in_wati_call_log(mobile, response)
             comment(mobile, template_name=template_name1, bt=bt)
         else:
