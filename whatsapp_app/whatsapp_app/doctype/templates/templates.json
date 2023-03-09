@@ -36,7 +36,7 @@
    "fieldname": "template_doctype",
    "fieldtype": "Select",
    "label": "Doctype",
-   "options": "Lead\nSupplier"
+   "options": "Lead\nSupplier\nOpportunity"
   }
  ],
  "index_web_pages_for_search": 1,
