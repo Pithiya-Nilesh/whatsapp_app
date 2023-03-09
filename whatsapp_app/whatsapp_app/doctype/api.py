@@ -1,10 +1,10 @@
-from datetime import datetime
+import datetime
 import json
-from frappe.utils import now, getdate
+
 import frappe
 import requests
 from frappe.model.document import Document
-from frappe.utils import add_to_date
+from frappe.utils import now
 
 
 # @frappe.whitelist()
@@ -77,60 +77,39 @@ def set_data_in_wati_call_log(number, response):
         frappe.db.commit()
 
 @frappe.whitelist(allow_guest=True)
-def send_register_message(name='', number='', types='', equipment_name=''):
+def send_register_message(name='', number='', types=''):
     global template
     if frappe.db.get_single_value('WhatsApp Api', 'disabled'):
         return 'Your WhatsApp api key is not set or may be disabled'
     wa_name = ''
-    wa_name1 = ''
-    wa_name2 = ''
     if types == 'supplier':
         template = 'register_template_for_suplier'
         wa_name = 'supplier_name'
     elif types == 'customer':
         template = 'customer_registration_template'
         wa_name = 'name'
-    elif types == 'inquiry':
-        template = 'equipment_inquiry'
-        wa_name1 = 'name'
-        wa_name2 = 'equipment_name'
-
-
     number = int(number)
     bt = [{"name": wa_name, "value": name}]
-    bt1 = [{"name": wa_name1, "value": name}, {"name": wa_name2, "value": equipment_name}]
     access_token, api_endpoint, name_type, version = whatsapp_keys_details()
     headers = {
         "Content-Type": "text/json",
         "Authorization": access_token
     }
     url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{number}"
-    if types == 'inquiry':
-        payload = {
-            "parameters": bt1,
-            "broadcast_name": template,
-            "template_name": template
-        }
-        response = requests.post(url, json=payload, headers=headers)
-        set_data_in_wati_call_log(number, response)
-        # comment(number, template_name=template, bt=bt)
-        data = json.loads(response.text)
-        return data['validWhatsAppNumber'], number, template, bt1
-    else:
-        payload = {
-            "parameters": bt,
-            "broadcast_name": template,
-            "template_name": template
-        }
-        response = requests.post(url, json=payload, headers=headers)
-        set_data_in_wati_call_log(number, response)
-        # comment(number, template_name=template, bt=bt)
-        data = json.loads(response.text)
-        return data['validWhatsAppNumber'], number, template, bt
+    payload = {
+        "parameters": bt,
+        "broadcast_name": template,
+        "template_name": template
+    }
+    response = requests.post(url, json=payload, headers=headers)
+    set_data_in_wati_call_log(number, response)
+    # comment(number, template_name=template, bt=bt)
+    data = json.loads(response.text)
+    return data['validWhatsAppNumber'], number, template, bt
 
 # whatsapp_app.whatsapp_app.doctype.api.bulk_messages
 @frappe.whitelist()
-def send_messages(l_mobile=0, template='', l_name='', ):
+def send_messages(l_mobile=0, template='', l_name='', doctype=''):
     if frappe.db.get_single_value('WhatsApp Api', 'disabled'):
         return 'Your WhatsApp api key is not set or may be disabled'
     if l_name:
@@ -146,7 +125,9 @@ def send_messages(l_mobile=0, template='', l_name='', ):
         mobile = int(mobile)
         url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{mobile}"
         if template != '':
+            # if doctype == '':
             doctype = frappe.db.get_value("Templates", template, ['template_doctype'])
+            # doctype = frappe.db.get_value("Templates", filters={'template_name': template}, fieldname=['template_doctype'])
             bt = bulk_templates(template=template, l_mobile=mobile, doctype=doctype)
             if bt == 'Terminate':
                 payload = {
@@ -201,24 +182,25 @@ def send_whatsapp_message(number, message='', template_name=''):
         "Content-Type": "text/json",
         "Authorization": access_token
     }
+    template_name1 = frappe.db.get_value("Templates", template_name, "template_name")
     url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{number}"
-    if template_name != '':
+    if template_name1 != '':
         doctype = frappe.db.get_value("Templates", template_name, ['template_doctype'])
         bt = bulk_templates(template=template_name, l_mobile=number, doctype=doctype)
         if bt == 'Terminate':
             payload = {
-                "broadcast_name": template_name,
-                "template_name": template_name
+                "broadcast_name": template_name1,
+                "template_name": template_name1
             }
         else:
             payload = {
                 "parameters": bt,
-                "broadcast_name": template_name,
-                "template_name": template_name
+                "broadcast_name": template_name1,
+                "template_name": template_name1
             }
         response = requests.post(url, json=payload, headers=headers)
         set_data_in_wati_call_log(number, response)
-        comment(number, template_name=template_name, bt=bt)
+        comment(number, template_name=template_name1, bt=bt)
         return response.text
     else:
         url = f"{api_endpoint}/{name_type}/{version}/sendSessionMessage/91{number}?messageText={message}"
@@ -272,7 +254,6 @@ def comment(number, message='', template_name='', bt='', bt1=''):
     l_name = frappe.db.get_value('Lead', filters={"whatsapp_no": number}, fieldname=["name"])
     s_name = frappe.db.get_value('Supplier', filters={"whatsapp_no": number}, fieldname=["name"])
     o_name = frappe.db.get_value('Opportunity', filters={"whatsapp": number}, fieldname=["name"])
-    r_name = frappe.db.get_value('Raw Data', filters={"whatsapp_no": number}, fieldname=["full_name"])
     if message != '':
         content = f"<div class='card'><b style='color: green' class='px-2 pt-2'>Whatsapp Message Sent: </b> <span class='px-2 pb-2'>{message}</span></div>"
     else:
@@ -297,8 +278,6 @@ def comment(number, message='', template_name='', bt='', bt1=''):
         set_comment('Supplier', s_name, name, content)
     if o_name:
         set_comment('Opportunity', o_name, name, content)
-    if r_name:
-        set_comment('Raw Data', r_name, name, content)
 
     return 'okey'
 
@@ -331,6 +310,7 @@ def send_bulk_whatsapp_message(template_name, doctype, name):
     if frappe.db.get_single_value('WhatsApp Api', 'disabled'):
         return 'Your WhatsApp api key is not set or may be disabled'
     name = json.loads(name)
+    template_name1 = frappe.db.get_value("Templates", template_name, "template_name")
     number = []
     if doctype == 'Opportunity':
         for i in name:
@@ -348,22 +328,22 @@ def send_bulk_whatsapp_message(template_name, doctype, name):
     for mobile in number:
         mobile = int(mobile)
         url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{mobile}"
-        if template_name != '':
+        if template_name1 != '':
             bt = bulk_templates(template=template_name, l_mobile=mobile, doctype=doctype)
             if bt == 'Terminate':
                 payload = {
-                    "broadcast_name": template_name,
-                    "template_name": template_name
+                    "broadcast_name": template_name1,
+                    "template_name": template_name1
                 }
             else:
                 payload = {
                     "parameters": bt,
-                    "broadcast_name": template_name,
-                    "template_name": template_name
+                    "broadcast_name": template_name1,
+                    "template_name": template_name1
                 }
             response = requests.post(url, json=payload, headers=headers)
             set_data_in_wati_call_log(mobile, response)
-            comment(mobile, template_name=template_name, bt=bt)
+            comment(mobile, template_name=template_name1, bt=bt)
         else:
             url = f"{api_endpoint}/{name_type}/{version}/sendSessionMessage/91{mobile}?messageText={message}"
             response = requests.post(url, headers=headers)
@@ -382,158 +362,3 @@ def queue_whatsapp(name, number, types):
 @frappe.whitelist(allow_guest=True)
 def get_unread_message_number():
     return frappe.db.get_all("wati call message log", filters={'read': 0}, fields=["name"], pluck="name")
-
-
-@frappe.whitelist(allow_guest=True)
-def send_insurance_expiry_reminder_notification():
-    if frappe.db.get_single_value('WhatsApp Api', 'disabled'):
-        return 'Your WhatsApp api key is not set or may be disabled'
-    else:
-        date = add_to_date(datetime.now(), days=15, as_string=True)
-        data1 = frappe.db.get_list("Item", fields=["supplier_name", "whatsapp_no", "register_no", "equipment_model_no"], filters={"insurance_date": date})
-        if data1 and data1['whatsapp_no']:
-            template = 'insuranse_expiry_reminder'
-            for i in data1:
-                supplier_name = i['supplier_name']
-                mobile = i['supplier_number']
-                equipment_name = i['register_no'] if not None else i['equipment_model_no']
-                access_token, api_endpoint, name_type, version = whatsapp_keys_details()
-                headers = {
-                    "Content-Type": "text/json",
-                    "Authorization": access_token
-                }
-                url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{mobile}"
-                payload = {
-                    "parameters": [
-                        {
-                            "name": "supp_name",
-                            "value": supplier_name
-                        },
-                        {
-                            "name": "equipment_name",
-                            "value": equipment_name
-                        }
-                    ],
-                    "broadcast_name": template,
-                    "template_name": template
-                }
-                response = requests.post(url, json=payload, headers=headers)
-
-@frappe.whitelist(allow_guest=True)
-def send_fitness_expiry_reminder_notification():
-    if frappe.db.get_single_value('WhatsApp Api', 'disabled'):
-        return 'Your WhatsApp api key is not set or may be disabled'
-    else:
-        date = add_to_date(datetime.now(), days=15, as_string=True)
-        data1 = frappe.db.get_list("Item", fields=["supplier_name", "whatsapp_no", "register_no",
-                                                   "equipment_model_no"], filters={"fitness_dt": date})
-        if data1 and data1['whatsapp_no']:
-            template = 'fitness_certificate_notification'
-            for i in data1:
-                supplier_name = i['supplier_name']
-                mobile = i['supplier_number']
-                equipment_name = i['register_no'] if not None else i['equipment_model_no']
-                access_token, api_endpoint, name_type, version = whatsapp_keys_details()
-                headers = {
-                    "Content-Type": "text/json",
-                    "Authorization": access_token
-                }
-                url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{mobile}"
-                payload = {
-                    "parameters": [
-                        {
-                            "name": "s_name",
-                            "value": supplier_name
-                        },
-                        {
-                            "name": "e_name",
-                            "value": equipment_name
-                        }
-                    ],
-                    "broadcast_name": template,
-                    "template_name": template
-                }
-                response = requests.post(url, json=payload, headers=headers)
-
-        #     mobile_nos = []
-        #     supplier_name = []
-        #     data = []
-        #     mobile_nos.clear()
-        #     supplier_name.clear()
-        #     data.clear()
-        #
-        #     for i in data1:
-        #         mobile_nos.append(frappe.db.get_value("Supplier", fieldname=["whatsapp_no"], filters={"name": i}))
-        #     mobile_nos = [x for x in mobile_nos if x != "" and x is not None]
-        #     mobile_nos = [*set(mobile_nos)]
-        #     for i in mobile_nos:
-        #         supplier_name.append(frappe.db.get_value("Supplier", filters={"whatsapp_no": i}))
-        #     for i in supplier_name:
-        #         data.append(frappe.db.get_list("Item", filters={"supplier": i, "insurance_dateexpiry_date": date}, fields=["supplier_name", "insurance_dateexpiry_date", "name"]))
-        #
-        #     print("\n\n data", data, "\n\n")
-        #     print("\n\n mobile nos", mobile_nos, "\n\n")
-        # return data1
-        # ******************************
-        # data = frappe.form_dict
-        # final = data['data']
-
-@frappe.whitelist(allow_guest=True)
-def send_daily_mail_report():
-    new_supplier = frappe.db.sql(
-        "select count(name)as Supplier from `tabSupplier` where creation between curdate() - interval 2 day and curdate()", as_list=True)
-    new_equipment = frappe.db.sql(
-        "select count(name)as Equipment from `tabItem` where creation between curdate() - interval 2 day and curdate()", as_list=True)
-    total_supplier = frappe.db.get_list("Supplier")
-    total_equipment = frappe.db.get_list("Item")
-    today = frappe.utils.get_datetime(getdate()).strftime("%d-%b-%Y")
-
-    recipients = [
-        'mailto:arjun.pachani@gmail.com',
-        'mailto:dhaval.nadpara@migoo.in',
-        'mailto:parthdbhimani@gmail.com'
-    ]
-
-    message = f'''
-
-        <p>Dear Team Management,</p>
-        <p>The updates as of {today} are</p>
-        <p>New Supplier Added: {new_supplier[0][0]}</p>
-        <p>New Equipment Added: {new_equipment[0][0]}</p>
-        <p>Total Supplier: {len(total_supplier)}</p>
-        <p>Total Equipment: {len(total_equipment)}</p>
-
-    '''
-
-    frappe.sendmail(
-        recipients=recipients,
-        subject='Daily Report',
-        message=message
-    )
-@frappe.whitelist(allow_guest=True)
-def send_expo_form_template(name, number, equipment):
-    if frappe.db.get_single_value('WhatsApp Api', 'disabled'):
-        return 'Your WhatsApp api key is not set or may be disabled'
-    template = 'hire_expo_form'
-    number = int(number)
-    access_token, api_endpoint, name_type, version = whatsapp_keys_details()
-    headers = {
-        "Content-Type": "text/json",
-        "Authorization": access_token
-    }
-    url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{number}"
-    payload = {
-        "parameters": [
-            {
-                "name": "c_name",
-                "value": name
-            },
-            {
-                "name": "equipment_name",
-                "value": equipment
-            }
-        ],
-        "broadcast_name": template,
-        "template_name": template
-    }
-    response = requests.post(url, json=payload, headers=headers)
