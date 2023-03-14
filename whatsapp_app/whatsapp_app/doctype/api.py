@@ -206,7 +206,7 @@ def send_whatsapp_message(number, message='', template_name=''):
     }
     template_name1 = frappe.db.get_value("Templates", template_name, "template_name")
     url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{number}"
-    if template_name1 != '':
+    if template_name1 != None:
         doctype = frappe.db.get_value("Templates", template_name, ['template_doctype'])
         bt = bulk_templates(template=template_name, l_mobile=number, doctype=doctype)
         if bt == 'Terminate':
