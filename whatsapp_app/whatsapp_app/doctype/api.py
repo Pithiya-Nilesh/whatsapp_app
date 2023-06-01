@@ -1,5 +1,6 @@
 import datetime
 import json
+import sys
 from frappe.utils import now, getdate
 import frappe
 import requests
@@ -556,12 +557,13 @@ def get_template():
     headers = {
         "Content-Type": "application/json",
         "Authorization": access_token
-        }
+    }
     response = requests.post(url, headers=headers)
     data = response.json()
     
     if "messageTemplates" in data:
         templates = data["messageTemplates"]
+        all_templates_available = True  # Flag to track if all templates are available
 
         for template in templates:
             if template["status"] == "APPROVED":
@@ -575,10 +577,16 @@ def get_template():
                 )
 
                 if not existing_template:
+                    all_templates_available = False  # Set flag to False if any template is missing
                     new_template = frappe.new_doc("Templates")
                     new_template.template_name = element_name
                     new_template.sample = body
                     new_template.insert(ignore_permissions=True)
                     frappe.db.commit()
+        
+        if all_templates_available:
+            frappe.msgprint("All templates are available.")
+        else:
+            None
     
     

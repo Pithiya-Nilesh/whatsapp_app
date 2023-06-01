@@ -35,12 +35,12 @@
    "fieldname": "template_doctype",
    "fieldtype": "Select",
    "label": "Doctype",
-   "options": "Lead\nSupplier\nOpportunity\nCustomer"
+   "options": "\nLead\nSupplier\nOpportunity\nCustomer"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-03-09 16:35:41.643004",
+ "modified": "2023-06-01 13:54:39.008593",
  "modified_by": "Administrator",
  "module": "Whatsapp App",
  "name": "Templates",
