@@ -6,7 +6,6 @@ import requests
 from frappe.model.document import Document
 from frappe.utils import now
 
-
 # @frappe.whitelist()
 def bulk_templates(template, l_mobile, doctype=''):
     list = []
@@ -338,3 +337,35 @@ def send_bulk_whatsapp_message(template_name, doctype, name):
             url = f"{api_endpoint}/{name_type}/{version}/sendSessionMessage/91{mobile}?messageText={message}"
             response = requests.post(url, headers=headers)
     return response
+
+@frappe.whitelist(allow_guest=True)
+def get_template():
+    access_token, api_endpoint, name_type, version = whatsapp_keys_details()    
+    url = f"{api_endpoint}/{name_type}/{version}/getMessageTemplates"
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": access_token
+        }
+    response = requests.post(url, headers=headers)
+    data = response.json()
+    
+    if "messageTemplates" in data:
+        templates = data["messageTemplates"]
+
+        for template in templates:
+            if template["status"] == "APPROVED":
+                element_name = template["elementName"]
+                body = template["bodyOriginal"]
+
+                existing_template = frappe.get_all(
+                    "Templates",
+                    filters={"template_name": element_name, "sample": body},
+                    fields=["name"]
+                )
+
+                if not existing_template:
+                    new_template = frappe.new_doc("Templates")
+                    new_template.template_name = element_name
+                    new_template.sample = body
+                    new_template.insert(ignore_permissions=True)
+                    frappe.db.commit()

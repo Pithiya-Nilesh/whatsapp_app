@@ -6,3 +6,7 @@ frappe.ui.form.on('Templates', {
 
 	// }
 });
+
+
+
+
