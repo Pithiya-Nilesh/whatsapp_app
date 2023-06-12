@@ -46,6 +46,8 @@ def bulk_templates(template, l_mobile, doctype=''):
             return 'Terminate'
         elif doctype =='Opportunity':
             final_values.append(frappe.db.get_value(f"{doctype}", filters={'whatsapp': l_mobile}, fieldname=[f'{i}']))
+        elif doctype == 'Equipment':
+            final_values.append(frappe.db.get_value("Item", filters={'whatsapp_no': l_mobile}, fieldname=[f'{i}']))
         else:
             final_values.append(frappe.db.get_value(f"{doctype}", filters={'whatsapp_no': l_mobile}, fieldname=[f'{i}']))
     for i in range(0, len(final_values)):
@@ -275,10 +277,11 @@ def comment(number, message='', template_name='', bt='', bt1=''):
         bt = json.loads(bt1)
     name = frappe.session.user
     l_name = frappe.db.get_value('Lead', filters={"whatsapp_no": number}, fieldname=["name"])
-    s_name = frappe.db.get_value('Supplier', filters={"whatsapp_no": number}, fieldname=["name"])
     o_name = frappe.db.get_value('Opportunity', filters={"whatsapp": number}, fieldname=["name"])
     r_name = frappe.db.get_value('Raw Data', filters={"whatsapp_no": number}, fieldname=["full_name"])
     c_name = frappe.db.get_value('Customer', filters={"whatsapp_no": number}, fieldname=["customer_name"])
+    e_name = frappe.db.get_value('Item', filters={"whatsapp_no": number}, fieldname=["name"])
+    s_name = frappe.db.get_value('Supplier', filters={"whatsapp_no": number}, fieldname=["name"])
     
     if message != '':
         content = f"<div class='card'><b style='color: green' class='px-2 pt-2'>Whatsapp Message Sent: </b> <span class='px-2 pb-2'>{message}</span></div>"
@@ -300,6 +303,8 @@ def comment(number, message='', template_name='', bt='', bt1=''):
 
     if l_name:
         set_comment('Lead', l_name, name, content)
+    if e_name:
+        set_comment('Item', e_name, name, content)
     if s_name:
         set_comment('Supplier', s_name, name, content)
     if o_name:
@@ -590,3 +595,7 @@ def get_template():
             None
     
     
+@frappe.whitelist(allow_guest = True)
+def get_template_sample(select_message_type):
+    print("\n\n value", select_message_type, "\n\n")
+    return select_message_type

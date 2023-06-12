@@ -57,6 +57,8 @@ def comment(**kwargs):
     raw_name = frappe.db.get_value('Raw Data', filters={"whatsapp_no": se_mo}, fieldname=["full_name"])
     c_name = frappe.db.get_value('Customer', filters={"whatsapp_no": se_mo}, fieldname=["name"])
     customer_name = frappe.db.get_value('Customer', filters={"whatsapp_no": se_mo}, fieldname=["customer_name"])
+    e_name = frappe.db.get_value('Item', filters={"whatsapp_no": se_mo}, fieldname=["name"])
+    equipment_name = frappe.db.get_value('Item', filters={"whatsapp_no": se_mo}, fieldname=["name"])
 
 
     content = f"<div class='card'><b style='color:orange' class='px-2 pt-2'><i class='fa fa-whatsapp' aria-hidden='true'> Whatsapp Message Received: </i></b> <span class='px-2 pb-2'>{message}</span></div>"
@@ -76,6 +78,9 @@ def comment(**kwargs):
     if c_name is not None:
         set_comment('Customer', c_name, customer_name, content)
         set_notification_log('Opportunity', c_name, customer_name, message)
+    if e_name is not None:
+        set_comment('Item', e_name, equipment_name, content)
+        set_notification_log('Item', e_name, equipment_name, message)
 
     return 'okey'
 
