@@ -38,7 +38,6 @@ def bulk_templates(template, l_mobile, doctype=''):
                 # print(i1)
     else:
         value_n = ["name"]
-
     final_values = []
     for i in value_v:
         # print(i)
@@ -593,9 +592,26 @@ def get_template():
             frappe.msgprint("All templates are available.")
         else:
             None
-    
-    
+
 @frappe.whitelist(allow_guest = True)
-def get_template_sample(select_message_type):
-    print("\n\n value", select_message_type, "\n\n")
-    return select_message_type
+def get_template_sample(selected_template, selected_doctype, whatsapp_no):
+    list = bulk_templates(template=selected_template, doctype=selected_doctype, l_mobile=whatsapp_no)
+    content = get_content(selected_template, list)
+    return content
+
+def get_content(template_name='', bt=''):
+    sample = frappe.db.get_value("Templates", filters={'template_name': template_name}, fieldname=["sample"])
+    sample = sample.replace("{{", "{")
+    sample = sample.replace("}}", "}")
+    list1 = []
+    keysList = []
+    keysList.clear()
+    for i in range(0, len(bt)):
+        keysList.append(bt[i]["name"])
+    list1.clear()
+    for i in range(0, len(bt)):
+        list1.append(bt[i]["value"])
+    res = dict(map(lambda i, j: (i, j), keysList, list1))
+    formatted = sample.format(**res)
+    content = f"{formatted}"
+    return content
