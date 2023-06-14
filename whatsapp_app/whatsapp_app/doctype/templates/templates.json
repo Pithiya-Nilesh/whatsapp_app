@@ -9,6 +9,7 @@
  "field_order": [
   "template_name",
   "template_doctype",
+  "status",
   "sample",
   "table"
  ],
@@ -36,12 +37,18 @@
    "fieldname": "template_doctype",
    "fieldtype": "Select",
    "label": "Doctype",
-   "options": "Lead\nSupplier\nOpportunity\nCustomer\nRaw Data\nEquipment"
+   "options": "\nLead\nSupplier\nOpportunity\nCustomer\nRaw Data\nEquipment"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "\nAPPROVED\nREJECTED\nDELETED"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-06-12 12:45:58.236832",
+ "modified": "2023-06-14 15:36:01.448044",
  "modified_by": "Administrator",
  "module": "Whatsapp App",
  "name": "Templates",
