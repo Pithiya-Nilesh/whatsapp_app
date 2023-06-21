@@ -197,7 +197,7 @@ def send(name='', number='', requesttype='', equipment='', textarea=''):
 
 
 @frappe.whitelist()
-def send_whatsapp_message(number, message='', template_name=''):
+def send_whatsapp_message(number, message='', template_name='', data='', doctype=''):
     # number = int(number)
     if frappe.db.get_single_value('WhatsApp Api', 'disabled'):
         return 'Your WhatsApp api key is not set or may be disabled'
@@ -206,11 +206,13 @@ def send_whatsapp_message(number, message='', template_name=''):
         "Content-Type": "text/json",
         "Authorization": access_token
     }
-    template_name1 = frappe.db.get_value("Templates", template_name, "template_name")
+    # template_name1 = frappe.db.get_value("Templates", template_name, "template_name")
+    template_name1 = template_name
     url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{number}"
     if template_name1 != None:
-        doctype = frappe.db.get_value("Templates", template_name, ['template_doctype'])
-        bt = bulk_templates(template=template_name, l_mobile=number, doctype=doctype)
+        # doctype = frappe.db.get_value("Templates", template_name, ['template_doctype'])
+        # bt = bulk_templates(template=template_name, l_mobile=number, doctype=doctype)
+        bt = map_dynamic_filelds_for_wati(number, doctype, data)
         if bt == 'Terminate':
             payload = {
                 "broadcast_name": template_name1,
@@ -231,6 +233,7 @@ def send_whatsapp_message(number, message='', template_name=''):
         response = requests.post(url, headers=headers)
         set_data_in_wati_call_log(number, response)
         comment(number, message)
+        print("\n\n asdfasdf", response, "\n\n")
         return response.text
 
 @frappe.whitelist()
@@ -339,11 +342,12 @@ def contact_us_message(mobile, doctype):
 
 
 @frappe.whitelist(allow_guest=True)
-def send_bulk_whatsapp_message(template_name, doctype, name):
+def send_bulk_whatsapp_message(template_name, doctype, name, data):
     if frappe.db.get_single_value('WhatsApp Api', 'disabled'):
         return 'Your WhatsApp api key is not set or may be disabled'
     name = json.loads(name)
-    template_name1 = frappe.db.get_value("Templates", template_name, "template_name")
+    # template_name1 = frappe.db.get_value("Templates", template_name, "template_name")
+    template_name1 = template_name
     number = []
     if doctype == 'Opportunity':
         for i in name:
@@ -362,9 +366,9 @@ def send_bulk_whatsapp_message(template_name, doctype, name):
         mobile = int(mobile)
         url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{mobile}"
         if template_name1 != '':
-            print("\n\n template1", template_name1, "\n\n")
-            bt = bulk_templates(template=template_name, l_mobile=mobile, doctype=doctype)
-            print("\n\n bt", bt, "\n\n")
+            # bt = bulk_templates(template=template_name, l_mobile=mobile, doctype=doctype)
+            # print("\n\n bt", bt, "\n\n")
+            bt = map_dynamic_filelds_for_wati(mobile, doctype, data)
             if bt == 'Terminate':
                 payload = {
                     "broadcast_name": template_name1,
@@ -618,3 +622,51 @@ def get_content(template_name='', bt=''):
         formatted = sample.format(**res)
         content = f"{formatted}"
         return content
+    
+@frappe.whitelist(allow_guest=True)
+def demo():
+    # print("\n\n frappe", demo1, "\n\n")
+    template = 'register_template_for_suplier'
+    mobile = '7990915950'
+    doctype = 'Equipment'
+    demo1 = [{"name": "supplier_name",  "is_dynamic": 1, "value": "supplier_name"}, {"name":  "company_name",  "is_dynamic": 1, "value": "whatsapp_no"}, {"name":  "age",  "is_dynamic": 0, "value":  23}]
+  
+    list = map_dynamic_filelds_for_wati(mobile, 'Equipment', data=demo1)
+    
+    print("\n\n list", list, "\n\n")
+
+
+def map_dynamic_filelds_for_wati(l_mobile, doctype='', data=''):
+    data1 = json.loads(data)
+    list = []
+    list.clear()
+    value_v = []
+    value_n = []
+    static = []
+    dynamic = []
+    for i in data1:
+        if i["is_dynamic"] == 1:
+            dynamic.append(i)
+        if i["is_dynamic"] == 0:
+            static.append(i)
+
+    for i in dynamic:
+        value_v.append(i["value"])
+        value_n.append(i["name"])
+   
+    final_values = []
+    for i in value_v:
+        if i == 'value':
+            return 'Terminate'
+        elif doctype =='Opportunity':
+            final_values.append(frappe.db.get_value(f"{doctype}", filters={'whatsapp': l_mobile}, fieldname=[f'{i}']))
+        elif doctype == 'Equipment':
+            final_values.append(frappe.db.get_value("Item", filters={'whatsapp_no': l_mobile}, fieldname=[f'{i}']))
+        else:
+            final_values.append(frappe.db.get_value(f"{doctype}", filters={'whatsapp_no': l_mobile}, fieldname=[f'{i}']))
+    for i in range(0, len(final_values)):
+        dict = {"name": value_n[i], "value": final_values[i]}
+        list.append(dict)
+    for i in static:
+        list.append({"name": i['name'], "value": i["value"]})
+    return list
