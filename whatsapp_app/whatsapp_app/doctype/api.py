@@ -267,7 +267,7 @@ def check_status(number):
 
 @frappe.whitelist()
 def get_template_list(doctype):
-    return frappe.db.get_list("Templates", filters={"template_doctype": doctype}, pluck = "name")
+    return frappe.db.get_list("Templates", filters={"template_doctype": ['in', [doctype, '']], "status": "APPROVED"}, pluck = "name")
 
 
 @frappe.whitelist(allow_guest=True)
@@ -567,26 +567,26 @@ def get_template():
     
     if "messageTemplates" in data:
         templates = data["messageTemplates"]
-        all_templates_available = True  # Flag to track if all templates are available
+        all_templates_available = True  
 
         for template in templates:
-            if template["status"] == "APPROVED":
-                element_name = template["elementName"]
-                body = template["bodyOriginal"]
-
-                existing_template = frappe.get_all(
-                    "Templates",
-                    filters={"template_name": element_name, "sample": body},
-                    fields=["name"]
-                )
-
-                if not existing_template:
-                    all_templates_available = False  # Set flag to False if any template is missing
-                    new_template = frappe.new_doc("Templates")
-                    new_template.template_name = element_name
-                    new_template.sample = body
-                    new_template.insert(ignore_permissions=True)
-                    frappe.db.commit()
+            # if template["status"] == "APPROVED":
+            element_name = template["elementName"]
+            status = template["status"]
+            body = template["bodyOriginal"]
+            existing_template = frappe.get_all(
+                "Templates",
+                filters={"template_name": element_name, "status": status, "sample": body},
+                fields=["name"]
+            )
+            if not existing_template:
+                all_templates_available = False  
+                new_template = frappe.new_doc("Templates")
+                new_template.template_name = element_name
+                new_template.status = status
+                new_template.sample = body
+                new_template.insert(ignore_permissions=True)
+                frappe.db.commit()
         
         if all_templates_available:
             frappe.msgprint("All templates are available.")
@@ -600,18 +600,21 @@ def get_template_sample(selected_template, selected_doctype, whatsapp_no):
     return content
 
 def get_content(template_name='', bt=''):
-    sample = frappe.db.get_value("Templates", filters={'template_name': template_name}, fieldname=["sample"])
-    sample = sample.replace("{{", "{")
-    sample = sample.replace("}}", "}")
-    list1 = []
-    keysList = []
-    keysList.clear()
-    for i in range(0, len(bt)):
-        keysList.append(bt[i]["name"])
-    list1.clear()
-    for i in range(0, len(bt)):
-        list1.append(bt[i]["value"])
-    res = dict(map(lambda i, j: (i, j), keysList, list1))
-    formatted = sample.format(**res)
-    content = f"{formatted}"
-    return content
+    if template_name == '':
+        return None
+    else:
+        sample = frappe.db.get_value("Templates", filters={'template_name': template_name}, fieldname=["sample"])
+        sample = sample.replace("{{", "{")
+        sample = sample.replace("}}", "}")
+        list1 = []
+        keysList = []
+        keysList.clear()
+        for i in range(0, len(bt)):
+            keysList.append(bt[i]["name"])
+        list1.clear()
+        for i in range(0, len(bt)):
+            list1.append(bt[i]["value"])
+        res = dict(map(lambda i, j: (i, j), keysList, list1))
+        formatted = sample.format(**res)
+        content = f"{formatted}"
+        return content
