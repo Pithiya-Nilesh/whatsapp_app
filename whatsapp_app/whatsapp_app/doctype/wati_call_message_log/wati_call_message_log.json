@@ -10,7 +10,8 @@
   "read",
   "time",
   "phone",
-  "data"
+  "data",
+  "client_read"
  ],
  "fields": [
   {
@@ -30,18 +31,26 @@
    "fieldtype": "Check",
    "in_list_view": 1,
    "in_standard_filter": 1,
-   "label": "Read"
+   "label": "Read",
+   "read_only": 1
   },
   {
    "fieldname": "time",
    "fieldtype": "Datetime",
    "label": "Time",
    "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "client_read",
+   "fieldtype": "Check",
+   "label": "Client Read",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-12-17 11:43:06.723334",
+ "modified": "2023-06-22 11:43:59.677864",
  "modified_by": "Administrator",
  "module": "Whatsapp App",
  "name": "wati call message log",

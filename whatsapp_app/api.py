@@ -42,6 +42,20 @@ def data(**kwargs):
         # frappe.db.set_value("wati call message log", f'{se_mo}', "read", 0)
     return 'success'
 
+def message_read(**kwargs):
+    wa_data = frappe.local.form_dict
+    id = wa_data["id"]
+    data = frappe.db.get_list("wati call message log", fields=["data"], limit_start=0, limit_page_length=0)
+    for i in data:
+        data = json.loads(i['data'])
+        for j in data["data"]:
+            if "id" in j:
+                if j["id"] == id:
+                    waid = j["waId"][-10:]
+                    frappe.db.set_value("wati call message log", waid, "client_read", 1)
+                    frappe.db.commit()
+                    break
+    
 
 def comment(**kwargs):
     wa_data = frappe.local.form_dict
@@ -123,6 +137,10 @@ def wati_webhooks():
     frappe.call(comment, **frappe.form_dict)
     # frappe.call(notification_log, **frappe.form_dict)
     return data1
+
+@frappe.whitelist(allow_guest=True)
+def wati_read_webhooks():
+    data = frappe.call(message_read, **frappe.form_dict)
 
 
 
