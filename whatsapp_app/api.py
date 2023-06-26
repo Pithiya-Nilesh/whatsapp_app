@@ -55,7 +55,7 @@ def message_read(**kwargs):
                     frappe.db.set_value("wati call message log", waid, "client_read", 1)
                     frappe.db.commit()
                     break
-    
+                    
 
 def comment(**kwargs):
     wa_data = frappe.local.form_dict
