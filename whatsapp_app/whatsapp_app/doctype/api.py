@@ -3,6 +3,7 @@ import json
 import sys
 from frappe.utils import now, getdate
 import frappe
+from frappe.utils.file_manager import save_file_on_filesystem
 import requests
 from frappe.model.document import Document
 from frappe.utils import add_to_date
@@ -670,3 +671,18 @@ def map_dynamic_filelds_for_wati(l_mobile, doctype='', data=''):
     for i in static:
         list.append({"name": i['name'], "value": i["value"]})
     return list
+
+@frappe.whitelist(allow_guest=True)
+def get_image(filename):
+    access_token, api_endpoint, name_type, version = whatsapp_keys_details()    
+    url = f"{api_endpoint}/{name_type}/{version}/getMedia?fileName=data/images/{filename}"
+    headers = {
+        "Authorization": access_token
+    }
+    response = requests.request(
+    "GET", url, headers=headers)
+    if response.content:
+        save_file_on_filesystem(fname=filename, content=response.content)
+    
+
+    

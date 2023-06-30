@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>URL Check Example</title>
+</head>
+<body>
+  <input type="text" id="urlInput" placeholder="Enter URL">
+  <button onclick="checkURL()">Check URL</button>
+  <p id="result"></p>
+
+  <script>
+    function checkURL() {
+      var urlInput = document.getElementById('urlInput').value;
+      var xhr = new XMLHttpRequest();
+
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4) {
+          if (xhr.status === 200) {
+            document.getElementById('result').textContent = 'URL exists.';
+          } else {
+            document.getElementById('result').textContent = 'URL does not exist.';
+          }
+        }
+      };
+
+      xhr.open('HEAD', urlInput, true);
+      xhr.send();
+    }
+  </script>
+</body>
+</html>
