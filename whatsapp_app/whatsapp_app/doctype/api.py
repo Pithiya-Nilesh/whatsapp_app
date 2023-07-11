@@ -7,7 +7,11 @@ from frappe.utils.file_manager import save_file_on_filesystem
 import requests
 from frappe.model.document import Document
 from frappe.utils import add_to_date
-
+from frappe.utils import now_datetime
+from collections import defaultdict
+import re
+import weasyprint
+import os
 
 # @frappe.whitelist()
 def bulk_templates(template, l_mobile, doctype=''):
@@ -135,42 +139,95 @@ def send_register_message(name='', number='', types='', equipment_name=''):
         return data['validWhatsAppNumber'], number, template, bt
 
 # whatsapp_app.whatsapp_app.doctype.api.bulk_messages
+# @frappe.whitelist()
+# def send_messages(l_mobile=0, template='', l_name='', ):
+#     if frappe.db.get_single_value('WhatsApp Api', 'disabled'):
+#         return 'Your WhatsApp api key is not set or may be disabled'
+#     if l_name:
+#         l_mobile = frappe.db.get_value("Lead", f"{l_name}", "phone")
+
+#     access_token, api_endpoint, name_type, version = whatsapp_keys_details()
+#     headers = {
+#         "Content-Type": "text/json",
+#         "Authorization": access_token
+#     }
+#     mobile_nos = " ".join(l_mobile.split()).split()
+#     for mobile in mobile_nos:
+#         mobile = int(mobile)
+#         url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{mobile}"
+#         if template != '':
+#             doctype = frappe.db.get_value("Templates", template, ['template_doctype'])
+#             bt = bulk_templates(template=template, l_mobile=mobile, doctype=doctype)
+#             if bt == 'Terminate':
+#                 payload = {
+#                     "broadcast_name": template,
+#                     "template_name": template
+#                 }
+#             else:
+#                 payload = {
+#                     "parameters": bt,
+#                     "broadcast_name": template,
+#                     "template_name": template
+#                 }
+#             response = requests.post(url, json=payload, headers=headers)
+#         else:
+#             url = f"{api_endpoint}/{name_type}/{version}/sendSessionMessage/91{mobile}?messageText={message}"
+#             response = requests.post(url, headers=headers)
+#     return response
+
 @frappe.whitelist()
-def send_messages(l_mobile=0, template='', l_name='', ):
+def send_whatsapp_message(number, message='', template_name='', data='', doctype='', current_date=''):
+  
     if frappe.db.get_single_value('WhatsApp Api', 'disabled'):
         return 'Your WhatsApp api key is not set or may be disabled'
-    if l_name:
-        l_mobile = frappe.db.get_value("Lead", f"{l_name}", "phone")
-
     access_token, api_endpoint, name_type, version = whatsapp_keys_details()
     headers = {
         "Content-Type": "text/json",
         "Authorization": access_token
     }
-    mobile_nos = " ".join(l_mobile.split()).split()
-    for mobile in mobile_nos:
-        mobile = int(mobile)
-        url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{mobile}"
-        if template != '':
-            doctype = frappe.db.get_value("Templates", template, ['template_doctype'])
-            bt = bulk_templates(template=template, l_mobile=mobile, doctype=doctype)
-            if bt == 'Terminate':
-                payload = {
-                    "broadcast_name": template,
-                    "template_name": template
-                }
-            else:
-                payload = {
-                    "parameters": bt,
-                    "broadcast_name": template,
-                    "template_name": template
-                }
-            response = requests.post(url, json=payload, headers=headers)
-        else:
-            url = f"{api_endpoint}/{name_type}/{version}/sendSessionMessage/91{mobile}?messageText={message}"
-            response = requests.post(url, headers=headers)
-    return response
+    # template_name1 = frappe.db.get_value("Templates", template_name, "template_name")
+    template_name1 = template_name
+    url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{number}"
+    if template_name1 != '':
+        # doctype = frappe.db.get_value("Templates", template_name, ['template_doctype'])
+        # bt = bulk_templates(template=template_name, l_mobile=number, doctype=doctype)
 
+        bt = map_dynamic_filelds_for_wati(number, doctype, data)
+        if bt == 'Terminate':
+            payload = {
+                "broadcast_name": template_name1,
+                "template_name": template_name1
+            }
+        else:
+            payload = {
+                "parameters": bt,
+                "broadcast_name": template_name1,
+                "template_name": template_name1
+            }
+        response = requests.post(url, json=payload, headers=headers)
+        set_data_in_wati_call_log(number, response)
+        comment(number, template_name=template_name1, bt=bt)
+        # return response.text
+  
+    else:
+        url = f"{api_endpoint}/{name_type}/{version}/sendSessionMessage/91{number}?messageText={message}"
+        response = requests.post(url, headers=headers)
+        set_data_in_wati_call_log(number, response)
+        comment(number, message)
+        # print("\n\n asdfasdf", response, "\n\n")
+        # return response.text
+        
+    temp_id = frappe.db.get_value("wati call message log", filters={'name': number}, fieldname="data")
+    json_data = json.loads(temp_id)
+    if json_data['data']:
+        json_data['data'][-1]['send_time'] = current_date
+    else:
+        json_data['data'] = [{
+            "send_time": current_date
+        }]
+    
+    frappe.db.set_value("wati call message log", number, 'data', json.dumps(json_data))
+    frappe.db.commit()
 
 @frappe.whitelist(allow_guest=True)
 def send(name='', number='', requesttype='', equipment='', textarea=''):
@@ -579,6 +636,10 @@ def get_template():
             element_name = template["elementName"]
             status = template["status"]
             body = template["bodyOriginal"]
+            header = template["header"]
+            img = None
+            if header is not None:
+                img = header.get("mediaFromPC")
             existing_template = frappe.get_all(
                 "Templates",
                 filters={"template_name": element_name, "status": status, "sample": body},
@@ -590,6 +651,7 @@ def get_template():
                 new_template.template_name = element_name
                 new_template.status = status
                 new_template.sample = body
+                new_template.image = img
                 new_template.insert(ignore_permissions=True)
                 frappe.db.commit()
         
@@ -598,32 +660,78 @@ def get_template():
         else:
             None
 
-@frappe.whitelist(allow_guest = True)
-def get_template_sample(selected_template, selected_doctype, whatsapp_no):
-    list = bulk_templates(template=selected_template, doctype=selected_doctype, l_mobile=whatsapp_no)
-    content = get_content(selected_template, list)
-    return content
+# @frappe.whitelist(allow_guest = True)
+# def get_template_sample(selected_template, selected_doctype, whatsapp_no):
+#     list = bulk_templates(template=selected_template, doctype=selected_doctype, l_mobile=whatsapp_no)
+#     content = get_content(selected_template, list)
+#     return content
 
-def get_content(template_name='', bt=''):
-    if template_name == '':
-        return None
-    else:
-        sample = frappe.db.get_value("Templates", filters={'template_name': template_name}, fieldname=["sample"])
-        sample = sample.replace("{{", "{")
-        sample = sample.replace("}}", "}")
-        list1 = []
-        keysList = []
-        keysList.clear()
-        for i in range(0, len(bt)):
-            keysList.append(bt[i]["name"])
-        list1.clear()
-        for i in range(0, len(bt)):
-            list1.append(bt[i]["value"])
-        res = dict(map(lambda i, j: (i, j), keysList, list1))
-        formatted = sample.format(**res)
-        content = f"{formatted}"
-        return content
-    
+# def get_content(template_name='', bt=''):
+#     if template_name == '':
+#         return None
+#     else:
+#         sample = frappe.db.get_value("Templates", filters={'template_name': template_name}, fieldname=["sample"])
+#         sample = sample.replace("{{", "{")
+#         sample = sample.replace("}}", "}")
+#         list1 = []
+#         keysList = []
+#         keysList.clear()
+#         for i in range(0, len(bt)):
+#             keysList.append(bt[i]["name"])
+#         list1.clear()
+#         for i in range(0, len(bt)):
+#             list1.append(bt[i]["value"])
+#         res = dict(map(lambda i, j: (i, j), keysList, list1))
+#         formatted = sample.format(**res)
+#         content = f"{formatted}"
+#         return content
+ 
+@frappe.whitelist(allow_guest=True)  
+def get_template_sample(phone):
+    temp_id = frappe.db.get_value("wati call message log", filters={'name': phone}, fieldname="data")
+    json_data = json.loads(temp_id)
+
+    for item in json_data['data']:
+        if 'template_name' not in item:
+            continue
+        
+        template_name = item['template_name']
+        paraJson = item['parameteres']
+        values = [param['value'] for param in paraJson]
+        
+        templates = frappe.db.get_all("Templates", filters={'template_name': template_name}, fields=["template_name", "sample"])
+
+        tempPara = [] 
+        template_parameters = {}  
+        sample = ""  
+        
+        for template in templates:
+            if 'sample' in template:
+                sample = template.get("sample")
+                
+                tempPara = re.findall(r"{{(.*?)}}", sample)
+                
+                template_parameters = {
+                    "template_name": template.get("template_name"),
+                    "parameters": tempPara
+                }
+        
+        replaced_parameters = [values[i] if i < len(values) else param for i, param in enumerate(tempPara)]
+        modified_tempPara = {
+            "template_name": template_parameters.get("template_name"),
+            "parameters": replaced_parameters
+        }
+        
+        modified_sample = sample
+        for i, param in enumerate(tempPara):
+            modified_sample = modified_sample.replace("{{" + param + "}}", replaced_parameters[i])
+        
+        item['modified_sample'] = modified_sample 
+
+    frappe.db.set_value("wati call message log", phone, 'data', json.dumps(json_data))
+    frappe.db.commit()
+    return "OK"
+   
 @frappe.whitelist(allow_guest=True)
 def demo():
     # print("\n\n frappe", demo1, "\n\n")
@@ -683,6 +791,255 @@ def get_image(filename):
     "GET", url, headers=headers)
     if response.content:
         save_file_on_filesystem(fname=filename, content=response.content)
-    
 
+
+@frappe.whitelist(allow_guest=True)
+def get_img(phone):
+    temp_id = frappe.db.get_value("wati call message log", filters={'name': phone}, fieldname="data")
+    json_data = json.loads(temp_id)
+
+    for item in json_data['data']:
+        if 'template_name' not in item:
+            continue
+        
+        template_name = item['template_name']
+        
+        templateImg = frappe.db.get_all("Templates", filters={'template_name': template_name}, fields=["image"])
+        # print(templateImg)
+        
+        image_filename = ''
+        if templateImg:
+            image_filename = templateImg[0].get('image', '')
+            # print(image_filename)
+        
+        item['templateImg'] = image_filename 
+   
+    frappe.db.set_value("wati call message log", phone, 'data', json.dumps(json_data))
+    frappe.db.commit()
+    return "OK"
     
+    
+def generate_pdf():
+    name = frappe.db.sql("""
+
+    with insurance as(select 
+        name,
+        supplier,
+        supplier_email,
+        supplier_name,
+        equipment_main_category,
+        register_no,
+        model,
+        insurance_date as 'insurance_dt',
+        DATEDIFF(insurance_date, CURDATE()) as 'insuranceDaysToGo',
+        CONCAT('Insurance') AS 'insurances'
+        from tabItem
+        where
+        insurance_date >= CURDATE() 
+        AND DATEDIFF(insurance_date, CURDATE()) <= 15),
+
+    fitness as(select 
+        name,
+        supplier,
+        supplier_email,
+        supplier_name,
+        equipment_main_category,
+        register_no,
+        model,
+        fitness_dt as 'fitness_dt',
+        DATEDIFF(fitness_dt, CURDATE()) as 'FitnessDaysToGo',
+        CONCAT('Fitness') AS 'fitnesses'
+        from tabItem
+        where
+        fitness_dt >= CURDATE() 
+        AND DATEDIFF(fitness_dt, CURDATE()) <= 15),
+
+    PUC as(select 
+        name,
+        supplier,
+        supplier_email,
+        supplier_name,
+        equipment_main_category,
+        register_no,
+        model,
+        pollution as 'pollution_dt',
+        DATEDIFF(pollution, CURDATE()) as 'PollutionDaysToGo',
+        CONCAT('Pollution') AS 'Pollutions'
+        from tabItem
+        where
+        pollution >= CURDATE()
+        AND DATEDIFF(pollution, CURDATE()) <= 15)
+
+    select 
+        name,
+        supplier,
+        supplier_email,
+        supplier_name,
+        equipment_main_category,
+        register_no,
+        model,
+        DATE_FORMAT(insurance_dt, '%d-%m-%Y'), 
+        insurances,
+        insuranceDaysToGo
+
+        from insurance
+
+        union
+
+        select 
+        name,
+        supplier,
+        supplier_email,
+        supplier_name,
+        equipment_main_category,
+        register_no,
+        model,
+        DATE_FORMAT(fitness_dt, '%d-%m-%Y'), 
+        fitnesses,
+        FitnessDaysToGo
+        from fitness
+
+        union
+
+        select 
+        name,
+        supplier,
+        supplier_email,
+        supplier_name,
+        equipment_main_category,
+        register_no,
+        model,
+        DATE_FORMAT(pollution_dt, '%d-%m-%Y'),
+        Pollutions,
+        PollutionDaysToGo
+        from PUC
+    """)
+
+   # create a dictionary to store equipment information for each supplier
+    supplier_dict = defaultdict(list)
+
+    for i in name:
+        equipment_name = i[0]
+        supplier = i[1]
+        supplier_email = i[2]
+        supplier_name =  i[3]
+        equipment_main_category = i[4]
+        register_no = i[5]
+        model = i[6]
+        date = i[7]
+        status = i[8]
+        daystogo = i[9]
+
+        # add equipment information to supplier dictionary
+        supplier_dict[supplier].append({
+            'equipment_name': equipment_name,
+            'supplier_email': supplier_email,
+            'supplier_name': supplier_name,
+            'equipment_main_category': equipment_main_category,
+            'register_no': register_no,
+            'model': model,
+            'date': date,
+            'status': status,
+            'daystogo': daystogo
+        })
+
+    # loop through supplier dictionary and send a single email to each supplier
+    for supplier, equipment_list in supplier_dict.items():
+        message = '''
+            <div>
+                <div class="sec-2">
+                    <h3 style="">Hello, {}</h4>
+                    <p>We are writing to remind you that your Equipment's documents are set to expire. The details are mentioned below.</p>
+                    <table border="1px" cellspacing="0" cellpadding="4" style="border-collapse: collapse;">
+                        <tr style="background-color: #e6992a;">
+                            <th style="border: 1px solid black; padding: 4px;">Compliance</th>
+                            <th style="border: 1px solid black; padding: 4px;">Valid Till</th>
+                            <th style="border: 1px solid black; padding: 4px;">Expiring in</th>
+                            <th style="border: 1px solid black; padding: 4px;">Equipment</th>
+                            <th style="border: 1px solid black; padding: 4px;">Equipment No</th>
+                            <th style="border: 1px solid black; padding: 4px;">Model No</th>
+                        </tr>
+            '''.format(supplier_dict[supplier][0]['supplier_name'])
+
+        # add equipment information for the current supplier to the email message
+        for equipment in equipment_list:
+            message += '''
+                        <tr>
+                            <td style="border: 1px solid black; padding: 4px; text-align: center;">{}</td>
+                            <td style="border: 1px solid black; padding: 4px; text-align: center;">{}</td>
+                            <td style="border: 1px solid black; padding: 4px; text-align: center;">{} Days to Go</td>
+                            <td style="border: 1px solid black; padding: 4px; text-align: center;">{}</td>
+                            <td style="border: 1px solid black; padding: 4px; text-align: center;">{}</td>
+                            <td style="border: 1px solid black; padding: 4px; text-align: center;">{}</td>
+                        </tr>
+            '''.format(equipment['status'], equipment['date'], equipment['daystogo'], equipment['equipment_main_category'], equipment['register_no'],
+                       equipment['model'])
+        message += '''
+                    </table>
+                </div>
+            </div>
+            <p>Get it renewed as soon as possible to avoid further inconvenience.</p>
+            <p>Thank you for choosing Migoo. We value your trust and are committed to providing you with the best service possible.</p>
+            <div><b>Thanks & Regards,</b></div>
+            <br>
+            <div><b>Surya Prakash Pal</b></div>
+            <div><b>Assistant Manager</b></div> 
+            '''                           
+        # print("\n", supplier_dict, "\n")
+        s_name = frappe.db.get_value("Supplier", filters={'name': supplier}, fieldname=["name_of_suppier", "whatsapp_no"])  
+        # print("\n", s_name, "\n") 
+        if s_name is None:
+            continue
+        name_of_supplier = s_name[0] 
+        whatsapp_no = s_name[1] 
+
+        file_path = name_of_supplier.replace(" ", "_").lower() + '.pdf'
+        pdf = weasyprint.HTML(string=message).write_pdf()
+        
+        with open(file_path, 'wb') as f:
+            f.write(pdf)
+        
+        print("Supplier: {}, WhatsApp No: {}, File: {}".format(name_of_supplier, whatsapp_no, file_path))
+            
+        save_file_on_filesystem(file_path,content=pdf)
+
+        if frappe.db.get_single_value('WhatsApp Api', 'disabled'):
+            return 'Your WhatsApp api key is not set or may be disabled'
+        template = 'sent_pdf'
+        number = whatsapp_no
+        access_token, api_endpoint, name_type, version = whatsapp_keys_details()
+        headers = {
+        "Content-Type": "text/json",
+        "Authorization": access_token
+        }
+        file_link = 'http://migoostage.frappe.cloud/files/' + file_path
+        print("\n\n", file_link)
+        url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{number}"
+        payload = {
+            "parameters": [
+                {
+                    "name": "doctype_name",
+                    "value": "Lead"
+                },
+                {
+                    "name": "pdf_link",
+                    "value": file_link
+                }
+            ],
+            "broadcast_name": template,
+            "template_name": template
+        }
+        response = requests.post(url, json=payload, headers=headers)
+        print("\n\n RESPONSE:", response, "\n\n\n\n")
+        print("\n\n RESPONSE:", response.text, "\n\n\n\n")
+
+
+
+        
+@frappe.whitelist(allow_guest=True)
+def create_table():
+    generate_pdf()
+    return "PDF created"
+    
+    
+      
