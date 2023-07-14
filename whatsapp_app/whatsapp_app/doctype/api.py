@@ -432,12 +432,14 @@ def send_bulk_whatsapp_message(template_name, doctype, name, data):
                     "broadcast_name": template_name1,
                     "template_name": template_name1
                 }
+                print("\n\n WITHOUT PARAMETER:", payload, "\n\n")
             else:
                 payload = {
                     "parameters": bt,
                     "broadcast_name": template_name1,
                     "template_name": template_name1
                 }
+                print("\n\n WITH:", payload, "\n\n")
             response = requests.post(url, json=payload, headers=headers)
             print("\n\n response", response, "\n\n")
             set_data_in_wati_call_log(mobile, response)
@@ -817,59 +819,96 @@ def get_img(phone):
     frappe.db.set_value("wati call message log", phone, 'data', json.dumps(json_data))
     frappe.db.commit()
     return "OK"
-    
-    
+
+@frappe.whitelist(allow_guest=True)  
 def generate_pdf():
     name = frappe.db.sql("""
 
-    with insurance as(select 
-        name,
-        supplier,
-        supplier_email,
-        supplier_name,
-        equipment_main_category,
-        register_no,
-        model,
-        insurance_date as 'insurance_dt',
-        DATEDIFF(insurance_date, CURDATE()) as 'insuranceDaysToGo',
-        CONCAT('Insurance') AS 'insurances'
+    with insurance as (
+        select 
+            name,
+            supplier,
+            supplier_email,
+            supplier_name,
+            equipment_main_category,
+            register_no,
+            model,
+            insurance_date as 'insurance_dt',
+            DATEDIFF(insurance_date, CURDATE()) as 'insuranceDaysToGo',
+            CONCAT('Insurance') AS 'insurances'
         from tabItem
         where
-        insurance_date >= CURDATE() 
-        AND DATEDIFF(insurance_date, CURDATE()) <= 15),
-
-    fitness as(select 
-        name,
-        supplier,
-        supplier_email,
-        supplier_name,
-        equipment_main_category,
-        register_no,
-        model,
-        fitness_dt as 'fitness_dt',
-        DATEDIFF(fitness_dt, CURDATE()) as 'FitnessDaysToGo',
-        CONCAT('Fitness') AS 'fitnesses'
+            insurance_date >= CURDATE() 
+            AND DATEDIFF(insurance_date, CURDATE()) <= 15
+    ),
+    fitness as (
+        select 
+            name,
+            supplier,
+            supplier_email,
+            supplier_name,
+            equipment_main_category,
+            register_no,
+            model,
+            fitness_dt as 'fitness_dt',
+            DATEDIFF(fitness_dt, CURDATE()) as 'FitnessDaysToGo',
+            CONCAT('Fitness') AS 'fitnesses'
         from tabItem
         where
-        fitness_dt >= CURDATE() 
-        AND DATEDIFF(fitness_dt, CURDATE()) <= 15),
-
-    PUC as(select 
-        name,
-        supplier,
-        supplier_email,
-        supplier_name,
-        equipment_main_category,
-        register_no,
-        model,
-        pollution as 'pollution_dt',
-        DATEDIFF(pollution, CURDATE()) as 'PollutionDaysToGo',
-        CONCAT('Pollution') AS 'Pollutions'
+            fitness_dt >= CURDATE() 
+            AND DATEDIFF(fitness_dt, CURDATE()) <= 15
+    ),
+    PUC as (
+        select 
+            name,
+            supplier,
+            supplier_email,
+            supplier_name,
+            equipment_main_category,
+            register_no,
+            model,
+            pollution as 'pollution_dt',
+            DATEDIFF(pollution, CURDATE()) as 'PollutionDaysToGo',
+            CONCAT('Pollution') AS 'Pollutions'
         from tabItem
         where
-        pollution >= CURDATE()
-        AND DATEDIFF(pollution, CURDATE()) <= 15)
-
+            pollution >= CURDATE()
+            AND DATEDIFF(pollution, CURDATE()) <= 15
+    ),
+    npermit as (
+        select
+            name,
+            supplier,
+            supplier_email,
+            supplier_name,
+            equipment_main_category,
+            register_no,
+            model,
+            npermit_upto as 'npermit_upto_dt',
+            DATEDIFF(npermit_upto, CURDATE()) as 'National_PermitDaysToGo',
+            CONCAT('National Permit') AS 'National_Permits'
+        from tabItem
+        where
+            npermit_upto >= CURDATE()
+            AND DATEDIFF(npermit_upto, CURDATE()) <= 15
+    ),
+    permit_validity as (
+        select
+            name,
+            supplier,
+            supplier_email,
+            supplier_name,
+            equipment_main_category,
+            register_no,
+            model,
+            permit_validity_upto as 'permit_validity_upto_dt',
+            DATEDIFF(permit_validity_upto, CURDATE()) as 'State_PermitDaysToGo',
+            CONCAT('State Permit') AS 'State_Permits'
+        from tabItem
+        where
+            permit_validity_upto >= CURDATE()
+            AND DATEDIFF(permit_validity_upto, CURDATE()) <= 15
+    )
     select 
         name,
         supplier,
@@ -881,12 +920,9 @@ def generate_pdf():
         DATE_FORMAT(insurance_dt, '%d-%m-%Y'), 
         insurances,
         insuranceDaysToGo
-
-        from insurance
-
-        union
-
-        select 
+    from insurance
+    union
+    select 
         name,
         supplier,
         supplier_email,
@@ -897,11 +933,9 @@ def generate_pdf():
         DATE_FORMAT(fitness_dt, '%d-%m-%Y'), 
         fitnesses,
         FitnessDaysToGo
-        from fitness
-
-        union
-
-        select 
+    from fitness
+    union
+    select 
         name,
         supplier,
         supplier_email,
@@ -912,7 +946,35 @@ def generate_pdf():
         DATE_FORMAT(pollution_dt, '%d-%m-%Y'),
         Pollutions,
         PollutionDaysToGo
-        from PUC
+    from PUC
+    union
+    select
+        name,
+        supplier,
+        supplier_email,
+        supplier_name,
+        equipment_main_category,
+        register_no,
+        model,
+        DATE_FORMAT(npermit_upto_dt, '%d-%m-%Y'),
+        National_Permits,
+        National_PermitDaysToGo
+    from npermit
+    union
+    select
+        name,
+        supplier,
+        supplier_email,
+        supplier_name,
+        equipment_main_category,
+        register_no,
+        model,
+        DATE_FORMAT(permit_validity_upto_dt, '%d-%m-%Y'),
+        State_Permits,
+        State_PermitDaysToGo
+    from permit_validity
+
+        
     """)
 
    # create a dictionary to store equipment information for each supplier
@@ -985,7 +1047,8 @@ def generate_pdf():
             <div><b>Surya Prakash Pal</b></div>
             <div><b>Assistant Manager</b></div> 
             '''                           
-        # print("\n", supplier_dict, "\n")
+    #     print("\n", supplier_dict, "\n")
+    # return supplier_dict
         s_name = frappe.db.get_value("Supplier", filters={'name': supplier}, fieldname=["name_of_suppier", "whatsapp_no"])  
         # print("\n", s_name, "\n") 
         if s_name is None:
@@ -1003,43 +1066,43 @@ def generate_pdf():
             
         save_file_on_filesystem(file_path,content=pdf)
 
-        if frappe.db.get_single_value('WhatsApp Api', 'disabled'):
-            return 'Your WhatsApp api key is not set or may be disabled'
-        template = 'sent_pdf'
-        number = whatsapp_no
-        access_token, api_endpoint, name_type, version = whatsapp_keys_details()
-        headers = {
-        "Content-Type": "text/json",
-        "Authorization": access_token
-        }
-        file_link = 'http://migoostage.frappe.cloud/files/' + file_path
-        print("\n\n", file_link)
-        url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{number}"
-        payload = {
-            "parameters": [
-                {
-                    "name": "doctype_name",
-                    "value": "Lead"
-                },
-                {
-                    "name": "pdf_link",
-                    "value": file_link
-                }
-            ],
-            "broadcast_name": template,
-            "template_name": template
-        }
-        response = requests.post(url, json=payload, headers=headers)
-        print("\n\n RESPONSE:", response, "\n\n\n\n")
-        print("\n\n RESPONSE:", response.text, "\n\n\n\n")
+        # if frappe.db.get_single_value('WhatsApp Api', 'disabled'):
+        #     return 'Your WhatsApp api key is not set or may be disabled'
+        # template = 'sent_pdf'
+        # number = whatsapp_no
+        # access_token, api_endpoint, name_type, version = whatsapp_keys_details()
+        # headers = {
+        # "Content-Type": "text/json",
+        # "Authorization": access_token
+        # }
+       
+        # file_link = 'https://migoostage.frappe.cloud/files/' + file_path
+        # print("\n\n", file_link, name_of_supplier, whatsapp_no)
+        # url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{number}"
+        # payload = {
+        #     "parameters": [
+        #         {
+        #             "name": "doctype_name",
+        #             "value": "Lead"
+        #         },
+        #         {
+        #             "name": "pdf_link",
+        #             "value": file_link
+        #         }
+        #     ],
+        #     "broadcast_name": template,
+        #     "template_name": template
+        # }
+        # response = requests.post(url, json=payload, headers=headers)
+        # print("\n\n RESPONSE:", response, "\n\n\n\n")
+        # print("\n\n RESPONSE:", response.text, "\n\n\n\n")
 
-
-
-        
 @frappe.whitelist(allow_guest=True)
 def create_table():
     generate_pdf()
     return "PDF created"
+
+        
+
     
     
-      

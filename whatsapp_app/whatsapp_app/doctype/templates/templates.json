@@ -48,13 +48,13 @@
   },
   {
    "fieldname": "image",
-   "fieldtype": "Data",
+   "fieldtype": "Image",
    "label": "Image"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-07-11 14:50:33.986332",
+ "modified": "2023-07-12 17:47:29.664350",
  "modified_by": "Administrator",
  "module": "Whatsapp App",
  "name": "Templates",
