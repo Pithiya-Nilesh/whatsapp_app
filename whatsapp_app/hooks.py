@@ -12,6 +12,18 @@ app_license = "MIT"
 # Includes in <head>
 # ------------------
 
+fixtures = [
+    
+     {"dt":"Client Script","filters":[
+        [
+            "module","in",[
+               "Whatsapp App"
+            ]
+        ]
+    ]}
+]
+
+
 # include js, css files in header of desk.html
 # app_include_css = "/assets/whatsapp_app/css/whatsapp_app.css"
 # app_include_js = "/assets/whatsapp_app/js/whatsapp_app.js"

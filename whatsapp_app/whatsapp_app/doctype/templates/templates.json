@@ -11,6 +11,7 @@
   "template_doctype",
   "status",
   "sample",
+  "image",
   "table"
  ],
  "fields": [
@@ -44,11 +45,16 @@
    "fieldtype": "Select",
    "label": "Status",
    "options": "\nAPPROVED\nREJECTED\nDELETED"
+  },
+  {
+   "fieldname": "image",
+   "fieldtype": "Image",
+   "label": "Image"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-06-14 17:31:54.892300",
+ "modified": "2023-07-12 17:47:29.664350",
  "modified_by": "Administrator",
  "module": "Whatsapp App",
  "name": "Templates",
