@@ -140,10 +140,10 @@ scheduler_events = {
     # 	"all": [
     # 		"whatsapp_app.tasks.all"
     # 	],
-    	"daily": [
-    		"whatsapp_app.whatsapp_app.doctype.api.send_insurance_expiry_reminder_notification",
-   		"whatsapp_app.whatsapp_app.doctype.api.send_fitness_expiry_reminder_notification",
-    	]
+    	# "daily": [
+    	# 	"whatsapp_app.whatsapp_app.doctype.api.send_insurance_expiry_reminder_notification",
+   		# "whatsapp_app.whatsapp_app.doctype.api.send_fitness_expiry_reminder_notification",
+    	# ]
     # 	"hourly": [
     # 		"whatsapp_app.tasks.hourly"
     # 	],
