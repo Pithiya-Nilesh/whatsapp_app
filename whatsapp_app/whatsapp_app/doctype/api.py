@@ -1156,7 +1156,7 @@ def generate_pdf():
 
         if frappe.db.get_single_value('WhatsApp Api', 'disabled'):
             return 'Your WhatsApp api key is not set or may be disabled'
-        template = 'sent_pdf'
+        template = 'compalince_update_remainders_in_cc'
         number = whatsapp_no
         access_token, api_endpoint, name_type, version = whatsapp_keys_details()
         headers = {
@@ -1165,13 +1165,12 @@ def generate_pdf():
         }
        
         file_link = 'https://migoostage.frappe.cloud/files/' + file_path
-        print("\n\n", file_link, name_of_supplier, whatsapp_no)
         url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{number}"
         payload = {
             "parameters": [
                 {
-                    "name": "doctype_name",
-                    "value": "Lead"
+                    "name": "supp_name",
+                    "value": name_of_supplier
                 },
                 {
                     "name": "pdf_link",
@@ -1182,8 +1181,7 @@ def generate_pdf():
             "template_name": template
         }
         response = requests.post(url, json=payload, headers=headers)
-        print("\n\n RESPONSE:", response, "\n\n\n\n")
-        print("\n\n RESPONSE:", response.text, "\n\n\n\n")
+
 
 @frappe.whitelist(allow_guest=True)
 def create_table():
