@@ -121,7 +121,7 @@ fixtures = [
 
 scheduler_events = {
     #"send_insurance_email": {
-       # " * * * * 1": [
+       # " 0 0 * * MON": [
           #  "whatsapp_app.whatsapp_app.doctype.api.create_table"
        # ]
    # },
