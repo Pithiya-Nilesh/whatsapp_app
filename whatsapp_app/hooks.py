@@ -108,11 +108,11 @@ app_license = "MIT"
 # ---------------
 
 scheduler_events = {
-    # "whatsapp_message_report": {
-    #     "* * * * *": [
-    #         "whatsapp_app.task.send_report_on_whatsapp"
-    #     ]
-    # }
+    "whatsapp_message_report": {
+        "* * * * *": [
+            "whatsapp_app.task.send_report_on_whatsapp"
+        ]
+    }
 
     # 	"all": [
     # 		"whatsapp_app.tasks.all"
