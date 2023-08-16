@@ -1163,8 +1163,12 @@ def generate_pdf():
         "Content-Type": "text/json",
         "Authorization": access_token
         }
+
+        from frappe.utils import get_url
+        site_url = get_url()
        
-        file_link = 'https://migoostage.frappe.cloud/files/' + file_path
+        file_link = site_url + '/' + file_path
+        
         url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{number}"
         payload = {
             "parameters": [
