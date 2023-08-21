@@ -120,7 +120,7 @@ fixtures = [
 # ---------------
 
 scheduler_events = {
-    "send_insurance_email": {
+    "send_insurance_reminder": {
        "0 10 * * MON": [
           "whatsapp_app.whatsapp_app.doctype.api.create_table"
         ]
