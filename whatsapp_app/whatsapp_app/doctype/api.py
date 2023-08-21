@@ -1190,7 +1190,7 @@ def generate_pdf():
 @frappe.whitelist(allow_guest=True)
 def create_table():
     enable_cron = frappe.db.get_single_value('Custom Settings', 'enable_cron_job')
-    if enable_cron == "1":
+    if enable_cron == 1:
         generate_pdf()
         return "PDF created"
 
