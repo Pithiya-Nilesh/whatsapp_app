@@ -14,15 +14,32 @@ app_license = "MIT"
 
 fixtures = [
     
-     {"dt":"Client Script","filters":[
-        [
-            "module","in",[
-               "Whatsapp App"
-            ]
-        ]
-    ]}
+    #  {"dt":"Client Script","filters":[
+    #     [
+    #         "module","in",[
+    #            "Whatsapp App"
+    #         ]
+    #     ]
+    # ]},
+    {"dt": "DocPerm", "filters": [["name", "in", ["WhatsApp Manager"]]]},
 ]
 
+doctype_js = {
+    "Lead" : "public/js/lead.js",
+    "Supplier" : "public/js/supplier.js",
+    "Opportunity" : "public/js/opportunity.js",
+    "Customer": "public/js/customer.js",
+    "Raw Data": "public/js/raw_data.js",
+    "Item": "public/js/item.js"
+}
+doctype_list_js = {
+    "Lead" : "public/js/lead_list.js",
+    "Supplier" : "public/js/supplier_list.js",
+    "Opportunity" : "public/js/opportunity_list.js",
+    "Customer": "public/js/customer_list.js",
+    "Raw Data": "public/js/raw_data_list.js",
+    "Item": "public/js/item_list.js",
+}
 
 # include js, css files in header of desk.html
 # app_include_css = "/assets/whatsapp_app/css/whatsapp_app.css"
