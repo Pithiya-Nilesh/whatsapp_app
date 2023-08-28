@@ -138,7 +138,7 @@ doctype_list_js = {
 
 scheduler_events = {
     "send_insurance_reminder": {
-       "0 10 * * MON": [
+       "0 10 * * 1": [
           "whatsapp_app.whatsapp_app.doctype.api.create_table"
         ]
     },
