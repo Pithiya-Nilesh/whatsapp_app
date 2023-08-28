@@ -1167,7 +1167,7 @@ def generate_pdf():
         from frappe.utils import get_url
         site_url = get_url()
        
-        file_link = site_url + '/' + file_path
+        file_link = site_url + '/files/' + file_path
         
         url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{number}"
         payload = {
