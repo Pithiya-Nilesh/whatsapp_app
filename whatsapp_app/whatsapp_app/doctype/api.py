@@ -1152,8 +1152,6 @@ def generate_pdf():
         
         with open(file_path, 'wb') as f:
             f.write(pdf)
-        
-        print("Supplier: {}, WhatsApp No: {}, File: {}".format(name_of_supplier, whatsapp_no, file_path))
             
         save_file_on_filesystem(file_path, content=pdf)
 
@@ -1213,8 +1211,8 @@ def delete_sent_file():
     from datetime import datetime # from python std library
     from frappe.utils import add_to_date
 
-    before_15_days = add_to_date(datetime.now(), days=-14, as_string=True)
-    doc_name = frappe.db.get_list("Sent File", filters=[["sent_date", "<", before_15_days]], fields=["name", "file_path"])
+    before_14_days = add_to_date(datetime.now(), days=-14, as_string=True)
+    doc_name = frappe.db.get_list("Sent File", filters=[["sent_date", "<", before_14_days]], fields=["name", "file_path"])
     for name in doc_name:
         delete_file(f"/files/{name.file_path}")
         frappe.delete_doc('Sent File', name.name)
