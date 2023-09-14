@@ -142,6 +142,11 @@ scheduler_events = {
           "whatsapp_app.whatsapp_app.doctype.api.create_table"
         ]
     },
+    "delete_insurance_reminder_pdf": {
+       "0 0 1,15 * *": [
+          "whatsapp_app.whatsapp_app.doctype.api.delete_sent_file"
+        ]
+    },
     # "whatsapp_message_report": {
     #     "* * * * *": [
     #         "whatsapp_app.task.send_report_on_whatsapp"

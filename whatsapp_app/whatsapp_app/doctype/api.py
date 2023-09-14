@@ -3,7 +3,7 @@ import json
 import sys
 from frappe.utils import now, getdate
 import frappe
-from frappe.utils.file_manager import save_file_on_filesystem
+from frappe.utils.file_manager import save_file_on_filesystem, delete_file, delete_file_from_filesystem
 import requests
 from frappe.model.document import Document
 from frappe.utils import add_to_date
@@ -822,6 +822,9 @@ def get_img(phone):
 
 @frappe.whitelist(allow_guest=True)  
 def generate_pdf():
+    if frappe.db.get_single_value('WhatsApp Api', 'disabled'):
+            return 'Your WhatsApp api key is not set or may be disabled'
+    
     name = frappe.db.sql("""
 
     with insurance as (
@@ -1152,10 +1155,19 @@ def generate_pdf():
         
         print("Supplier: {}, WhatsApp No: {}, File: {}".format(name_of_supplier, whatsapp_no, file_path))
             
-        save_file_on_filesystem(file_path,content=pdf)
+        save_file_on_filesystem(file_path, content=pdf)
 
-        if frappe.db.get_single_value('WhatsApp Api', 'disabled'):
-            return 'Your WhatsApp api key is not set or may be disabled'
+        # create a new document
+        from frappe.utils import today
+
+        doc = frappe.get_doc({
+            'doctype': 'Sent File',
+            'file_path': file_path,
+            'sent_date': today()
+        })
+        doc.insert(ignore_permissions=True)
+        frappe.db.commit()
+
         template = 'compalince_update_remainders_in_cc'
         number = whatsapp_no
         access_token, api_endpoint, name_type, version = whatsapp_keys_details()
@@ -1194,7 +1206,17 @@ def create_table():
         generate_pdf()
         return "PDF created"
 
-        
 
-    
+@frappe.whitelist(allow_guest=True)    
+def delete_sent_file():
+
+    from datetime import datetime # from python std library
+    from frappe.utils import add_to_date
+
+    before_15_days = add_to_date(datetime.now(), days=-14, as_string=True)
+    doc_name = frappe.db.get_list("Sent File", filters=[["sent_date", "<", before_15_days]], fields=["name", "file_path"])
+    for name in doc_name:
+        delete_file(f"/files/{name.file_path}")
+        frappe.delete_doc('Sent File', name.name)
+        frappe.db.commit()
     
