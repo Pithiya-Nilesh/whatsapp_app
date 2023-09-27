@@ -997,6 +997,7 @@ def generate_pdf():
 
    # create a dictionary to store equipment information for each supplier
     supplier_dict = defaultdict(list)
+    reminder_supllier = []
 
     for i in name:
         equipment_name = i[0]
@@ -1022,6 +1023,9 @@ def generate_pdf():
             'status': status,
             'daystogo': daystogo
         })
+        if daystogo <= 7:
+            reminder_supllier.append(supplier)
+
 
     # loop through supplier dictionary and send a single email to each supplier
     for supplier, equipment_list in supplier_dict.items():
@@ -1138,8 +1142,8 @@ def generate_pdf():
                 </div>
             </div>
             '''                           
-    #     print("\n", supplier_dict, "\n")
-    # return supplier_dict
+        #     print("\n", supplier_dict, "\n")
+        # return supplier_dict
         s_name = frappe.db.get_value("Supplier", filters={'name': supplier}, fieldname=["name_of_suppier", "whatsapp_no"])  
         # print("\n", s_name, "\n") 
         if s_name is None:
@@ -1197,10 +1201,25 @@ def generate_pdf():
         response = requests.post(url, json=payload, headers=headers)
 
 
+        # send reminder if compliance expired in 7 days.
+        supplier_unique_list = list(set(reminder_supllier))
+
+        for r_supplier in supplier_unique_list:
+            whatsapp_no = frappe.db.get_value("Supplier", filters={'name': r_supplier}, fieldname=["whatsapp_no"])  
+            if whatsapp_no is None:
+                continue
+            url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{whatsapp_no}"
+            payload = {
+                "broadcast_name": "compliance_update",
+                "template_name": "compliance_update"
+            }
+            response = requests.post(url, json=payload, headers=headers)
+
+
 @frappe.whitelist(allow_guest=True)
 def create_table():
-    enable_cron = frappe.db.get_single_value('Custom Settings', 'enable_cron_job')
-    if enable_cron == 1:
+    # enable_cron = frappe.db.get_single_value('Custom Settings', 'enable_cron_job')
+    # if enable_cron == 1:
         generate_pdf()
         return "PDF created"
 
@@ -1217,4 +1236,3 @@ def delete_sent_file():
         delete_file(f"/files/{name.file_path}")
         frappe.delete_doc('Sent File', name.name)
         frappe.db.commit()
-    
