@@ -169,3 +169,22 @@ def message_received():
 #     }]
 #
 #     return timeline_contents
+
+
+
+@frappe.whitelist(allow_guest=True)
+def wati_r_webhooks():
+    data1 = frappe.call(r_data, **frappe.form_dict)
+    return data1
+
+
+def r_data(**kwargs):
+    wa_data = frappe.local.form_dict
+    data = {"data": []}
+    data['data'].append(wa_data)
+    data = json.dumps(data)
+    doc = frappe.new_doc({"doctype": "wati call message log", "data": f"{data}", "read": 0, "time": now()})
+    doc.insert()
+    frappe.db.commit()
+        # frappe.db.set_value("wati call message log", f'{se_mo}', "read", 0)
+    return 'success'

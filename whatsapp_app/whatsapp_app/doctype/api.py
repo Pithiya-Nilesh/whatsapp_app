@@ -291,7 +291,7 @@ def send_whatsapp_message(number, message='', template_name='', data='', doctype
         response = requests.post(url, headers=headers)
         set_data_in_wati_call_log(number, response)
         comment(number, message)
-        print("\n\n asdfasdf", response, "\n\n")
+        # print("\n\n asdfasdf", response, "\n\n")
         return response.text
 
 @frappe.whitelist()
@@ -1200,7 +1200,6 @@ def generate_pdf():
         }
         response = requests.post(url, json=payload, headers=headers)
 
-
         # send reminder if compliance expired in 7 days.
         supplier_unique_list = list(set(reminder_supllier))
 
@@ -1214,6 +1213,7 @@ def generate_pdf():
                 "template_name": "compliance_update"
             }
             response = requests.post(url, json=payload, headers=headers)
+            
 
 
 @frappe.whitelist(allow_guest=True)
@@ -1236,3 +1236,20 @@ def delete_sent_file():
         delete_file(f"/files/{name.file_path}")
         frappe.delete_doc('Sent File', name.name)
         frappe.db.commit()
+
+
+@frappe.whitelist(allow_guest=True)
+def a():
+    access_token, api_endpoint, name_type, version = whatsapp_keys_details()
+    url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=917990915950"
+    headers = {
+        "Content-Type": "text/json",
+        "Authorization": access_token
+        }
+    payload = {
+        "broadcast_name": "compliance_update",
+        "template_name": "compliance_update"
+    }
+    response = requests.post(url, json=payload, headers=headers)
+    print("response", response)
+    print("response.text", response.text)
