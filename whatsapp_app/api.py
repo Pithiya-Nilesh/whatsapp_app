@@ -181,9 +181,13 @@ def wati_r_webhooks():
 def r_data(**kwargs):
     wa_data = frappe.local.form_dict
     data = {"data": []}
+
     data['data'].append(wa_data)
-    data = json.dumps(data)
-    doc = frappe.new_doc({"doctype": "wati call message log", "data": f"{data}", "read": 0, "time": now()})
+
+    data1 = json.dumps(data)
+
+    doc = frappe.get_doc({"doctype": "wati call message log", "phone": 7990915951, "data": f"{data1}", "read": 0, "time": now()})
+
     doc.insert()
     frappe.db.commit()
         # frappe.db.set_value("wati call message log", f'{se_mo}', "read", 0)
