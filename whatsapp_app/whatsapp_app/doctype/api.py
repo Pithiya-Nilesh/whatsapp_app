@@ -1199,20 +1199,22 @@ def generate_pdf():
             "template_name": template
         }
         response = requests.post(url, json=payload, headers=headers)
+        
 
-        # send reminder if compliance expired in 7 days.
-        supplier_unique_list = list(set(reminder_supllier))
+    # send reminder if compliance expired in 7 days.
+    supplier_unique_list = list(set(reminder_supllier))
 
-        for r_supplier in supplier_unique_list:
-            whatsapp_no = frappe.db.get_value("Supplier", filters={'name': r_supplier}, fieldname=["whatsapp_no"])  
-            if whatsapp_no is None:
-                continue
-            url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{whatsapp_no}"
-            payload = {
-                "broadcast_name": "compliance_update",
-                "template_name": "compliance_update"
-            }
-            response = requests.post(url, json=payload, headers=headers)
+    for r_supplier in supplier_unique_list:
+        whatsapp_no = frappe.db.get_value("Supplier", filters={'name': r_supplier}, fieldname=["whatsapp_no"])  
+        if whatsapp_no is None:
+            continue
+        print("asdfasdf \n\n", whatsapp_no)
+        url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{whatsapp_no}"
+        payload = {
+            "broadcast_name": "compliance_update",
+            "template_name": "compliance_update"
+        }
+        response = requests.post(url, json=payload, headers=headers)
             
 
 

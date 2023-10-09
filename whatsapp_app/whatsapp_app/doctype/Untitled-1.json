@@ -1,0 +1,57 @@
+
+
+
+{
+    "result": true,
+    "phone_number": "917990915950",
+    "template_name": "compliance_update",
+    "parameteres": null,
+    "contact": {
+        "id": "638b213ed66674bb8e9fd37b",
+        "wAid": "917990915950",
+        "firstName": "Loading...",
+        "fullName": "Loading...",
+        "phone": "917990915950",
+        "source": null,
+        "contactStatus": "VALID",
+        "photo": null,
+        "created": "Dec-03-2022",
+        "optedIn": false,
+        "isDeleted": false,
+        "lastUpdated": "2023-07-11T09:48:18.255Z",
+        "allowBroadcast": true,
+        "allowSMS": true,
+        "teamIds": [
+            "638990b1d66674bb8e9fd2d6"
+        ],
+        "isInFlow": false,
+        "lastFlowId": "64b2234ab2076d6a32e2195d",
+        "currentFlowNodeId": "main_buttons-JzyKU",
+        "selectedHubspotId": ""
+    },
+    "model": {
+        "ids": [
+            "638b213ed66674bb8e9fd37b"
+        ]
+    },
+    "validWhatsAppNumber": true
+}
+{
+    "data": [
+        {
+            "eventType": "sentMessageREPLIED_v2",
+            "statusString": "Replied",
+            "localMessageId": null,
+            "id": "651e44cc807350a6839bdf04",
+            "whatsappMessageId": "wamid.HBgMOTE3OTkwOTE1OTUwFQIAERgSQTI4QThBQjU1MjMxOURGQzRDAA==",
+            "conversationId": "638b21a1d66674bb8e9fd387",
+            "ticketId": "651d1b57807350a6839bde84",
+            "text": null,
+            "type": "template",
+            "timestamp": "1696482551",
+            "assigneeId": null,
+            "operatorEmail": "migvedsolutions@gmail.com",
+            "cmd": "whatsapp_app.api.wati_r_webhooks"
+        }
+    ]
+}
