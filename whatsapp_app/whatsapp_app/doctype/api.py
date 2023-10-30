@@ -1239,7 +1239,7 @@ def generate_pdf():
                 log.insert()
                 frappe.db.commit()
 
-                wtsw = frappe.new_doc("Wati Template Sent Webhook")
+                wtsw = frappe.new_doc("Wati Webhook Template Sent")
                 wtsw.whatsapp_no = '91'+number if number else ''
                 wtsw.template_name = 'compliance_update'
                 wtsw.doc_type = "Supplier"
@@ -1269,8 +1269,8 @@ def send_remider_if_not_repliyed():
     if frappe.db.get_single_value('WhatsApp Api', 'disabled'):
             return 'Your WhatsApp api key is not set or may be disabled'
 
-    # data = frappe.db.get_list("Wati Template Sent Webhook", filters=[["date", "=", frappe.utils.add_days(frappe.utils.now_datetime(), -6)], ["replied_text", "in", ["No", "whatsapp_no"]]], fields=["name", "whatsapp_no", "doc_type", "doc_name", "template_name"])
-    data = frappe.db.get_list("Wati Template Sent Webhook", filters=[["date", "=", frappe.utils.add_days(frappe.utils.now_datetime(), -3)], ["replied_text", "in", ["No", "whatsapp_no"]]], fields=["name", "whatsapp_no", "doc_type", "doc_name", "template_name"])
+    # data = frappe.db.get_list("Wati Webhook Template Sent", filters=[["date", "=", frappe.utils.add_days(frappe.utils.now_datetime(), -6)], ["replied_text", "in", ["No", "whatsapp_no"]]], fields=["name", "whatsapp_no", "doc_type", "doc_name", "template_name"])
+    data = frappe.db.get_list("Wati Webhook Template Sent", filters=[["date", "=", frappe.utils.add_days(frappe.utils.now_datetime(), -3)], ["replied_text", "in", ["No", "whatsapp_no"]]], fields=["name", "whatsapp_no", "doc_type", "doc_name", "template_name"])
     
     for i in data:
         if check_daily_message_limit_for_user(i.whatsapp_no, "compliance_update"):
@@ -1299,7 +1299,7 @@ def send_remider_if_not_repliyed():
                 log.insert()
                 frappe.db.commit()
 
-                wtsw = frappe.new_doc("Wati Template Sent Webhook")
+                wtsw = frappe.new_doc("Wati Webhook Template Sent")
                 wtsw.whatsapp_no = i.whatsapp_no if i.whatsapp_no else ''
                 wtsw.template_name = 'compliance_update'
                 wtsw.doc_type = i.doc_type
@@ -1363,7 +1363,7 @@ def a():
             # continue
 
 
-def check_daily_message_limit_for_user(number, template_name):    
+def check_daily_message_limit_for_user(number, template_name):  
     # check dailly limit per user for send template, count past 24 hours message log and if message log reach limit send false else true
 
     dmlpu = frappe.db.get_single_value('WhatsApp Api', 'daily_message_limit_per_user')

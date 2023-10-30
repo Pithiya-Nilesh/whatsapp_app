@@ -1,0 +1,107 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2023-10-30 19:00:38.440646",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "doc_type",
+  "doc_name",
+  "whatsapp_no",
+  "template_name",
+  "whatsapp_id",
+  "date",
+  "data",
+  "column_break_vs0iu",
+  "is_replied",
+  "replied_text",
+  "whatsapp_equipment"
+ ],
+ "fields": [
+  {
+   "fieldname": "doc_type",
+   "fieldtype": "Link",
+   "label": "Doc Type",
+   "options": "DocType"
+  },
+  {
+   "fieldname": "doc_name",
+   "fieldtype": "Dynamic Link",
+   "label": "Doc Name",
+   "options": "doc_type"
+  },
+  {
+   "fieldname": "whatsapp_no",
+   "fieldtype": "Data",
+   "label": "Whatsapp No"
+  },
+  {
+   "fieldname": "template_name",
+   "fieldtype": "Data",
+   "label": "Template Name"
+  },
+  {
+   "fieldname": "whatsapp_id",
+   "fieldtype": "Data",
+   "label": "Whatsapp ID"
+  },
+  {
+   "fieldname": "date",
+   "fieldtype": "Date",
+   "label": "Date"
+  },
+  {
+   "fieldname": "data",
+   "fieldtype": "Code",
+   "label": "Data",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_vs0iu",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_replied",
+   "fieldtype": "Check",
+   "label": "Is Replied"
+  },
+  {
+   "fieldname": "replied_text",
+   "fieldtype": "Data",
+   "label": "Replied Text"
+  },
+  {
+   "fieldname": "whatsapp_equipment",
+   "fieldtype": "Table",
+   "label": "Equipment",
+   "options": "Whatsapp Equipment"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2023-10-30 19:00:38.440646",
+ "modified_by": "Administrator",
+ "module": "Whatsapp App",
+ "name": "Wati Webhook Template Sent",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

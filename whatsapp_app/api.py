@@ -199,9 +199,9 @@ def r_data(**kwargs):
 def sent_template_message_webhook():
     response = frappe.form_dict
     if response["templateName"] == "compliance_update":
-        data = frappe.db.get_value("Wati Template Sent Webhook", {"whatsapp_no": response["waId"]}, ["name"])
+        data = frappe.db.get_value("Wati Webhook Template Sent", {"whatsapp_no": response["waId"]}, ["name"])
         if data:
-            wtsw = frappe.get_doc("Wati Template Sent Webhook", data)
+            wtsw = frappe.get_doc("Wati Webhook Template Sent", data)
             wtsw.whatsapp_id = response["whatsappMessageId"]
             wtsw.data = frappe.as_json(response, 4)
             wtsw.save(ignore_permissions=True)
@@ -211,16 +211,16 @@ def sent_template_message_webhook():
 @frappe.whitelist(allow_guest=True)
 def template_message_replied():
     response = frappe.form_dict
-    doc = frappe.db.get_value("Wati Template Sent Webhook", filters={"whatsapp_id": f'{response["whatsappMessageId"]}'}, fieldname=["name"])
+    doc = frappe.db.get_value("Wati Webhook Template Sent", filters={"whatsapp_id": f'{response["whatsappMessageId"]}'}, fieldname=["name"])
     if doc:
-        frappe.db.set_value("Wati Template Sent Webhook", doc, {'is_replied': 1, 'replied_text': response["text"]})
+        frappe.db.set_value("Wati Webhook Template Sent", doc, {'is_replied': 1, 'replied_text': response["text"]})
         frappe.db.commit()
         if response["text"] == "Yes":
             equipment_list = frappe.db.get_list("Whatsapp Equipment", {"parent": doc}, pluck="name")
         
 
     # doc = frappe.db.get_value(
-    #     "Wati Template Sent Webhook",
+    #     "Wati Webhook Template Sent",
     #     filters={"whatsapp_id": response["whatsappMessageId"]},
     #     fieldname=["name", "mobile_no", "whatsapp_id", "template_name"],
     #     as_dict=True
