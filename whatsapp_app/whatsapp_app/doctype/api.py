@@ -3,6 +3,7 @@ import json
 import sys
 from frappe.utils import now, getdate
 import frappe
+from frappe.utils.data import today
 from frappe.utils.file_manager import save_file_on_filesystem, delete_file, delete_file_from_filesystem
 import requests
 from frappe.model.document import Document
@@ -60,7 +61,6 @@ def bulk_templates(template, l_mobile, doctype=''):
     return list
 
 
-
 def whatsapp_keys_details():
     access_token = frappe.db.get_single_value('WhatsApp Api', 'access_token')
     api_endpoint = frappe.db.get_single_value('WhatsApp Api', 'api_endpoint')
@@ -85,6 +85,7 @@ def set_data_in_wati_call_log(number, response):
         doc = frappe.get_doc({"doctype": "wati call message log", "phone": f"{number}", "data": f"{data}"})
         doc.insert()
         frappe.db.commit()
+
 
 @frappe.whitelist(allow_guest=True)
 def send_register_message(name='', number='', types='', equipment_name=''):
@@ -782,6 +783,7 @@ def map_dynamic_filelds_for_wati(l_mobile, doctype='', data=''):
         list.append({"name": i['name'], "value": i["value"]})
     return list
 
+
 @frappe.whitelist(allow_guest=True)
 def get_image(filename):
     access_token, api_endpoint, name_type, version = whatsapp_keys_details()    
@@ -820,7 +822,7 @@ def get_img(phone):
     frappe.db.commit()
     return "OK"
 
-@frappe.whitelist(allow_guest=True)  
+@frappe.whitelist(allow_guest=True)
 def generate_pdf():
     if frappe.db.get_single_value('WhatsApp Api', 'disabled'):
             return 'Your WhatsApp api key is not set or may be disabled'
@@ -844,7 +846,7 @@ def generate_pdf():
             CONCAT('Insurance') AS 'insurances'
         from tabItem
         where
-            insurance_date >= CURDATE() 
+            insurance_date >= CURDATE()
             AND DATEDIFF(insurance_date, CURDATE()) <= 15
     ),
     fitness as (
@@ -991,7 +993,6 @@ def generate_pdf():
         State_Permits,
         State_PermitDaysToGo
     from permit_validity
-
         
     """)
 
@@ -1023,7 +1024,7 @@ def generate_pdf():
             'status': status,
             'daystogo': daystogo
         })
-        if daystogo <= 3:
+        if daystogo <= 7:
             reminder_supllier.append(supplier)
 
 
@@ -1058,6 +1059,7 @@ def generate_pdf():
                         </tr>
             '''.format(equipment['status'], equipment['date'], equipment['daystogo'], equipment['equipment_main_category'], equipment['register_no'],
                        equipment['model'])
+
         message += '''
                     </table>
                 </div>
@@ -1145,11 +1147,11 @@ def generate_pdf():
         #     print("\n", supplier_dict, "\n")
         # return supplier_dict
         s_name = frappe.db.get_value("Supplier", filters={'name': supplier}, fieldname=["name_of_suppier", "whatsapp_no"])  
-        # print("\n", s_name, "\n") 
+        # print("\n", s_name, "\n")
         if s_name is None:
             continue
-        name_of_supplier = s_name[0] 
-        whatsapp_no = s_name[1] 
+        name_of_supplier = s_name[0]
+        whatsapp_no = s_name[1]
 
         file_path = name_of_supplier.replace(" ", "_").lower() + '.pdf'
         pdf = weasyprint.HTML(string=message).write_pdf()
@@ -1198,7 +1200,17 @@ def generate_pdf():
             "broadcast_name": template,
             "template_name": template
         }
-        response = requests.post(url, json=payload, headers=headers)
+        if check_daily_message_limit_for_user(number, template):
+            response = requests.post(url, json=payload, headers=headers)
+
+            data = json.loads(response.text)
+
+            if "result" in data and data["result"]:
+                log = frappe.new_doc("Whatsapp Message Daily Limit Log")
+                log.whatsapp_no = number
+                log.template_name = template
+                log.insert()
+                frappe.db.commit()
         
 
     # send reminder if compliance expired in 7 days.
@@ -1208,25 +1220,101 @@ def generate_pdf():
         whatsapp_no = frappe.db.get_value("Supplier", filters={'name': r_supplier}, fieldname=["whatsapp_no"])  
         if whatsapp_no is None:
             continue
-        print("asdfasdf \n\n", whatsapp_no)
+        # print("asdfasdf \n\n", whatsapp_no)
         url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{whatsapp_no}"
         payload = {
             "broadcast_name": "compliance_update",
-            "template_name": "compliance_update"
+            "template_name": "compliance_update",
+            "parameters": []
         }
-        response = requests.post(url, json=payload, headers=headers)
-            
+        if check_daily_message_limit_for_user(number, "compliance_update"):
 
+            response = requests.post(url, json=payload, headers=headers)
+            data = json.loads(response.text)
+
+            if "result" in data and data["result"]:
+                log = frappe.new_doc("Whatsapp Message Daily Limit Log")
+                log.whatsapp_no = number
+                log.template_name = "compliance_update"
+                log.insert()
+                frappe.db.commit()
+
+                wtsw = frappe.new_doc("Wati Template Sent Webhook")
+                wtsw.whatsapp_no = '91'+number if number else ''
+                wtsw.template_name = 'compliance_update'
+                wtsw.doc_type = "Supplier"
+                wtsw.doc_name = supplier
+                wtsw.date = add_to_date(datetime.now(), days=3, as_string=True, as_datetime=True)
+
+                for equipment in equipment_list:
+                    child_row = wtsw.append("whatsapp_equipment", {})
+                    child_row.equipment_name = equipment["equipment_name"]               
+
+                wtsw.insert(ignore_permissions=True)
+                frappe.db.commit()
+        
 
 @frappe.whitelist(allow_guest=True)
 def create_table():
+    # scheduler event
     enable_cron = frappe.db.get_single_value('Custom Settings', 'enable_cron_job')
     if enable_cron == 1:
-        generate_pdf()
-        return "PDF created"
+        return generate_pdf()
+        # return "PDF created"
 
 
-@frappe.whitelist(allow_guest=True)    
+@frappe.whitelist(allow_guest=True)
+def send_remider_if_not_repliyed():
+    # scheduler event
+    if frappe.db.get_single_value('WhatsApp Api', 'disabled'):
+            return 'Your WhatsApp api key is not set or may be disabled'
+
+    # data = frappe.db.get_list("Wati Template Sent Webhook", filters=[["date", "=", frappe.utils.add_days(frappe.utils.now_datetime(), -6)], ["replied_text", "in", ["No", "whatsapp_no"]]], fields=["name", "whatsapp_no", "doc_type", "doc_name", "template_name"])
+    data = frappe.db.get_list("Wati Template Sent Webhook", filters=[["date", "=", frappe.utils.add_days(frappe.utils.now_datetime(), -3)], ["replied_text", "in", ["No", "whatsapp_no"]]], fields=["name", "whatsapp_no", "doc_type", "doc_name", "template_name"])
+    
+    for i in data:
+        if check_daily_message_limit_for_user(i.whatsapp_no, "compliance_update"):
+            equipments = frappe.db.get_list("Whatsapp Equipment", {"parent": i.name}, ["equipment_name"])
+            
+            access_token, api_endpoint, name_type, version = whatsapp_keys_details()
+            headers = {
+            "Content-Type": "text/json",
+            "Authorization": access_token
+            }
+
+            url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber={i.whatsapp_no}"
+            payload = {
+                "broadcast_name": "compliance_update",
+                "template_name": "compliance_update",
+                "parameters": []
+            }
+            
+            response = requests.post(url, json=payload, headers=headers)
+            data = json.loads(response.text)
+
+            if "result" in data and data["result"]:
+                log = frappe.new_doc("Whatsapp Message Daily Limit Log")
+                log.whatsapp_no = i.whatsapp_no
+                log.template_name = "compliance_update"
+                log.insert()
+                frappe.db.commit()
+
+                wtsw = frappe.new_doc("Wati Template Sent Webhook")
+                wtsw.whatsapp_no = i.whatsapp_no if i.whatsapp_no else ''
+                wtsw.template_name = 'compliance_update'
+                wtsw.doc_type = i.doc_type
+                wtsw.doc_name = i.doc_name
+                wtsw.date = today()
+
+                for equipment in equipments:
+                    child_row = wtsw.append("whatsapp_equipment", {})
+                    child_row.equipment_name = equipment["equipment_name"]                
+
+                wtsw.insert(ignore_permissions=True)
+                frappe.db.commit()
+
+
+@frappe.whitelist(allow_guest=True)
 def delete_sent_file():
 
     from datetime import datetime # from python std library
@@ -1242,16 +1330,74 @@ def delete_sent_file():
 
 @frappe.whitelist(allow_guest=True)
 def a():
-    access_token, api_endpoint, name_type, version = whatsapp_keys_details()
-    url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=917990915950"
-    headers = {
-        "Content-Type": "text/json",
-        "Authorization": access_token
-        }
-    payload = {
-        "broadcast_name": "compliance_update",
-        "template_name": "compliance_update"
-    }
-    response = requests.post(url, json=payload, headers=headers)
-    print("response", response)
-    print("response.text", response.text)
+    # access_token, api_endpoint, name_type, version = whatsapp_keys_details()
+    # url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=917990915950"
+    # headers = {
+    #     "Content-Type": "text/json",
+    #     "Authorization": access_token
+    #     }
+    # payload = {
+    #     "broadcast_name": "compliance_update",
+    #     "template_name": "compliance_update"
+    # }
+    # response = requests.post(url, json=payload, headers=headers)
+    # print("response", response)
+    # print("response.text", response.text)
+
+    # return frappe.db.get_list("Whatsapp Message Daily Limit Log", fields=["*"])
+
+
+    numbers = ["7990915950", "8690396913", "7678767898"]
+
+    for number in numbers:
+        if check_daily_message_limit_for_user(number, "aadf"):
+            print("\n\n send message")
+            log = frappe.new_doc("Whatsapp Message Daily Limit Log")
+            log.whatsapp_no = number
+            log.template_name = "aadf"
+            log.insert()
+            frappe.db.commit()
+            # continue
+        else:
+            print("\n\n reach limit")
+            # continue
+
+
+def check_daily_message_limit_for_user(number, template_name):    
+    # check dailly limit per user for send template, count past 24 hours message log and if message log reach limit send false else true
+
+    dmlpu = frappe.db.get_single_value('WhatsApp Api', 'daily_message_limit_per_user')
+    vt = frappe.db.get_single_value('WhatsApp Api', 'validate_template')
+    from frappe.utils import now_datetime, add_to_date
+
+    # Calculate the datetime 24 hours ago from the current time
+    twenty_four_hours_ago = add_to_date(now_datetime(), hours=-24)
+
+    if vt == 1:
+        whatsapp_log = frappe.db.count('Whatsapp Message Daily Limit Log', {"creation": [">", twenty_four_hours_ago], "whatsapp_no": number, "template_name": template_name})
+    else:
+        whatsapp_log = frappe.db.count('Whatsapp Message Daily Limit Log', {"creation": [">", twenty_four_hours_ago], "whatsapp_no": number})
+
+    if whatsapp_log > int(dmlpu):
+        # you can`t send message
+        return False
+    else:
+        # you can send message
+        return True
+    
+
+# 1 use case
+# 1.supplier list medvo jena equipment 72 kalak pela pura thya hoy.
+#     supplier_mobile_no
+
+# 2. check any answer recieved from supplier. past 14 days.
+
+#     if yes then not send template:
+#     else send template compliance update and wait for answer
+
+
+
+# 2 use case
+
+# 1. get supplier from sent template log where not reply or reply is no.
+# 
