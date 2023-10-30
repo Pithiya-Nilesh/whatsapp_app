@@ -1024,7 +1024,7 @@ def generate_pdf():
             'status': status,
             'daystogo': daystogo
         })
-        if daystogo <= 7:
+        if daystogo <= 3:
             reminder_supllier.append(supplier)
 
 
@@ -1213,7 +1213,7 @@ def generate_pdf():
                 frappe.db.commit()
         
 
-    # send reminder if compliance expired in 7 days.
+    # send reminder if compliance expired in 3 days.
     supplier_unique_list = list(set(reminder_supllier))
 
     for r_supplier in supplier_unique_list:

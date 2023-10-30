@@ -192,3 +192,67 @@ def r_data(**kwargs):
     frappe.db.commit()
         # frappe.db.set_value("wati call message log", f'{se_mo}', "read", 0)
     return 'success'
+
+
+
+@frappe.whitelist(allow_guest=True)
+def sent_template_message_webhook():
+    response = frappe.form_dict
+    if response["templateName"] == "compliance_update":
+        data = frappe.db.get_value("Wati Template Sent Webhook", {"whatsapp_no": response["waId"]}, ["name"])
+        if data:
+            wtsw = frappe.get_doc("Wati Template Sent Webhook", data)
+            wtsw.whatsapp_id = response["whatsappMessageId"]
+            wtsw.data = frappe.as_json(response, 4)
+            wtsw.save(ignore_permissions=True)
+            frappe.db.commit()
+
+
+@frappe.whitelist(allow_guest=True)
+def template_message_replied():
+    response = frappe.form_dict
+    doc = frappe.db.get_value("Wati Template Sent Webhook", filters={"whatsapp_id": f'{response["whatsappMessageId"]}'}, fieldname=["name"])
+    if doc:
+        frappe.db.set_value("Wati Template Sent Webhook", doc, {'is_replied': 1, 'replied_text': response["text"]})
+        frappe.db.commit()
+        if response["text"] == "Yes":
+            equipment_list = frappe.db.get_list("Whatsapp Equipment", {"parent": doc}, pluck="name")
+        
+
+    # doc = frappe.db.get_value(
+    #     "Wati Template Sent Webhook",
+    #     filters={"whatsapp_id": response["whatsappMessageId"]},
+    #     fieldname=["name", "mobile_no", "whatsapp_id", "template_name"],
+    #     as_dict=True
+    # )
+
+    # # Fetch the child table data from the document
+    # child_table_data = frappe.get_all(
+    #     "Whatsapp Equipment",
+    #     filters={"parent": doc.get("name")},
+    #     fields=["equipment_name"],
+    #     as_list=False,
+    # )
+
+    # # Now, you can access the child table data
+    # whatsapp_equipment = child_table_data if child_table_data else []
+
+    # data = frappe.db.get_value("Whatsapp Template Replied", {"whatsapp_no": doc.mobile_no[-10:]}, ["name"])
+    # print("\n\n data", data)
+
+    # wtr = frappe.get_doc("Whatsapp Template Replied", data)
+    # wtr.replied_text = response["text"]
+    # wtr.is_replied = 1
+    # wtr.save(ignore_permissions=True)
+    # frappe.db.commit()
+
+    # if doc:
+    #     # supplier = frappe.db.get_value("Supplier", filters={"whatsapp_no": doc.mobile_no[-10:]}, fieldname=["name", "name_of_suppier"], as_dict=True)
+    #     data = frappe.db.get_value("Whatsapp Template Replied", {"whatsapp_no": doc.mobile_no[-10:]}, ["name"])
+    #     print("\n\n data", data)
+    #     for i in data:
+    #         wtr = frappe.get_doc("Whatsapp Template Replied", i)
+    #         wtr.replied_text = response["text"]
+    #         wtr.is_replied = 1
+    #         wtr.save(ignore_permissions=True)
+    #         frappe.db.commit()

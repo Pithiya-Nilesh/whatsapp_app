@@ -11,6 +11,9 @@
   "api_endpoint",
   "version",
   "name_type",
+  "scheduler_settings_section",
+  "validate_template",
+  "daily_message_limit_per_user",
   "amended_from"
  ],
  "fields": [
@@ -58,12 +61,30 @@
    "options": "WhatsApp Api",
    "print_hide": 1,
    "read_only": 1
+  },
+  {
+   "fieldname": "daily_message_limit_per_user",
+   "fieldtype": "Data",
+   "label": "Daily Message Limit Per User"
+  },
+  {
+   "default": "0",
+   "description": "if this checked and daily limit is 3. one user can received same 3 template per day and no messages count. else one user only received total 3 messages per day.",
+   "fieldname": "validate_template",
+   "fieldtype": "Check",
+   "label": "validate template"
+  },
+  {
+   "description": "This settings is only effect in scheduler events not manual whatsapp message.",
+   "fieldname": "scheduler_settings_section",
+   "fieldtype": "Section Break",
+   "label": "Scheduler Settings"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2022-12-12 12:39:37.234829",
+ "modified": "2023-10-12 16:35:52.343430",
  "modified_by": "Administrator",
  "module": "Whatsapp App",
  "name": "WhatsApp Api",
