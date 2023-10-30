@@ -1236,20 +1236,20 @@ def generate_pdf():
             "template_name": "compliance_update",
             "parameters": []
         }
-        if check_daily_message_limit_for_user(number, "compliance_update"):
+        if check_daily_message_limit_for_user(whatsapp_no, "compliance_update"):
 
             response = requests.post(url, json=payload, headers=headers)
             data = json.loads(response.text)
 
             if "result" in data and data["result"]:
                 log = frappe.new_doc("Whatsapp Message Daily Limit Log")
-                log.whatsapp_no = number
+                log.whatsapp_no = whatsapp_no
                 log.template_name = "compliance_update"
                 log.insert()
                 frappe.db.commit()
 
                 wtsw = frappe.new_doc("Wati Webhook Template Sent")
-                wtsw.whatsapp_no = '91'+number if number else ''
+                wtsw.whatsapp_no = '91'+whatsapp_no if whatsapp_no else ''
                 wtsw.template_name = 'compliance_update'
                 wtsw.doc_type = "Supplier"
                 wtsw.doc_name = supplier
