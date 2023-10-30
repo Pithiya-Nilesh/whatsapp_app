@@ -1212,7 +1212,15 @@ def generate_pdf():
                 log.template_name = template
                 log.insert()
                 frappe.db.commit()
-        
+        else:
+            olwtm = frappe.new_doc("Over Limit Whatsapp Template Messages")
+            olwtm.doc_type = "Supplier"
+            olwtm.doc_name = supplier
+            olwtm.template_name = template
+            olwtm.file_url = file_link
+            olwtm.whatsapp_no = number
+            olwtm.insert(ignore_permissions=True)
+            frappe.db.commit()
 
     # send reminder if compliance expired in 3 days.
     supplier_unique_list = list(set(reminder_supllier))
@@ -1253,6 +1261,15 @@ def generate_pdf():
 
                 wtsw.insert(ignore_permissions=True)
                 frappe.db.commit()
+        else:
+            olwtm = frappe.new_doc("Over Limit Whatsapp Template Messages")
+            olwtm.doc_type = "Supplier"
+            olwtm.doc_name = supplier
+            olwtm.template_name = "compliance_update"
+            olwtm.file_url = file_link
+            olwtm.whatsapp_no = whatsapp_no
+            olwtm.insert(ignore_permissions=True)
+            frappe.db.commit()
         
 
 @frappe.whitelist(allow_guest=True)
@@ -1309,10 +1326,18 @@ def send_remider_if_not_repliyed():
 
                 for equipment in equipments:
                     child_row = wtsw.append("whatsapp_equipment", {})
-                    child_row.equipment_name = equipment["equipment_name"]                
+                    child_row.equipment_name = equipment["equipment_name"]          
 
                 wtsw.insert(ignore_permissions=True)
                 frappe.db.commit()
+        else:
+            olwtm = frappe.new_doc("Over Limit Whatsapp Template Messages")
+            olwtm.doc_type = i.doc_type
+            olwtm.doc_name = i.doc_name
+            olwtm.template_name = "compliance_update"
+            olwtm.whatsapp_no = i.whatsapp_no
+            olwtm.insert(ignore_permissions=True)
+            frappe.db.commit()
 
 
 @frappe.whitelist(allow_guest=True)
@@ -1384,8 +1409,7 @@ def check_daily_message_limit_for_user(number, template_name):
         return False
     else:
         # you can send message
-        return True
-    
+        return True  
 
 # 1 use case
 # 1.supplier list medvo jena equipment 72 kalak pela pura thya hoy.
