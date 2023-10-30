@@ -213,8 +213,12 @@ def template_message_replied():
     response = frappe.form_dict
     doc = frappe.db.get_value("Wati Webhook Template Sent", filters={"whatsapp_id": f'{response["whatsappMessageId"]}'}, fieldname=["name"])
     if doc:
-        frappe.db.set_value("Wati Webhook Template Sent", doc, {'is_replied': 1, 'replied_text': f'{response["text"]}'})
-        frappe.db.commit()
+        if response["text"] == "Yes":
+            frappe.db.set_value("Wati Webhook Template Sent", doc, {'is_replied': 1, 'replied_text': "Yes"})
+            frappe.db.commit()
+        elif response["text"] == "No":
+            frappe.db.set_value("Wati Webhook Template Sent", doc, {'is_replied': 1, 'replied_text': "No"})
+            frappe.db.commit()
         # if response["text"] == "Yes":
         #     equipment_list = frappe.db.get_list("Whatsapp Equipment", {"parent": doc}, pluck="name")
         
