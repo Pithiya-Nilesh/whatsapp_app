@@ -1857,7 +1857,6 @@ def send_messages_from_list_of_reminder(name):
             }
             url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{wmd.whatsapp_no}"
             response = requests.post(url, json=payload, headers=headers)
-            sleep(10)
             
         if wmd.with_reminder == 1:
             reminder_list.append(wmd.whatsapp_no)
