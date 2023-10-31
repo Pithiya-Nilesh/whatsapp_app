@@ -1621,12 +1621,13 @@ def generate_pdf_and_store_data():
             'status': status,
             'daystogo': daystogo
         })
-        if daystogo <= 3:
+        if daystogo <= 7:
             reminder_supllier.append(supplier)
 
 
     # loop through supplier dictionary and send a single email to each supplier
     for supplier, equipment_list in supplier_dict.items():
+
         message = '''
             <div>
                 <div class="sec-2">
@@ -1643,6 +1644,7 @@ def generate_pdf_and_store_data():
                         </tr>
             '''.format(supplier_dict[supplier][0]['supplier_name'])
 
+        with_reminder = 0
         # add equipment information for the current supplier to the email message
         for equipment in equipment_list:
             message += '''
@@ -1656,6 +1658,9 @@ def generate_pdf_and_store_data():
                         </tr>
             '''.format(equipment['status'], equipment['date'], equipment['daystogo'], equipment['equipment_main_category'], equipment['register_no'],
                        equipment['model'])
+
+            if equipment["daystogo"] <= 7:
+                with_reminder = 1
 
         message += '''
                     </table>
@@ -1775,47 +1780,44 @@ def generate_pdf_and_store_data():
         site_url = get_url()
         file_link = site_url + '/files/' + file_path
         
-        lowmtbs.append("whatsapp_message_details", {
-            "whatsapp_no": number,
-            "pdf_link": file_link,
-            "template_name": template,
-            "supplier_name": name_of_supplier,
-            "doc_type": "Supplier",
-            "doc_name": supplier,
-            "type": "14_days_reminder"
-        })
+        if with_reminder == 0:
+            lowmtbs.append("whatsapp_message_details", {
+                "whatsapp_no": number,
+                "pdf_link": file_link,
+                "template_name": template,
+                "supplier_name": name_of_supplier,
+                "doc_type": "Supplier",
+                "doc_name": supplier,
+                "type": "14_days_reminder"
+            })
+        else:
+            # send reminder template
+            whatsapp_no = frappe.db.get_value("Supplier", filters={'name': supplier}, fieldname=["whatsapp_no"])  
+            if whatsapp_no is None:
+                continue
+            lowmtbs.append("whatsapp_message_details", {
+                "whatsapp_no": number,
+                "pdf_link": file_link,
+                "template_name": template,
+                "supplier_name": name_of_supplier,
+                "doc_type": "Supplier",
+                "doc_name": supplier,
+                "type": "14_days_reminder",
+                "with_reminder": 1
+            })
+            wtsw = frappe.new_doc("Wati Webhook Template Sent")
+            wtsw.whatsapp_no = '91'+whatsapp_no if whatsapp_no else ''
+            wtsw.template_name = 'compliance_update'
+            wtsw.doc_type = "Supplier"
+            wtsw.doc_name = supplier
+            wtsw.date = add_to_date(datetime.now(), days=7, as_string=True, as_datetime=True)
 
+            for equipment in equipment_list:
+                child_row = wtsw.append("whatsapp_equipment", {})
+                child_row.equipment_name = equipment["equipment_name"]               
 
-    # send reminder if compliance expired in 3 days.
-    supplier_unique_list = list(set(reminder_supllier))
-
-    for r_supplier in supplier_unique_list:
-        whatsapp_no = frappe.db.get_value("Supplier", filters={'name': r_supplier}, fieldname=["whatsapp_no"])  
-        if whatsapp_no is None:
-            continue
-        
-        # send reminder template
-        lowmtbs.append("whatsapp_message_details", {
-            "whatsapp_no": number,
-            "template_name": "compliance_update",
-            "supplier_name": name_of_supplier,
-            "doc_type": "Supplier",
-            "doc_name": r_supplier,
-            "type": "3_days_reminder"
-        })
-        wtsw = frappe.new_doc("Wati Webhook Template Sent")
-        wtsw.whatsapp_no = '91'+whatsapp_no if whatsapp_no else ''
-        wtsw.template_name = 'compliance_update'
-        wtsw.doc_type = "Supplier"
-        wtsw.doc_name = r_supplier
-        wtsw.date = add_to_date(datetime.now(), days=3, as_string=True, as_datetime=True)
-
-        for equipment in equipment_list:
-            child_row = wtsw.append("whatsapp_equipment", {})
-            child_row.equipment_name = equipment["equipment_name"]               
-
-        wtsw.insert(ignore_permissions=True)
-        frappe.db.commit()
+            wtsw.insert(ignore_permissions=True)
+            frappe.db.commit()
 
     lowmtbs.insert(ignore_permissions=True)
     frappe.db.commit()
@@ -1851,21 +1853,31 @@ def send_messages_from_list_of_reminder(name):
                     }
                 ],
             }
-        elif wmd.type == "3_days_reminder":
+            url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{wmd.whatsapp_no}"
+            response = requests.post(url, json=payload, headers=headers)
+            
+        if wmd.with_reminder == 1:
             payload = {
-                "broadcast_name": wmd.template_name,
-                "template_name": wmd.template_name,
+                "broadcast_name": "compliance_update",
+                "template_name": "compliance_update",
                 "parameters": [],
             }
+            url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{wmd.whatsapp_no}"
+            response = requests.post(url, json=payload, headers=headers)
 
-
-        url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{wmd.whatsapp_no}"
-
-        response = requests.post(url, json=payload, headers=headers)
+        # elif wmd.type == "3_days_reminder":
+        #     # payload = {
+        #     #     "broadcast_name": wmd.template_name,
+        #     #     "template_name": wmd.template_name,
+        #     #     "parameters": [],
+        #     # }
+        #     payload = {
+        #         "broadcast_name": "compliance_update",
+        #         "template_name": "compliance_update",
+        #         "parameters": [],
+        #     }
 
     lowmtbs.sent = 1
+    lowmtbs.sent_date = today()
     lowmtbs.save()
     frappe.db.commit()
-
-    
-

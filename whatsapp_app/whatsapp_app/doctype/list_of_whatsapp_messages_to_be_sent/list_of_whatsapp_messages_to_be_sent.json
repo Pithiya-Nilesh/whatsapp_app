@@ -9,14 +9,16 @@
  "field_order": [
   "date",
   "whatsapp_message_details",
-  "sent"
+  "sent",
+  "sent_date"
  ],
  "fields": [
   {
    "default": "Today",
    "fieldname": "date",
    "fieldtype": "Date",
-   "label": "Date"
+   "label": "Date",
+   "read_only": 1
   },
   {
    "fieldname": "whatsapp_message_details",
@@ -30,11 +32,17 @@
    "fieldtype": "Check",
    "label": "Sent",
    "read_only": 1
+  },
+  {
+   "fieldname": "sent_date",
+   "fieldtype": "Date",
+   "label": "Sent Date",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-10-31 15:23:49.470752",
+ "modified": "2023-10-31 16:34:00.625315",
  "modified_by": "Administrator",
  "module": "Whatsapp App",
  "name": "List of WhatsApp Messages to be Sent",
