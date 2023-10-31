@@ -1,0 +1,74 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2023-10-31 12:38:37.323961",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "whatsapp_no",
+  "pdf_link",
+  "template_name",
+  "supplier_name",
+  "doc_type",
+  "doc_name",
+  "type"
+ ],
+ "fields": [
+  {
+   "fieldname": "whatsapp_no",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Whatsapp No"
+  },
+  {
+   "fieldname": "pdf_link",
+   "fieldtype": "Attach",
+   "in_list_view": 1,
+   "label": "PDF Link"
+  },
+  {
+   "fieldname": "template_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Template Name"
+  },
+  {
+   "fieldname": "doc_type",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "DocType",
+   "options": "DocType"
+  },
+  {
+   "fieldname": "doc_name",
+   "fieldtype": "Dynamic Link",
+   "in_list_view": 1,
+   "label": "DocName",
+   "options": "doc_type"
+  },
+  {
+   "fieldname": "supplier_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Supplier Name"
+  },
+  {
+   "fieldname": "type",
+   "fieldtype": "Data",
+   "label": "Type"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2023-10-31 15:08:05.139047",
+ "modified_by": "Administrator",
+ "module": "Whatsapp App",
+ "name": "Whatsapp Message Details",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

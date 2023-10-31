@@ -30,7 +30,8 @@ doctype_js = {
     "Opportunity" : "public/js/opportunity.js",
     "Customer": "public/js/customer.js",
     "Raw Data": "public/js/raw_data.js",
-    "Item": "public/js/item.js"
+    "Item": "public/js/item.js",
+    "List of WhatsApp Messages to be Sent": "public/js/list_of_messages_to_be_sent.js"
 }
 doctype_list_js = {
     "Lead" : "public/js/lead_list.js",
@@ -137,6 +138,17 @@ doctype_list_js = {
 # ---------------
 
 scheduler_events = {
+     "send_insurance_reminder": {
+       "0 10 * * 1": [
+          "whatsapp_app.whatsapp_app.doctype.api.generate_pdf_and_store_data"
+        ]
+    },
+    "delete_insurance_reminder_pdf": {
+       "0 0 1,15 * *": [
+          "whatsapp_app.whatsapp_app.doctype.api.delete_sent_file"
+        ]
+    },
+
     # "send_insurance_reminder": {
     #    "0 10 * * 1": [
     #       "whatsapp_app.whatsapp_app.doctype.api.create_table"
