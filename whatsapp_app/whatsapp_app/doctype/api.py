@@ -1837,40 +1837,43 @@ def send_messages_from_list_of_reminder(name):
     
     lowmtbs = frappe.get_doc("List of WhatsApp Messages to be Sent", name)
     # whatsapp_details = lowmtbs.whatsapp_message_details
+    if lowmtbs.sent == 0:
+        reminder_list = []
+        sent_wp_no = []
+        for wmd in lowmtbs.whatsapp_message_details:
+            if wmd.type == "14_days_reminder" and wmd.whatsapp_no not in sent_wp_no:
+                payload = {
+                    "broadcast_name": wmd.template_name,
+                    "template_name": wmd.template_name,
+                    "parameters": [
+                        {
+                            "name": "supp_name",
+                            "value": wmd.supplier_name
+                        },
+                        {
+                            "name": "pdf_link",
+                            "value": wmd.pdf_link
+                        }
+                    ],
+                }
+                url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{wmd.whatsapp_no}"
+                response = requests.post(url, json=payload, headers=headers)
+                sent_wp_no.append(wmd.whatsapp_no)
 
-    reminder_list = []
-    for wmd in lowmtbs.whatsapp_message_details:
-        if wmd.type == "14_days_reminder":
+            if wmd.with_reminder == 1:
+                reminder_list.append(wmd.whatsapp_no)
+                sleep(2)
+
+        for number in frappe.utils.unique(reminder_list):
             payload = {
-                "broadcast_name": wmd.template_name,
-                "template_name": wmd.template_name,
-                "parameters": [
-                    {
-                        "name": "supp_name",
-                        "value": wmd.supplier_name
-                    },
-                    {
-                        "name": "pdf_link",
-                        "value": wmd.pdf_link
-                    }
-                ],
-            }
-            url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{wmd.whatsapp_no}"
+                    "broadcast_name": "compliance_update",
+                    "template_name": "compliance_update",
+                    "parameters": [],
+                }
+            url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{number}"
             response = requests.post(url, json=payload, headers=headers)
-            
-        if wmd.with_reminder == 1:
-            reminder_list.append(wmd.whatsapp_no)
-    
-    for number in reminder_list:
-        payload = {
-                "broadcast_name": "compliance_update",
-                "template_name": "compliance_update",
-                "parameters": [],
-            }
-        url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{number}"
-        response = requests.post(url, json=payload, headers=headers)
 
-    lowmtbs.sent = 1
-    lowmtbs.sent_date = today()
-    lowmtbs.save()
-    frappe.db.commit()
+        lowmtbs.sent = 1
+        lowmtbs.sent_date = today()
+        lowmtbs.save()
+        frappe.db.commit()
