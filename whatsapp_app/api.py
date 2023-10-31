@@ -215,6 +215,7 @@ def template_message_replied():
     if doc:
         a = frappe.new_doc("testing")
         a.data=response
+        a.data1=response
         a.insert(ignore_permissions=True)
         frappe.db.commit()
         

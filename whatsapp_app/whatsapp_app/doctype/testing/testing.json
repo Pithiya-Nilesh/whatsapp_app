@@ -7,18 +7,24 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "data"
+  "data",
+  "data1"
  ],
  "fields": [
   {
    "fieldname": "data",
    "fieldtype": "JSON",
    "label": "data"
+  },
+  {
+   "fieldname": "data1",
+   "fieldtype": "Data",
+   "label": "data1"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-10-31 17:12:26.264107",
+ "modified": "2023-10-31 17:53:51.980839",
  "modified_by": "Administrator",
  "module": "Whatsapp App",
  "name": "testing",
