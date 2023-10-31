@@ -211,13 +211,13 @@ def sent_template_message_webhook():
 @frappe.whitelist(allow_guest=True)
 def template_message_replied():
     response = frappe.form_dict
+    a = frappe.new_doc("testing")
+    a.data=response
+    a.insert(ignore_permissions=True)
+    frappe.db.commit()
+
     doc = frappe.db.get_value("Wati Webhook Template Sent", filters={"whatsapp_id": f'{response["whatsappMessageId"]}'}, fieldname=["name"])
     if doc:
-        a = frappe.new_doc("testing")
-        a.data=response
-        a.data1=response
-        a.insert(ignore_permissions=True)
-        frappe.db.commit()
         
         if response["text"] == "Yes":
             frappe.db.set_value("Wati Webhook Template Sent", doc, {'is_replied': 1, 'replied_text': "Yes"})
