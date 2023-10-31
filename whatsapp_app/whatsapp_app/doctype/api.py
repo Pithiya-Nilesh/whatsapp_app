@@ -1252,7 +1252,7 @@ def generate_pdf():
                 wtsw.whatsapp_no = '91'+whatsapp_no if whatsapp_no else ''
                 wtsw.template_name = 'compliance_update'
                 wtsw.doc_type = "Supplier"
-                wtsw.doc_name = supplier
+                wtsw.doc_name = r_supplier
                 wtsw.date = add_to_date(datetime.now(), days=3, as_string=True, as_datetime=True)
 
                 for equipment in equipment_list:
@@ -1356,6 +1356,7 @@ def delete_sent_file():
 
 @frappe.whitelist(allow_guest=True)
 def a():
+    ''' this is testing function '''
     # access_token, api_endpoint, name_type, version = whatsapp_keys_details()
     # url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=917990915950"
     # headers = {
@@ -1404,12 +1405,12 @@ def check_daily_message_limit_for_user(number, template_name):
     else:
         whatsapp_log = frappe.db.count('Whatsapp Message Daily Limit Log', {"creation": [">", twenty_four_hours_ago], "whatsapp_no": number})
 
-    if whatsapp_log > int(dmlpu):
+    if whatsapp_log >= int(dmlpu):
         # you can`t send message
         return False
     else:
         # you can send message
-        return True  
+        return True
 
 # 1 use case
 # 1.supplier list medvo jena equipment 72 kalak pela pura thya hoy.

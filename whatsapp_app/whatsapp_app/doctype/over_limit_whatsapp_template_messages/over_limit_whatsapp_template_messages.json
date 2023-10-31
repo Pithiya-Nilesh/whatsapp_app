@@ -37,7 +37,7 @@
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
-   "options": "\nSent\nPending\nFailed"
+   "options": "\nSent\nPending\nFailed\nOver Limit"
   },
   {
    "fieldname": "file_url",
@@ -58,7 +58,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-10-30 19:41:23.411570",
+ "modified": "2023-10-30 20:10:01.419494",
  "modified_by": "Administrator",
  "module": "Whatsapp App",
  "name": "Over Limit Whatsapp Template Messages",
