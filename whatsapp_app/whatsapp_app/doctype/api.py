@@ -1,6 +1,7 @@
 import datetime
 import json
 import sys
+from time import sleep
 from frappe.utils import now, getdate
 import frappe
 from frappe.utils.data import today
@@ -1837,6 +1838,7 @@ def send_messages_from_list_of_reminder(name):
     lowmtbs = frappe.get_doc("List of WhatsApp Messages to be Sent", name)
     # whatsapp_details = lowmtbs.whatsapp_message_details
 
+    reminder_list = []
     for wmd in lowmtbs.whatsapp_message_details:
         if wmd.type == "14_days_reminder":
             payload = {
@@ -1855,27 +1857,19 @@ def send_messages_from_list_of_reminder(name):
             }
             url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{wmd.whatsapp_no}"
             response = requests.post(url, json=payload, headers=headers)
+            sleep(10)
             
         if wmd.with_reminder == 1:
-            payload = {
+            reminder_list.append(wmd.whatsapp_no)
+    
+    for number in reminder_list:
+        payload = {
                 "broadcast_name": "compliance_update",
                 "template_name": "compliance_update",
                 "parameters": [],
             }
-            url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{wmd.whatsapp_no}"
-            response = requests.post(url, json=payload, headers=headers)
-
-        # elif wmd.type == "3_days_reminder":
-        #     # payload = {
-        #     #     "broadcast_name": wmd.template_name,
-        #     #     "template_name": wmd.template_name,
-        #     #     "parameters": [],
-        #     # }
-        #     payload = {
-        #         "broadcast_name": "compliance_update",
-        #         "template_name": "compliance_update",
-        #         "parameters": [],
-        #     }
+        url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{number}"
+        response = requests.post(url, json=payload, headers=headers)
 
     lowmtbs.sent = 1
     lowmtbs.sent_date = today()
