@@ -138,16 +138,22 @@ doctype_list_js = {
 # ---------------
 
 scheduler_events = {
-    #  "send_insurance_reminder": {
-    #    "0 10 * * 1": [
-    #       "whatsapp_app.whatsapp_app.doctype.api.generate_pdf_and_store_data"
-    #     ]
-    # },
-    # "delete_insurance_reminder_pdf": {
-    #    "0 0 1,15 * *": [
-    #       "whatsapp_app.whatsapp_app.doctype.api.delete_sent_file"
-    #     ]
-    # },
+     "send_insurance_reminder": {
+       "0 10 * * 1": [
+          "whatsapp_app.whatsapp_app.doctype.api.generate_pdf_and_store_data"
+        ]
+    },
+    "delete_insurance_reminder_pdf": {
+       "0 0 1,15 * *": [
+          "whatsapp_app.whatsapp_app.doctype.api.delete_sent_file"
+        ]
+    },
+    
+    "send_remider_if_not_repliyed": {
+       "0 11 * * *": [
+          "whatsapp_app.whatsapp_app.doctype.api.send_remider_if_not_repliyed"
+        ]
+    },
 
     # "send_insurance_reminder": {
     #    "0 10 * * 1": [
