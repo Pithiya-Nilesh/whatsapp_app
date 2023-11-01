@@ -1428,7 +1428,6 @@ def check_daily_message_limit_for_user(number, template_name):
 def generate_pdf_and_store_data():
     enable_cron = frappe.db.get_single_value('Custom Settings', 'enable_cron_job')
     if enable_cron == 1:
-
         if frappe.db.get_single_value('WhatsApp Api', 'disabled'):
                 return 'Your WhatsApp api key is not set or may be disabled'
         
@@ -1827,7 +1826,7 @@ def generate_pdf_and_store_data():
 
                 for equipment in equipment_list:
                     child_row = wtsw.append("whatsapp_equipment", {})
-                    child_row.equipment_name = equipment["equipment_name"]               
+                    child_row.equipment_name = equipment["equipment_name"]     
 
                 wtsw.insert(ignore_permissions=True)
                 frappe.db.commit()
@@ -1873,22 +1872,22 @@ def send_messages_from_list_of_reminder(name):
                 test.template_name = wmd.template_name
                 test.insert(ignore_permissions=True)
                 frappe.db.commit()
-                # url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{wmd.whatsapp_no}"
-                # response = requests.post(url, json=payload, headers=headers)
-                # data = json.loads(response.text)
+                url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{wmd.whatsapp_no}"
+                response = requests.post(url, json=payload, headers=headers)
+                data = json.loads(response.text)
 
-                # if "result" in data and data["result"]:
-                #     log = frappe.new_doc("Whatsapp Message Daily Limit Log")
-                #     log.whatsapp_no = wmd.whatsapp_no
-                #     log.template_name = wmd.template_name
-                #     log.insert()
-                #     frappe.db.commit()
+                if "result" in data and data["result"]:
+                    log = frappe.new_doc("Whatsapp Message Daily Limit Log")
+                    log.whatsapp_no = wmd.whatsapp_no
+                    log.template_name = wmd.template_name
+                    log.insert()
+                    frappe.db.commit()
                 sent_wp_no.append(wmd.whatsapp_no)
 
 
             if wmd.with_reminder == 1:
                 reminder_list.append(wmd.whatsapp_no)
-        # sleep(30)
+        sleep(30)
 
         for number in frappe.utils.unique(reminder_list):
             payload = {
@@ -1896,14 +1895,14 @@ def send_messages_from_list_of_reminder(name):
                     "template_name": "compliance_update",
                     "parameters": [],
                 }
-            # url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{number}"
-            # response = requests.post(url, json=payload, headers=headers)
-            # if "result" in data and data["result"]:
-            #     log = frappe.new_doc("Whatsapp Message Daily Limit Log")
-            #     log.whatsapp_no = number
-            #     log.template_name = "compliance_update"
-            #     log.insert()
-            #     frappe.db.commit()
+            url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{number}"
+            response = requests.post(url, json=payload, headers=headers)
+            if "result" in data and data["result"]:
+                log = frappe.new_doc("Whatsapp Message Daily Limit Log")
+                log.whatsapp_no = number
+                log.template_name = "compliance_update"
+                log.insert()
+                frappe.db.commit()
 
             test = frappe.new_doc("testing")
             test.number = number
