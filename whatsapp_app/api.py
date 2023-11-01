@@ -216,9 +216,8 @@ def template_message_replied():
     a.insert(ignore_permissions=True)
     frappe.db.commit()
 
-    doc = frappe.db.get_value("Wati Webhook Template Sent", filters={"whatsapp_id": f'{response["whatsappMessageId"]}'}, fieldname=["name"])
+    doc = frappe.db.get_value("Wati Webhook Template Sent", filters={"whatsapp_id": f'{response["replyContextId"]}'}, fieldname=["name"])
     if doc:
-        
         if response["text"] == "Yes":
             frappe.db.set_value("Wati Webhook Template Sent", doc, {'is_replied': 1, 'replied_text': "Yes"})
             frappe.db.commit()
