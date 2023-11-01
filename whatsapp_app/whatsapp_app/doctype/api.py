@@ -1831,7 +1831,7 @@ def generate_pdf_and_store_data():
                 wtsw.insert(ignore_permissions=True)
                 frappe.db.commit()
 
-        if lowmtbs["whatsapp_message_details"]:
+        if lowmtbs.whatsapp_message_details:
             lowmtbs.insert(ignore_permissions=True)
             frappe.db.commit()
     
@@ -1995,7 +1995,7 @@ def send_remider_if_not_repliyed():
 
                 wtsw.insert(ignore_permissions=True)
                 frappe.db.commit()
-        if lowmtbs["whatsapp_message_details"]:
+        if lowmtbs.whatsapp_message_details:
             lowmtbs.insert(ignore_permissions=True)
             frappe.db.commit()
 
