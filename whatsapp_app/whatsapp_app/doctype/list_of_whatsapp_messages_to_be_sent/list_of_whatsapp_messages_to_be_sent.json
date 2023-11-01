@@ -50,12 +50,15 @@
    "default": "0",
    "fieldname": "is_reminder",
    "fieldtype": "Check",
-   "label": "Is Reminder"
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Is Reminder",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-11-01 10:57:11.601782",
+ "modified": "2023-11-01 19:02:46.269939",
  "modified_by": "Administrator",
  "module": "Whatsapp App",
  "name": "List of WhatsApp Messages to be Sent",

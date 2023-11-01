@@ -24,6 +24,8 @@
   {
    "fieldname": "doc_type",
    "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Doc Type",
    "options": "DocType"
   },
@@ -36,11 +38,15 @@
   {
    "fieldname": "whatsapp_no",
    "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Whatsapp No"
   },
   {
    "fieldname": "template_name",
    "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Template Name"
   },
   {
@@ -67,11 +73,15 @@
    "default": "0",
    "fieldname": "is_replied",
    "fieldtype": "Check",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Is Replied"
   },
   {
    "fieldname": "replied_text",
    "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Replied Text"
   },
   {
@@ -88,7 +98,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-11-01 11:09:58.923295",
+ "modified": "2023-11-01 19:06:19.881854",
  "modified_by": "Administrator",
  "module": "Whatsapp App",
  "name": "Wati Webhook Template Sent",
