@@ -17,7 +17,8 @@
   "column_break_vs0iu",
   "is_replied",
   "replied_text",
-  "whatsapp_equipment"
+  "whatsapp_equipment",
+  "reminder_id"
  ],
  "fields": [
   {
@@ -78,11 +79,16 @@
    "fieldtype": "Table",
    "label": "Equipment",
    "options": "Whatsapp Equipment"
+  },
+  {
+   "fieldname": "reminder_id",
+   "fieldtype": "Data",
+   "label": "Reminder ID"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-10-30 19:00:38.440646",
+ "modified": "2023-11-01 11:09:58.923295",
  "modified_by": "Administrator",
  "module": "Whatsapp App",
  "name": "Wati Webhook Template Sent",

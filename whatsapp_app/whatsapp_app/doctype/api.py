@@ -1285,63 +1285,68 @@ def get_img(phone):
 #             # return "PDF created"
 
 
-@frappe.whitelist(allow_guest=True)
-def send_remider_if_not_repliyed():
-    # scheduler event
-    if frappe.db.get_single_value('WhatsApp Api', 'disabled'):
-            return 'Your WhatsApp api key is not set or may be disabled'
+# @frappe.whitelist(allow_guest=True)
+# def send_remider_if_not_repliyed():
+#     # scheduler event
+#     enable_cron = frappe.db.get_single_value('Custom Settings', 'enable_cron_job')
+#     if enable_cron == 1:
+#         from frappe.utils import get_url
+#         site_url = get_url()
+#         if site_url == "https://www.migoo.in/" or site_url == "https://migoo.in/":
+#             if frappe.db.get_single_value('WhatsApp Api', 'disabled'):
+#                     return 'Your WhatsApp api key is not set or may be disabled'
 
-    # data = frappe.db.get_list("Wati Webhook Template Sent", filters=[["date", "=", frappe.utils.add_days(frappe.utils.now_datetime(), -6)], ["replied_text", "in", ["No", "whatsapp_no"]]], fields=["name", "whatsapp_no", "doc_type", "doc_name", "template_name"])
-    data = frappe.db.get_list("Wati Webhook Template Sent", filters=[["date", "=", frappe.utils.add_days(frappe.utils.now_datetime(), -3)], ["replied_text", "in", ["No", "whatsapp_no"]]], fields=["name", "whatsapp_no", "doc_type", "doc_name", "template_name"])
-    
-    for i in data:
-        if check_daily_message_limit_for_user(i.whatsapp_no, "compliance_update"):
-            equipments = frappe.db.get_list("Whatsapp Equipment", {"parent": i.name}, ["equipment_name"])
+#             # data = frappe.db.get_list("Wati Webhook Template Sent", filters=[["date", "=", frappe.utils.add_days(frappe.utils.now_datetime(), -6)], ["replied_text", "in", ["No", "whatsapp_no"]]], fields=["name", "whatsapp_no", "doc_type", "doc_name", "template_name"])
+#             data = frappe.db.get_list("Wati Webhook Template Sent", filters=[["date", "=", frappe.utils.add_days(frappe.utils.now_datetime(), -3)], ["replied_text", "in", ["No", "whatsapp_no"]]], fields=["name", "whatsapp_no", "doc_type", "doc_name", "template_name"])
             
-            access_token, api_endpoint, name_type, version = whatsapp_keys_details()
-            headers = {
-            "Content-Type": "text/json",
-            "Authorization": access_token
-            }
+#             for i in data:
+#                 if check_daily_message_limit_for_user(i.whatsapp_no, "compliance_update"):
+#                     equipments = frappe.db.get_list("Whatsapp Equipment", {"parent": i.name}, ["equipment_name"])
+                    
+#                     access_token, api_endpoint, name_type, version = whatsapp_keys_details()
+#                     headers = {
+#                     "Content-Type": "text/json",
+#                     "Authorization": access_token
+#                     }
 
-            url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber={i.whatsapp_no}"
-            payload = {
-                "broadcast_name": "compliance_update",
-                "template_name": "compliance_update",
-                "parameters": []
-            }
-            
-            response = requests.post(url, json=payload, headers=headers)
-            data = json.loads(response.text)
+#                     url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber={i.whatsapp_no}"
+#                     payload = {
+#                         "broadcast_name": "compliance_update",
+#                         "template_name": "compliance_update",
+#                         "parameters": []
+#                     }
+                    
+#                     response = requests.post(url, json=payload, headers=headers)
+#                     data = json.loads(response.text)
 
-            if "result" in data and data["result"]:
-                log = frappe.new_doc("Whatsapp Message Daily Limit Log")
-                log.whatsapp_no = i.whatsapp_no
-                log.template_name = "compliance_update"
-                log.insert()
-                frappe.db.commit()
+#                     if "result" in data and data["result"]:
+#                         log = frappe.new_doc("Whatsapp Message Daily Limit Log")
+#                         log.whatsapp_no = i.whatsapp_no
+#                         log.template_name = "compliance_update"
+#                         log.insert()
+#                         frappe.db.commit()
 
-                wtsw = frappe.new_doc("Wati Webhook Template Sent")
-                wtsw.whatsapp_no = i.whatsapp_no if i.whatsapp_no else ''
-                wtsw.template_name = 'compliance_update'
-                wtsw.doc_type = i.doc_type
-                wtsw.doc_name = i.doc_name
-                wtsw.date = today()
+#                         wtsw = frappe.new_doc("Wati Webhook Template Sent")
+#                         wtsw.whatsapp_no = i.whatsapp_no if i.whatsapp_no else ''
+#                         wtsw.template_name = 'compliance_update'
+#                         wtsw.doc_type = i.doc_type
+#                         wtsw.doc_name = i.doc_name
+#                         wtsw.date = today()
 
-                for equipment in equipments:
-                    child_row = wtsw.append("whatsapp_equipment", {})
-                    child_row.equipment_name = equipment["equipment_name"]          
+#                         for equipment in equipments:
+#                             child_row = wtsw.append("whatsapp_equipment", {})
+#                             child_row.equipment_name = equipment["equipment_name"]          
 
-                wtsw.insert(ignore_permissions=True)
-                frappe.db.commit()
-        else:
-            olwtm = frappe.new_doc("Over Limit Whatsapp Template Messages")
-            olwtm.doc_type = i.doc_type
-            olwtm.doc_name = i.doc_name
-            olwtm.template_name = "compliance_update"
-            olwtm.whatsapp_no = i.whatsapp_no
-            olwtm.insert(ignore_permissions=True)
-            frappe.db.commit()
+#                         wtsw.insert(ignore_permissions=True)
+#                         frappe.db.commit()
+#                 else:
+#                     olwtm = frappe.new_doc("Over Limit Whatsapp Template Messages")
+#                     olwtm.doc_type = i.doc_type
+#                     olwtm.doc_name = i.doc_name
+#                     olwtm.template_name = "compliance_update"
+#                     olwtm.whatsapp_no = i.whatsapp_no
+#                     olwtm.insert(ignore_permissions=True)
+#                     frappe.db.commit()
 
 
 @frappe.whitelist(allow_guest=True)
@@ -1811,12 +1816,14 @@ def generate_pdf_and_store_data():
                     "type": "14_days_reminder",
                     "with_reminder": 1
                 })
+                from frappe.utils import random_string
                 wtsw = frappe.new_doc("Wati Webhook Template Sent")
                 wtsw.whatsapp_no = '91'+whatsapp_no if whatsapp_no else ''
                 wtsw.template_name = 'compliance_update'
                 wtsw.doc_type = "Supplier"
                 wtsw.doc_name = supplier
                 wtsw.date = add_to_date(datetime.now(), days=7, as_string=True, as_datetime=True)
+                wtsw.reminder_id = random_string(40)
 
                 for equipment in equipment_list:
                     child_row = wtsw.append("whatsapp_equipment", {})
@@ -1861,22 +1868,27 @@ def send_messages_from_list_of_reminder(name):
                         }
                     ],
                 }
-                url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{wmd.whatsapp_no}"
-                response = requests.post(url, json=payload, headers=headers)
-                data = json.loads(response.text)
+                test = frappe.new_doc("testing")
+                test.number = wmd.whatsapp_no
+                test.template_name = wmd.template_name
+                test.insert(ignore_permissions=True)
+                frappe.db.commit()
+                # url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{wmd.whatsapp_no}"
+                # response = requests.post(url, json=payload, headers=headers)
+                # data = json.loads(response.text)
 
-                if "result" in data and data["result"]:
-                    log = frappe.new_doc("Whatsapp Message Daily Limit Log")
-                    log.whatsapp_no = wmd.whatsapp_no
-                    log.template_name = wmd.template_name
-                    log.insert()
-                    frappe.db.commit()
-                    sent_wp_no.append(wmd.whatsapp_no)
+                # if "result" in data and data["result"]:
+                #     log = frappe.new_doc("Whatsapp Message Daily Limit Log")
+                #     log.whatsapp_no = wmd.whatsapp_no
+                #     log.template_name = wmd.template_name
+                #     log.insert()
+                #     frappe.db.commit()
+                sent_wp_no.append(wmd.whatsapp_no)
 
 
             if wmd.with_reminder == 1:
                 reminder_list.append(wmd.whatsapp_no)
-                sleep(2)
+        # sleep(30)
 
         for number in frappe.utils.unique(reminder_list):
             payload = {
@@ -1884,16 +1896,89 @@ def send_messages_from_list_of_reminder(name):
                     "template_name": "compliance_update",
                     "parameters": [],
                 }
-            url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{number}"
-            response = requests.post(url, json=payload, headers=headers)
-            if "result" in data and data["result"]:
-                log = frappe.new_doc("Whatsapp Message Daily Limit Log")
-                log.whatsapp_no = number
-                log.template_name = "compliance_update"
-                log.insert()
-                frappe.db.commit()
+            # url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{number}"
+            # response = requests.post(url, json=payload, headers=headers)
+            # if "result" in data and data["result"]:
+            #     log = frappe.new_doc("Whatsapp Message Daily Limit Log")
+            #     log.whatsapp_no = number
+            #     log.template_name = "compliance_update"
+            #     log.insert()
+            #     frappe.db.commit()
+
+            test = frappe.new_doc("testing")
+            test.number = number
+            test.template_name = "compliance_update"
+            test.insert(ignore_permissions=True)
+            frappe.db.commit()
 
         lowmtbs.sent = 1
         lowmtbs.sent_date = today()
         lowmtbs.save()
         frappe.db.commit()
+
+
+
+
+
+
+
+
+
+# # send again message if not answer was received
+# @frappe.whitelist(allow_guest=True)
+# def send_remider_if_not_repliyed():
+#     # scheduler event
+#     enable_cron = frappe.db.get_single_value('Custom Settings', 'enable_cron_job')
+#     if enable_cron == 1:
+#         if frappe.db.get_single_value('WhatsApp Api', 'disabled'):
+#                 return 'Your WhatsApp api key is not set or may be disabled'
+
+#         # data = frappe.db.get_list("Wati Webhook Template Sent", filters=[["date", "=", frappe.utils.add_days(frappe.utils.now_datetime(), -6)], ["replied_text", "in", ["No", "whatsapp_no"]]], fields=["name", "whatsapp_no", "doc_type", "doc_name", "template_name"])
+#         data = frappe.db.get_list("Wati Webhook Template Sent", filters=[["date", "=", frappe.utils.add_days(frappe.utils.now_datetime(), -3)], ["replied_text", "in", ["No", "whatsapp_no"]]], fields=["name", "whatsapp_no", "doc_type", "doc_name", "template_name"])
+        
+#         for i in data:
+
+#             equipments = frappe.db.get_list("Whatsapp Equipment", {"parent": i.name}, ["equipment_name"])
+            
+#             wtsw = frappe.new_doc("Wati Webhook Template Sent")
+#             wtsw.whatsapp_no = i.whatsapp_no if i.whatsapp_no else ''
+#             wtsw.template_name = 'compliance_update'
+#             wtsw.doc_type = i.doc_type
+#             wtsw.doc_name = i.doc_name
+#             wtsw.date = today()
+#             wtsw.reminder_id = i.reminder_id
+#             for equipment in equipments:
+#                 child_row = wtsw.append("whatsapp_equipment", {})
+#                 child_row.equipment_name = equipment["equipment_name"]        
+
+#             wtsw.insert(ignore_permissions=True)
+#             frappe.db.commit()
+
+
+
+# @frappe.whitelist(allow_guest=True)
+# def send_whatsapp_message_if_answer_not_received(name):
+    # if frappe.db.get_single_value('WhatsApp Api', 'disabled'):
+    #     return 'Your WhatsApp api key is not set or may be disabled'
+    # access_token, api_endpoint, name_type, version = whatsapp_keys_details()
+    # headers = {
+    # "Content-Type": "text/json",
+    # "Authorization": access_token
+    # }
+
+    # url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber={i.whatsapp_no}"
+    # payload = {
+    #     "broadcast_name": "compliance_update",
+    #     "template_name": "compliance_update",
+    #     "parameters": []
+    # }
+    
+    # response = requests.post(url, json=payload, headers=headers)
+    # data = json.loads(response.text)
+
+    # if "result" in data and data["result"]:
+    #     log = frappe.new_doc("Whatsapp Message Daily Limit Log")
+    #     log.whatsapp_no = i.whatsapp_no
+    #     log.template_name = "compliance_update"
+    #     log.insert()
+    #     frappe.db.commit()
