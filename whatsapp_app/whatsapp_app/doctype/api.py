@@ -1888,7 +1888,7 @@ def send_messages_from_list_of_reminder(name):
 
             if wmd.with_reminder == 1:
                 reminder_list.append(wmd.whatsapp_no)
-        sleep(30)
+                sleep(2)
 
         for number in frappe.utils.unique(reminder_list):
             payload = {
@@ -1949,6 +1949,28 @@ def send_messages_from_list_of_reminder(name):
         lowmtbs.sent_date = today()
         lowmtbs.save()
         frappe.db.commit()
+
+
+    # send report to migoo managment
+    from frappe.utils import get_url
+    numbers = ['7990915950', '8238875334']
+    report = f"{get_url()}/api/method/frappe.utils.print_format.download_pdf?doctype=List of WhatsApp Messages to be Sent&name={name}"
+    payload = {
+                "broadcast_name": "sent_pdf",
+                "template_name": "sent_pdf",
+                "parameters": [{
+                            "name": "pdf_link",
+                            "value": report
+                        },
+                        {
+                            "name": "doctype_name",
+                            "value": "equipment reminder whatsapp list report"
+                        }],
+            }
+    for number in numbers:
+        url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{number}"
+        response = requests.post(url, json=payload, headers=headers)
+
 
 
 ############################## send again message if not answer was received #############################
