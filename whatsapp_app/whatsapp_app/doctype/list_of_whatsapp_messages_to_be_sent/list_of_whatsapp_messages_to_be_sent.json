@@ -35,7 +35,8 @@
    "fieldtype": "Check",
    "in_list_view": 1,
    "in_standard_filter": 1,
-   "label": "Sent"
+   "label": "Sent",
+   "read_only": 1
   },
   {
    "fieldname": "sent_date",
@@ -57,7 +58,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-11-02 11:04:36.558219",
+ "modified": "2023-11-02 11:25:48.824522",
  "modified_by": "Administrator",
  "module": "Whatsapp App",
  "name": "List of WhatsApp Messages to be Sent",
@@ -74,6 +75,15 @@
    "role": "System Manager",
    "share": 1,
    "write": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Guest",
+   "share": 1
   }
  ],
  "sort_field": "modified",
