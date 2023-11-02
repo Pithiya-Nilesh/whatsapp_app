@@ -9,21 +9,31 @@ frappe.ui.form.on("List of WhatsApp Messages to be Sent", {
         if (hasWhatsAppManagerRole || isAdmin) {
             if(frm.doc.sent == 0){
                 frm.add_custom_button(__("Send Whatsapp Message"), function(){
-                    frappe.call({
-                        method: 'whatsapp_app.whatsapp_app.doctype.api.send_messages_from_list_of_reminder',
-                        args: {
-                            name: frm.doc.name
-                        },
-                        callback: function(r) {
-                            console.log("asdf", r)
-                            // if (!r.exc) {
-                                
-                                // }
+                    
+
+                    frappe.confirm('Are you sure you want to send this reminder messages in whatsapp?',
+                    () => {
+                        // action to perform if Yes is selected
+                        frappe.call({
+                            method: 'whatsapp_app.whatsapp_app.doctype.api.send_messages_from_list_of_reminder',
+                            args: {
+                                name: frm.doc.name
                             },
-                            // freeze: true
-                        })
+                            callback: function(r) {
+                                console.log("asdf", r)
+                                // if (!r.exc) {
+                                    
+                                    // }
+                                },
+                                // freeze: true
+                            })
+                            
+                        }, () => {
+                            // action to perform if No is selected
+                            // alert("no")
+                        })               
                     });
-            }
+                    }
               
         }
 
