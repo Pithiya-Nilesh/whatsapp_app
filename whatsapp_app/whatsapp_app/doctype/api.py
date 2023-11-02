@@ -1954,7 +1954,7 @@ def send_messages_from_list_of_reminder(name):
     # send report to migoo managment
     from frappe.utils import get_url
     numbers = ['7990915950', '8238875334']
-    report = f"{get_url()}/api/method/frappe.utils.print_format.download_pdf?doctype=List of WhatsApp Messages to be Sent&name={name}"
+    report = f"{get_url()}/api/method/frappe.utils.print_format.download_pdf?doctype=List%20of%20WhatsApp%20Messages%20to%20be%20Sent&name={name}"
     payload = {
                 "broadcast_name": "sent_pdf",
                 "template_name": "sent_pdf",
