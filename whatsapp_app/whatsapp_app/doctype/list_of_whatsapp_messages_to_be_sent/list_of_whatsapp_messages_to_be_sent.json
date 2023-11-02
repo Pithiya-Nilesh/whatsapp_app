@@ -11,6 +11,7 @@
   "whatsapp_message_details",
   "sent",
   "sent_date",
+  "sent_by",
   "is_reminder"
  ],
  "fields": [
@@ -35,8 +36,7 @@
    "fieldtype": "Check",
    "in_list_view": 1,
    "in_standard_filter": 1,
-   "label": "Sent",
-   "read_only": 1
+   "label": "Sent"
   },
   {
    "fieldname": "sent_date",
@@ -54,11 +54,19 @@
    "in_standard_filter": 1,
    "label": "Is Reminder",
    "read_only": 1
+  },
+  {
+   "fieldname": "sent_by",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Sent By",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-11-02 11:25:48.824522",
+ "modified": "2023-11-02 16:56:24.812674",
  "modified_by": "Administrator",
  "module": "Whatsapp App",
  "name": "List of WhatsApp Messages to be Sent",
