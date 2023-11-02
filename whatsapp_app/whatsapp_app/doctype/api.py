@@ -1873,16 +1873,16 @@ def send_messages_from_list_of_reminder(name):
                 test.template_name = wmd.template_name
                 test.insert(ignore_permissions=True)
                 frappe.db.commit()
-                # url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{wmd.whatsapp_no}"
-                # response = requests.post(url, json=payload, headers=headers)
-                # data = json.loads(response.text)
+                url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{wmd.whatsapp_no}"
+                response = requests.post(url, json=payload, headers=headers)
+                data = json.loads(response.text)
 
-                # if "result" in data and data["result"]:
-                #     log = frappe.new_doc("Whatsapp Message Daily Limit Log")
-                #     log.whatsapp_no = wmd.whatsapp_no
-                #     log.template_name = wmd.template_name
-                #     log.insert()
-                #     frappe.db.commit()
+                if "result" in data and data["result"]:
+                    log = frappe.new_doc("Whatsapp Message Daily Limit Log")
+                    log.whatsapp_no = wmd.whatsapp_no
+                    log.template_name = wmd.template_name
+                    log.insert()
+                    frappe.db.commit()
                 sent_wp_no.append(wmd.whatsapp_no)
 
 
@@ -1972,7 +1972,12 @@ def send_messages_from_list_of_reminder(name):
     for number in numbers:
         url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{number}"
         response = requests.post(url, json=payload, headers=headers)
-
+       
+        test = frappe.new_doc("testing")
+        test.number = number
+        test.template_name = "sent_pdf"
+        test.insert(ignore_permissions=True)
+        frappe.db.commit()
 
 
 ############################## send again message if not answer was received #############################
@@ -2022,9 +2027,3 @@ def send_remider_if_not_repliyed():
         if lowmtbs.whatsapp_message_details:
             lowmtbs.insert(ignore_permissions=True)
             frappe.db.commit()
-
-
-@frappe.whitelist(allow_guest=True)
-def a():
-    from frappe.utils import get_url
-    return f"{get_url()}/api/method/frappe.utils.print_format.download_pdf?doctype=List%20of%20WhatsApp%20Messages%20to%20be%20Sent&name=2c5674d9e5"
