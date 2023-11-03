@@ -1,6 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "format:{date}-{#####}",
  "creation": "2023-10-31 12:42:21.557977",
  "default_view": "List",
  "doctype": "DocType",
@@ -21,7 +22,7 @@
    "fieldtype": "Date",
    "in_list_view": 1,
    "in_standard_filter": 1,
-   "label": "Date",
+   "label": "Create Date",
    "read_only": 1
   },
   {
@@ -66,10 +67,11 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-11-02 16:56:24.812674",
+ "modified": "2023-11-03 12:28:39.426288",
  "modified_by": "Administrator",
  "module": "Whatsapp App",
  "name": "List of WhatsApp Messages to be Sent",
+ "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
   {

@@ -6,10 +6,10 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
+  "supplier_name",
   "whatsapp_no",
   "pdf_link",
   "template_name",
-  "supplier_name",
   "with_reminder",
   "doc_type",
   "doc_name",
@@ -26,7 +26,8 @@
    "fieldname": "pdf_link",
    "fieldtype": "Attach",
    "in_list_view": 1,
-   "label": "PDF Link"
+   "label": "PDF Link",
+   "print_hide": 1
   },
   {
    "fieldname": "template_name",
@@ -46,7 +47,8 @@
    "fieldtype": "Dynamic Link",
    "in_list_view": 1,
    "label": "DocName",
-   "options": "doc_type"
+   "options": "doc_type",
+   "print_hide": 1
   },
   {
    "fieldname": "supplier_name",
@@ -57,7 +59,8 @@
   {
    "fieldname": "type",
    "fieldtype": "Data",
-   "label": "Type"
+   "label": "Type",
+   "print_hide": 1
   },
   {
    "default": "0",
@@ -70,7 +73,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2023-10-31 16:34:21.581716",
+ "modified": "2023-11-03 13:17:17.945932",
  "modified_by": "Administrator",
  "module": "Whatsapp App",
  "name": "Whatsapp Message Details",

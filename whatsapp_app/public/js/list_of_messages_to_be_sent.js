@@ -32,9 +32,7 @@ frappe.ui.form.on("List of WhatsApp Messages to be Sent", {
                         }
                     )               
                 });
-            }   
+            }  
         }
-
-
     }
 })
