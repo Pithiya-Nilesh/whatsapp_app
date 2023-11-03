@@ -1873,16 +1873,17 @@ def send_messages_from_list_of_reminder(name):
                 test.template_name = wmd.template_name
                 test.insert(ignore_permissions=True)
                 frappe.db.commit()
-                url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{wmd.whatsapp_no}"
-                response = requests.post(url, json=payload, headers=headers)
-                data = json.loads(response.text)
+               
+                # url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{wmd.whatsapp_no}"
+                # response = requests.post(url, json=payload, headers=headers)
+                # data = json.loads(response.text)
 
-                if "result" in data and data["result"]:
-                    log = frappe.new_doc("Whatsapp Message Daily Limit Log")
-                    log.whatsapp_no = wmd.whatsapp_no
-                    log.template_name = wmd.template_name
-                    log.insert()
-                    frappe.db.commit()
+                # if "result" in data and data["result"]:
+                #     log = frappe.new_doc("Whatsapp Message Daily Limit Log")
+                #     log.whatsapp_no = wmd.whatsapp_no
+                #     log.template_name = wmd.template_name
+                #     log.insert()
+                #     frappe.db.commit()
                 sent_wp_no.append(wmd.whatsapp_no)
 
 
@@ -1955,7 +1956,8 @@ def send_messages_from_list_of_reminder(name):
 
     # send report to migoo managment
     from frappe.utils import get_url
-    numbers = ['9879832427', '8401265878', '7990915950', '9313086301', '9724547104', '8347718490', '9886107360', '9708618353', '9898019009']
+    # numbers = ['9879832427', '8401265878', '7990915950', '9313086301', '9724547104', '8347718490', '9886107360', '9708618353', '9898019009']
+    numbers = ['7990915950']
     report = f"{get_url()}/api/method/frappe.utils.print_format.download_pdf?doctype=List%20of%20WhatsApp%20Messages%20to%20be%20Sent&name={name}"
     payload = {
                 "broadcast_name": "sent_pdf",
