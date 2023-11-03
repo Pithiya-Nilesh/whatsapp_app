@@ -1874,16 +1874,16 @@ def send_messages_from_list_of_reminder(name):
                 test.insert(ignore_permissions=True)
                 frappe.db.commit()
                
-                # url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{wmd.whatsapp_no}"
-                # response = requests.post(url, json=payload, headers=headers)
-                # data = json.loads(response.text)
+                url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{wmd.whatsapp_no}"
+                response = requests.post(url, json=payload, headers=headers)
+                data = json.loads(response.text)
 
-                # if "result" in data and data["result"]:
-                #     log = frappe.new_doc("Whatsapp Message Daily Limit Log")
-                #     log.whatsapp_no = wmd.whatsapp_no
-                #     log.template_name = wmd.template_name
-                #     log.insert()
-                #     frappe.db.commit()
+                if "result" in data and data["result"]:
+                    log = frappe.new_doc("Whatsapp Message Daily Limit Log")
+                    log.whatsapp_no = wmd.whatsapp_no
+                    log.template_name = wmd.template_name
+                    log.insert()
+                    frappe.db.commit()
 
                 sent_wp_no.append(wmd.whatsapp_no)
 
@@ -1898,14 +1898,14 @@ def send_messages_from_list_of_reminder(name):
                     "template_name": "compliance_update",
                     "parameters": [],
                 }
-            # url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{number}"
-            # response = requests.post(url, json=payload, headers=headers)
-            # if "result" in data and data["result"]:
-            #     log = frappe.new_doc("Whatsapp Message Daily Limit Log")
-            #     log.whatsapp_no = number
-            #     log.template_name = "compliance_update"
-            #     log.insert()
-            #     frappe.db.commit()
+            url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{number}"
+            response = requests.post(url, json=payload, headers=headers)
+            if "result" in data and data["result"]:
+                log = frappe.new_doc("Whatsapp Message Daily Limit Log")
+                log.whatsapp_no = number
+                log.template_name = "compliance_update"
+                log.insert()
+                frappe.db.commit()
 
             test = frappe.new_doc("testing")
             test.number = number
@@ -1931,15 +1931,15 @@ def send_messages_from_list_of_reminder(name):
                     "parameters": []
                 }
                 
-                # response = requests.post(url, json=payload, headers=headers)
-                # data = json.loads(response.text)
+                response = requests.post(url, json=payload, headers=headers)
+                data = json.loads(response.text)
 
-                # if "result" in data and data["result"]:
-                #     log = frappe.new_doc("Whatsapp Message Daily Limit Log")
-                #     log.whatsapp_no = wmd.whatsapp_no
-                #     log.template_name = "compliance_update"
-                #     log.insert()
-                #     frappe.db.commit()
+                if "result" in data and data["result"]:
+                    log = frappe.new_doc("Whatsapp Message Daily Limit Log")
+                    log.whatsapp_no = wmd.whatsapp_no
+                    log.template_name = "compliance_update"
+                    log.insert()
+                    frappe.db.commit()
                 
                 sent_r_wp_no.append(wmd.whatsapp_no)
                 test = frappe.new_doc("testing")
@@ -1973,8 +1973,8 @@ def send_messages_from_list_of_reminder(name):
             }
     for number in numbers:
 
-        # url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{number}"
-        # response = requests.post(url, json=payload, headers=headers)
+        url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{number}"
+        response = requests.post(url, json=payload, headers=headers)
        
         test = frappe.new_doc("testing")
         test.number = number
