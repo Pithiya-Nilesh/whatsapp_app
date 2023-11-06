@@ -211,10 +211,6 @@ def sent_template_message_webhook():
 @frappe.whitelist(allow_guest=True)
 def template_message_replied():
     response = frappe.form_dict
-    a = frappe.new_doc("testing")
-    a.data=response
-    a.insert(ignore_permissions=True)
-    frappe.db.commit()
 
     doc = frappe.db.get_value("Wati Webhook Template Sent", filters={"whatsapp_id": f'{response["replyContextId"]}'}, fieldname=["name"])
     if doc:
@@ -227,6 +223,24 @@ def template_message_replied():
         # if response["text"] == "Yes":
         #     equipment_list = frappe.db.get_list("Whatsapp Equipment", {"parent": doc}, pluck="name")
         
+    else:
+        wa_data = response
+        se_mo = wa_data["waId"][-10:]
+        f_data = frappe.db.get_value("wati call message log", f"{se_mo}", "data")
+        if f_data is not None:
+            raw_data = json.loads(f_data)
+            raw_data['data'].append(wa_data)
+            data = json.dumps(raw_data)
+            frappe.db.set_value('wati call message log', f'{se_mo}', {'data': f'{data}', "read": 0, "time": now()})
+        else:
+            data = {"data": []}
+            data['data'].append(wa_data)
+            data = json.dumps(data)
+            doc = frappe.get_doc({"doctype": "wati call message log", "phone": f"{se_mo}", "data": f"{data}", "read": 0, "time": now()})
+            doc.insert()
+            frappe.db.commit()
+            # frappe.db.set_value("wati call message log", f'{se_mo}', "read", 0)
+        return 'success'
 
     # doc = frappe.db.get_value(
     #     "Wati Webhook Template Sent",
