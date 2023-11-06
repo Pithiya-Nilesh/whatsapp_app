@@ -25,22 +25,34 @@ def set_data(first_name, mobile):
 
 def data(**kwargs):
     wa_data = frappe.local.form_dict
-    se_mo = wa_data["waId"][-10:]
-    f_data = frappe.db.get_value("wati call message log", f"{se_mo}", "data")
-    if f_data is not None:
-        raw_data = json.loads(f_data)
-        raw_data['data'].append(wa_data)
-        data = json.dumps(raw_data)
-        frappe.db.set_value('wati call message log', f'{se_mo}', {'data': f'{data}', "read": 0, "time": now()})
-    else:
-        data = {"data": []}
-        data['data'].append(wa_data)
-        data = json.dumps(data)
-        doc = frappe.get_doc({"doctype": "wati call message log", "phone": f"{se_mo}", "data": f"{data}", "read": 0, "time": now()})
-        doc.insert()
-        frappe.db.commit()
-        # frappe.db.set_value("wati call message log", f'{se_mo}', "read", 0)
-    return 'success'
+    doc = frappe.db.get_value("Wati Webhook Template Sent", filters={"whatsapp_id": f'{wa_data["replyContextId"]}'}, fieldname=["name"])
+    if doc:
+        if wa_data["text"] == "Yes":
+            frappe.db.set_value("Wati Webhook Template Sent", doc, {'is_replied': 1, 'replied_text': "Yes"})
+            frappe.db.commit()
+        elif wa_data["text"] == "No":
+            frappe.db.set_value("Wati Webhook Template Sent", doc, {'is_replied': 1, 'replied_text': "No"})
+            frappe.db.commit()
+        # if response["text"] == "Yes":
+        #     equipment_list = frappe.db.get_list("Whatsapp Equipment", {"parent": doc}, pluck="name")
+
+    else:  
+        se_mo = wa_data["waId"][-10:]
+        f_data = frappe.db.get_value("wati call message log", f"{se_mo}", "data")
+        if f_data is not None:
+            raw_data = json.loads(f_data)
+            raw_data['data'].append(wa_data)
+            data = json.dumps(raw_data)
+            frappe.db.set_value('wati call message log', f'{se_mo}', {'data': f'{data}', "read": 0, "time": now()})
+        else:
+            data = {"data": []}
+            data['data'].append(wa_data)
+            data = json.dumps(data)
+            doc = frappe.get_doc({"doctype": "wati call message log", "phone": f"{se_mo}", "data": f"{data}", "read": 0, "time": now()})
+            doc.insert()
+            frappe.db.commit()
+            # frappe.db.set_value("wati call message log", f'{se_mo}', "read", 0)
+        return 'success'
 
 def message_read(**kwargs):
     wa_data = frappe.local.form_dict
