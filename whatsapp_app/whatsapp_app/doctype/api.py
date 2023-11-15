@@ -1919,6 +1919,17 @@ def send_messages_from_list_of_reminder(name=""):
                     wmcl.insert(ignore_permissions=True)
 
                     # set comment whatsapp message sent
+                    # comment(wmd.whatsapp_no, template_name=wmd.template_name, bt=[
+                    #     {
+                    #         "name": "supp_name",
+                    #         "value": wmd.supplier_name
+                    #     },
+                    #     {
+                    #         "name": "pdf_link",
+                    #         "value": wmd.pdf_link
+                    #     }
+                    # ])
+
                     from whatsapp_app.api import set_comment
                     content = f"<div class='card'><b style='color: green' class='px-2 pt-2'>Whatsapp Compliance Template Sent: </b> <a href='{wmd.pdf_link}' class='px-2 pb-2'>{wmd.pdf_link}</span></div>"
                     set_comment("Supplier", wmd.doc_name, "Administrator", content)
