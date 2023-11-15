@@ -18,12 +18,14 @@
   {
    "fieldname": "doc_type",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "DocType",
    "options": "DocType"
   },
   {
    "fieldname": "doc_name",
    "fieldtype": "Dynamic Link",
+   "hidden": 1,
    "label": "DocName",
    "options": "doc_type"
   },
@@ -51,7 +53,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-11-10 12:49:21.915009",
+ "modified": "2023-11-15 13:05:12.806020",
  "modified_by": "Administrator",
  "module": "Whatsapp App",
  "name": "Whatsapp Message Compliance Log",
