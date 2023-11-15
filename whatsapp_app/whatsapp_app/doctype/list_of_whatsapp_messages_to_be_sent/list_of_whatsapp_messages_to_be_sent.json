@@ -13,7 +13,8 @@
   "sent",
   "sent_date",
   "sent_by",
-  "is_reminder"
+  "is_reminder",
+  "message_type"
  ],
  "fields": [
   {
@@ -63,11 +64,17 @@
    "in_standard_filter": 1,
    "label": "Sent By",
    "read_only": 1
+  },
+  {
+   "fieldname": "message_type",
+   "fieldtype": "Select",
+   "label": "Message Type",
+   "options": "compliance updates pdf\ncompliance reminder"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-11-03 12:28:39.426288",
+ "modified": "2023-11-15 10:26:28.135864",
  "modified_by": "Administrator",
  "module": "Whatsapp App",
  "name": "List of WhatsApp Messages to be Sent",

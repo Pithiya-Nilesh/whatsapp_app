@@ -183,7 +183,6 @@ def message_received():
 #     return timeline_contents
 
 
-
 @frappe.whitelist(allow_guest=True)
 def wati_r_webhooks():
     data1 = frappe.call(r_data, **frappe.form_dict)
@@ -204,7 +203,6 @@ def r_data(**kwargs):
     frappe.db.commit()
         # frappe.db.set_value("wati call message log", f'{se_mo}', "read", 0)
     return 'success'
-
 
 
 @frappe.whitelist(allow_guest=True)
@@ -291,3 +289,4 @@ def template_message_replied():
     #         wtr.is_replied = 1
     #         wtr.save(ignore_permissions=True)
     #         frappe.db.commit()
+
