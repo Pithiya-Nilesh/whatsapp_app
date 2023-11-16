@@ -156,11 +156,11 @@ scheduler_events = {
         ]
     },
 
-    "send_insurance_reminder_daily_from_list": {
-       "0 11 * * *": [
-          "whatsapp_app.whatsapp_app.doctype.api.send_whatsapp_reminder_using_scheduler"
-        ]
-    },
+    # "send_insurance_reminder_daily_from_list": {
+    #    "0 11 * * *": [
+    #       "whatsapp_app.whatsapp_app.doctype.api.send_whatsapp_reminder_using_scheduler"
+    #     ]
+    # },
     
     # "send_remider_if_not_repliyed": {
     #    "0 11 * * *": [
