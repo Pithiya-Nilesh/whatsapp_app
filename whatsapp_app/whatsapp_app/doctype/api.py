@@ -1901,39 +1901,38 @@ def send_messages_from_list_of_reminder(name=""):
                 test.insert(ignore_permissions=True)
                 frappe.db.commit()
                 
-                # url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{wmd.whatsapp_no}"
-                # response = requests.post(url, json=payload, headers=headers)
-                # data = json.loads(response.text)
+                url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{wmd.whatsapp_no}"
+                response = requests.post(url, json=payload, headers=headers)
+                data = json.loads(response.text)
 
-                # if "result" in data and data["result"]:
-                log = frappe.new_doc("Whatsapp Message Daily Limit Log")
-                log.whatsapp_no = wmd.whatsapp_no
-                log.template_name = wmd.template_name
-                log.insert()
-                frappe.db.commit()
+                if "result" in data and data["result"]:
+                    log = frappe.new_doc("Whatsapp Message Daily Limit Log")
+                    log.whatsapp_no = wmd.whatsapp_no
+                    log.template_name = wmd.template_name
+                    log.insert()
+                    frappe.db.commit()
 
-                wmcl = frappe.new_doc("Whatsapp Message Compliance Log")
-                wmcl.whatsapp_no = wmd.whatsapp_no
-                wmcl.template_name = wmd.template_name
-                wmcl.sent_date = today()
-                wmcl.insert(ignore_permissions=True)
+                    wmcl = frappe.new_doc("Whatsapp Message Compliance Log")
+                    wmcl.whatsapp_no = wmd.whatsapp_no
+                    wmcl.template_name = wmd.template_name
+                    wmcl.sent_date = today()
+                    wmcl.insert(ignore_permissions=True)
 
-                # set comment whatsapp message sent
-                # comment(wmd.whatsapp_no, template_name=wmd.template_name, bt=[
-                #     {
-                #         "name": "supp_name",
-                #         "value": wmd.supplier_name
-                #     },
-                #     {
-                #         "name": "pdf_link",
-                #         "value": wmd.pdf_link
-                #     }
-                # ])
+                    # set comment whatsapp message sent
+                    # comment(wmd.whatsapp_no, template_name=wmd.template_name, bt=[
+                    #     {
+                    #         "name": "supp_name",
+                    #         "value": wmd.supplier_name
+                    #     },
+                    #     {
+                    #         "name": "pdf_link",
+                    #         "value": wmd.pdf_link
+                    #     }
+                    # ])
 
-                from whatsapp_app.api import set_comment
-                content = f"<div class='card'><b style='color: green' class='px-2 pt-2'>Whatsapp Compliance Template Sent: </b> <a href='{wmd.pdf_link}' class='px-2 pb-2'>{wmd.pdf_link}</span></div>"
-                set_comment("Supplier", wmd.doc_name, "Administrator", content)
-
+                    from whatsapp_app.api import set_comment
+                    content = f"<div class='card'><b style='color: green' class='px-2 pt-2'>Whatsapp Compliance Template Sent: </b> <a href='{wmd.pdf_link}' class='px-2 pb-2'>{wmd.pdf_link}</span></div>"
+                    set_comment("Supplier", wmd.doc_name, "Administrator", content)
 
                 sent_wp_no.append(wmd.whatsapp_no)
 
@@ -1949,27 +1948,25 @@ def send_messages_from_list_of_reminder(name=""):
                     "parameters": [],
                 }
 
-            # url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{number}"
-            # response = requests.post(url, json=payload, headers=headers)
-            # if "result" in data and data["result"]:
-            log = frappe.new_doc("Whatsapp Message Daily Limit Log")
-            log.whatsapp_no = number
-            log.template_name = "compliance_update"
-            log.insert()
-            frappe.db.commit()
+            url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{number}"
+            response = requests.post(url, json=payload, headers=headers)
+            if "result" in data and data["result"]:
+                log = frappe.new_doc("Whatsapp Message Daily Limit Log")
+                log.whatsapp_no = number
+                log.template_name = "compliance_update"
+                log.insert()
+                frappe.db.commit()
 
-            wmcl = frappe.new_doc("Whatsapp Message Compliance Log")
-            wmcl.whatsapp_no = number
-            wmcl.template_name = "compliance_update"
-            wmcl.sent_date = today()
-            wmcl.insert(ignore_permissions=True)
+                wmcl = frappe.new_doc("Whatsapp Message Compliance Log")
+                wmcl.whatsapp_no = number
+                wmcl.template_name = "compliance_update"
+                wmcl.sent_date = today()
+                wmcl.insert(ignore_permissions=True)
 
-            # # set comment whatsapp message sent
-            # from whatsapp_app.api import set_comment
-            # content = f"<div class='card'><b style='color: green' class='px-2 pt-2'>Whatsapp Reminder Template Sent: </b> <span class='px-2 pb-2'>{wmd.pdf_link}</span></div>"
-            # set_comment("Supplier", wmd.doc_name, "Administrator", content)
-
-
+                # # set comment whatsapp message sent
+                # from whatsapp_app.api import set_comment
+                # content = f"<div class='card'><b style='color: green' class='px-2 pt-2'>Whatsapp Reminder Template Sent: </b> <span class='px-2 pb-2'>{wmd.pdf_link}</span></div>"
+                # set_comment("Supplier", wmd.doc_name, "Administrator", content)
 
             test = frappe.new_doc("testing")
             test.number = number
@@ -1994,23 +1991,21 @@ def send_messages_from_list_of_reminder(name=""):
                     "parameters": []
                 }
                 
-                # response = requests.post(url, json=payload, headers=headers)
-                # data = json.loads(response.text)
+                response = requests.post(url, json=payload, headers=headers)
+                data = json.loads(response.text)
 
-                # if "result" in data and data["result"]:
-                log = frappe.new_doc("Whatsapp Message Daily Limit Log")
-                log.whatsapp_no = wmd.whatsapp_no
-                log.template_name = "compliance_update"
-                log.insert()
-                frappe.db.commit()
+                if "result" in data and data["result"]:
+                    log = frappe.new_doc("Whatsapp Message Daily Limit Log")
+                    log.whatsapp_no = wmd.whatsapp_no
+                    log.template_name = "compliance_update"
+                    log.insert()
+                    frappe.db.commit()
 
-                wmcl = frappe.new_doc("Whatsapp Message Compliance Log")
-                wmcl.whatsapp_no = wmd.whatsapp_no
-                wmcl.template_name = "compliance_update"
-                wmcl.sent_date = today()
-                wmcl.insert(ignore_permissions=True)
-
-                
+                    wmcl = frappe.new_doc("Whatsapp Message Compliance Log")
+                    wmcl.whatsapp_no = wmd.whatsapp_no
+                    wmcl.template_name = "compliance_update"
+                    wmcl.sent_date = today()
+                    wmcl.insert(ignore_permissions=True)
                 
                 sent_r_wp_no.append(wmd.whatsapp_no)
                 test = frappe.new_doc("testing")
@@ -2106,8 +2101,8 @@ def send_remider_if_not_repliyed():
 #####################  send reminder message from list using scheduler ###################################
 @frappe.whitelist(allow_guest=True)
 def send_whatsapp_reminder_using_scheduler():
-    # enable_cron = frappe.db.get_single_value('Custom Settings', 'enable_cron_job')
-    # if enable_cron == 1:
-    names = frappe.db.get_list("List of WhatsApp Messages to be Sent", filters={"date": today(), "sent": 0}, fields=["name"], pluck='name')
-    for name in names:
-        send_messages_from_list_of_reminder(name)
+    enable_cron = frappe.db.get_single_value('Custom Settings', 'enable_cron_job')
+    if enable_cron == 1:
+        names = frappe.db.get_list("List of WhatsApp Messages to be Sent", filters={"date": today(), "sent": 0}, fields=["name"], pluck='name')
+        for name in names:
+            send_messages_from_list_of_reminder(name)
