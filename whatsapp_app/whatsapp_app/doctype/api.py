@@ -1679,88 +1679,65 @@ def generate_pdf_and_store_data():
                     with_reminder = 1
 
             message += '''
+                       </table>
+                </div>
+            </div>
+                    <p>Get it renewed as soon as possible to avoid further inconvenience.</p>
+                    <p>Thank you for choosing Migoo. We value your trust and are committed to providing you with the best service possible.
+                    </p>
+                    <div><b>Thanks & Regards,</b></div>
+                    <div><b>Migoo Equipments</b></div> <br>
+                    <div>
+                        <table>
+                            <tr>
+                                <td style="border-right: 2.5px solid #e6992a; "> <img height="100px" width="200px"
+                                        src="https://ci3.googleusercontent.com/mail-sig/AIorK4xApvOKaFkqmuwgsKjfjYF0ASUBwoLoS100ryDehj-y7MrZPbkfvSIkssRcAMOn-yd-FOcSH30">
+                                </td>
+                                <td style="padding-left:12px; color: black;">
+                                    <div style="display: flex; margin-bottom: 2px;"> <img src="https://www.migoo.in/files/call (1).png"
+                                            height="16px" width="16px" style="margin-top: auto; margin-bottom: auto;">
+                                        <div style="margin-left: 5px;"> +91 79692 12223 </div>
+                                    </div>
+                                    <div style="display: flex; margin-bottom: 2px;"> <img src="https://www.migoo.in/files/email1ead26.png"
+                                            height="16px" width="16px" style="margin-top: auto; margin-bottom: auto;"> <a
+                                            style="color: black;" href="mailto:info@migoo.in" style="text-decoration: none;">
+                                            <div style="margin-left: 5px;">info@migoo.in</div>
+                                        </a> </div>
+                                    <div style="display: flex; margin-bottom: 2px;"> <img src="https://www.migoo.in/files/link.png"
+                                            height="16px" width="16px" style="margin-top: auto; margin-bottom: auto;"> <a
+                                            style="color: black;" href="https://www.migoo.in">
+                                            <div style="margin-left: 5px;">www.migoo.in</div>
+                                        </a> </div>
+                                    <div style="display: flex; margin-bottom: 2px;"> <img src="https://www.migoo.in/files/location.png"
+                                            height="16px" width="16px" style="margin-top: auto; margin-bottom: auto;">
+                                        <div style="margin-left: 5px;">Migved Solutions Private Limited,</div>
+                                    </div>
+                                    <div style="margin-left: 20px;"> A-1204, Mondeal Heights, <br> Iskcon Cross Road, S.G.Highway, <br>
+                                        Ahmedabad-380058 </div>
+                                    <div style="margin-top: 10px;"> <a
+                                            href="https://www.facebook.com/people/Migoo-Equipments/100087829991875/?mibextid=ZbWKwL"
+                                            target="_blank"> <img src="https://www.migoo.in/files/facebook.png" style="height: 20px;"></a>
+                                        <a href="https://www.instagram.com/migoo_equipment/?igshid=YmMyMTA2M2Y%3D"> <img
+                                                src="https://www.migoo.in/files/instagram.png" style="height: 20px;"></a> <a
+                                            href="https://www.linkedin.com/authwall?trk=bf&trkInfo=AQE3GrOu_soLXAAAAYTnfV7Ak5NhrLNM9IxIvNuvfFL51XjUZjWDRN_WROWhhGDHQfI05HuUk46hX4INHsRvXff6X08bFwXCpC3OG-A7nocY7Rtqb7kN1teuUQMukrXRVO5ai84=&original_referer=&sessionRedirect=https%3A%2F%2Fwww.linkedin.com%2Fin%2Fmigoo-equipments-270563257">
+                                            <img src="https://www.migoo.in/files/linkedin.png" style="height: 20px;"></a> <a
+                                            href="https://twitter.com/MigooEquipments"> <img
+                                                src="https://www.migoo.in/files/twitter-sign.png" style="height: 20px;"></a>
+                                    </div>
+                                </td>
+                            </tr>
                         </table>
                     </div>
+
+            <br>
+            <div>
+
+                <div style="display: flex; margin-bottom: 2px;">
+                    <img
+                        src="https://lh4.googleusercontent.com/Tg-ugYQdUjAPJTtdSu3Rc8pYT0hONyb7dbg-Z0LN2iYvKbhazcdWIu_Vyn7-m7IIPdU0fd9VwxdDKm90nE6tVaAeQ4_b13OV79O7w9sPJiJP4YOqt2juD4XWgjK4v4E5TmIVuOsY3dDyuQ7p3-B4ndw">
+                    <div style="color: green; margin-left: 5px;">Consider The Environment. Think Before You Print.</div>
                 </div>
-                <p>Get it renewed as soon as possible to avoid further inconvenience.</p>
-                <p>Thank you for choosing Migoo. We value your trust and are committed to providing you with the best service possible.</p>
-                <div><b>Thanks & Regards,</b></div>
-                <br>
-                <div><b>Surya Prakash Pal</b></div>
-                <div><b>Assistant Manager</b></div> 
-                <br>
-                <div>
-                    <table>
-                        <tr>
-                            <td style="border-right: 2.5px solid #e6992a; ">
-                                <img
-                                    src="https://ci3.googleusercontent.com/mail-sig/AIorK4zf_Mw4U0lrUBfnOuVQzvYfOGDhx1WSRbMtBaWBErGIoq8nQyLPAziA9SF9qRoUVfH4b4fWMfM">
-                            </td>
-                            <td style="padding-left:12px; color: black;">
-                                <div style="display: flex; margin-bottom: 2px;">
-                                    <img src="https://www.migoo.in/files/call (1).png" height="16px" width="16px"
-                                        style="margin-top: auto; margin-bottom: auto;">
-                                    <div style="margin-left: 5px;">
-                                        +91 79692 12202
-                                    </div>
-                                </div>
-
-                                <div style="display: flex; margin-bottom: 2px;">
-                                    <img src="https://www.migoo.in/files/email1ead26.png" height="16px" width="16px"
-                                        style="margin-top: auto; margin-bottom: auto;">
-                                    <a style="color: black;" href="mailto:surya@migoo.in" style="text-decoration: none;">
-                                        <div style="margin-left: 5px;">surya@migoo.in</div>
-                                    </a>
-                                </div>
-
-                                <div style="display: flex; margin-bottom: 2px;">
-                                    <img src="https://www.migoo.in/files/link.png" height="16px" width="16px"
-                                        style="margin-top: auto; margin-bottom: auto;">
-                                    <a style="color: black;" href="https://www.migoo.in">
-                                        <div style="margin-left: 5px;">www.migoo.in</div>
-                                    </a>
-                                </div>
-
-                                <div style="display: flex; margin-bottom: 2px;">
-                                    <img src="https://www.migoo.in/files/location.png" height="16px" width="16px"
-                                        style="margin-top: auto; margin-bottom: auto;">
-                                    <div style="margin-left: 5px;">Migved Solutions Private Limited,</div>
-                                </div>
-                                <div style="margin-left: 20px;">
-                                    A-1204, Mondeal Heights,
-                                    <br> Iskcon Cross Road, S.G.Highway, <br>
-                                    Ahmedabad-380058
-                                </div>
-
-                                <div style="margin-top: 10px;">
-                                    <a href="https://www.facebook.com/people/Migoo-Equipments/100087829991875/?mibextid=ZbWKwL"
-                                        target="_blank">
-                                        <img src="https://www.migoo.in/files/facebook.png" style="height: 20px;"></a>
-
-                                    <a href="https://www.instagram.com/migoo_equipment/?igshid=YmMyMTA2M2Y%3D">
-                                        <img src="https://www.migoo.in/files/instagram.png" style="height: 20px;"></a>
-
-                                    <a
-                                        href="https://www.linkedin.com/authwall?trk=bf&trkInfo=AQE3GrOu_soLXAAAAYTnfV7Ak5NhrLNM9IxIvNuvfFL51XjUZjWDRN_WROWhhGDHQfI05HuUk46hX4INHsRvXff6X08bFwXCpC3OG-A7nocY7Rtqb7kN1teuUQMukrXRVO5ai84=&original_referer=&sessionRedirect=https%3A%2F%2Fwww.linkedin.com%2Fin%2Fmigoo-equipments-270563257">
-                                        <img src="https://www.migoo.in/files/linkedin.png" style="height: 20px;"></a>
-
-                                    <a href="https://twitter.com/MigooEquipments">
-                                        <img src="https://www.migoo.in/files/twitter-sign.png" style="height: 20px;"></a>
-                                </div>
-                            </td>
-                        </tr>
-                    </table>
-                </div>
-
-                <br>
-                <div>
-
-                    <div style="display: flex; margin-bottom: 2px;">
-                        <img
-                            src="https://lh4.googleusercontent.com/Tg-ugYQdUjAPJTtdSu3Rc8pYT0hONyb7dbg-Z0LN2iYvKbhazcdWIu_Vyn7-m7IIPdU0fd9VwxdDKm90nE6tVaAeQ4_b13OV79O7w9sPJiJP4YOqt2juD4XWgjK4v4E5TmIVuOsY3dDyuQ7p3-B4ndw">
-                        <div style="color: green; margin-left: 5px;">Consider The Environment. Think Before You Print.</div>
-                    </div>
-                </div>
+            </div>
                 '''                           
             #     print("\n", supplier_dict, "\n")
             # return supplier_dict
@@ -2021,81 +1998,81 @@ def send_messages_from_list_of_reminder(name=""):
         frappe.db.commit()
 
 
-    # # send report to migoo managment
-    # from frappe.utils import get_url
-    # numbers = ['9879832427', '8401265878', '7990915950', '9313086301', '9724547104', '8347718490', '9886107360', '9708618353', '9898019009']
-    # report = f"{get_url()}/api/method/frappe.utils.print_format.download_pdf?doctype=List%20of%20WhatsApp%20Messages%20to%20be%20Sent&name={name}"
-    # payload = {
-    #             "broadcast_name": "sent_pdf",
-    #             "template_name": "sent_pdf",
-    #             "parameters": [{
-    #                         "name": "pdf_link",
-    #                         "value": f"{report}"
-    #                     },
-    #                     {
-    #                         "name": "doctype_name",
-    #                         "value": "equipment reminder whatsapp list report"
-    #                     }],
-    #         }
-    # for number in numbers:
+    # send report to migoo managment
+    from frappe.utils import get_url
+    numbers = ['9879832427', '8401265878', '7990915950', '9313086301', '9724547104', '8347718490', '9886107360', '9708618353', '9898019009']
+    report = f"{get_url()}/api/method/frappe.utils.print_format.download_pdf?doctype=List%20of%20WhatsApp%20Messages%20to%20be%20Sent&name={name}"
+    payload = {
+                "broadcast_name": "sent_pdf",
+                "template_name": "sent_pdf",
+                "parameters": [{
+                            "name": "pdf_link",
+                            "value": f"{report}"
+                        },
+                        {
+                            "name": "doctype_name",
+                            "value": "equipment reminder whatsapp list report"
+                        }],
+            }
+    for number in numbers:
 
-    #     url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{number}"
-    #     response = requests.post(url, json=payload, headers=headers)
+        url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{number}"
+        response = requests.post(url, json=payload, headers=headers)
        
-    #     test = frappe.new_doc("testing")
-    #     test.number = number
-    #     test.template_name = "sent_pdf"
-    #     test.insert(ignore_permissions=True)
-    #     frappe.db.commit()
+        test = frappe.new_doc("testing")
+        test.number = number
+        test.template_name = "sent_pdf"
+        test.insert(ignore_permissions=True)
+        frappe.db.commit()
 
 
 ############################## send again message if not answer was received #############################
 
-@frappe.whitelist(allow_guest=True)
-def send_remider_if_not_repliyed():
-    # scheduler event
-    enable_cron = frappe.db.get_single_value('Custom Settings', 'enable_cron_job')
-    if enable_cron == 1:
-        if frappe.db.get_single_value('WhatsApp Api', 'disabled'):
-                return 'Your WhatsApp api key is not set or may be disabled'
+# @frappe.whitelist(allow_guest=True)
+# def send_remider_if_not_repliyed():
+#     # scheduler event
+#     enable_cron = frappe.db.get_single_value('Custom Settings', 'enable_cron_job')
+#     if enable_cron == 1:
+#         if frappe.db.get_single_value('WhatsApp Api', 'disabled'):
+#                 return 'Your WhatsApp api key is not set or may be disabled'
 
-        # data = frappe.db.get_list("Wati Webhook Template Sent", filters=[["date", "=", frappe.utils.add_days(frappe.utils.now_datetime(), -6)], ["replied_text", "in", ["No", "whatsapp_no"]]], fields=["name", "whatsapp_no", "doc_type", "doc_name", "template_name"])
-        data = frappe.db.get_list("Wati Webhook Template Sent", filters=[["date", "=", frappe.utils.add_days(frappe.utils.now_datetime(), -3)], ["replied_text", "in", ["No", ""]]], fields=["name", "whatsapp_no", "doc_type", "doc_name", "template_name", "reminder_id"])
-        lowmtbs = frappe.new_doc("List of WhatsApp Messages to be Sent")
-        lowmtbs.is_reminder = 1
-        r_whatsapp = []
-        for i in data:
-            check = frappe.db.count("Wati Webhook Template Sent", {"reminder_id": i.reminder_id})
-            if check <= 3:
-                equipments = frappe.db.get_list("Whatsapp Equipment", {"parent": i.name}, ["equipment_name"])
+#         # data = frappe.db.get_list("Wati Webhook Template Sent", filters=[["date", "=", frappe.utils.add_days(frappe.utils.now_datetime(), -6)], ["replied_text", "in", ["No", "whatsapp_no"]]], fields=["name", "whatsapp_no", "doc_type", "doc_name", "template_name"])
+#         data = frappe.db.get_list("Wati Webhook Template Sent", filters=[["date", "=", frappe.utils.add_days(frappe.utils.now_datetime(), -3)], ["replied_text", "in", ["No", ""]]], fields=["name", "whatsapp_no", "doc_type", "doc_name", "template_name", "reminder_id"])
+#         lowmtbs = frappe.new_doc("List of WhatsApp Messages to be Sent")
+#         lowmtbs.is_reminder = 1
+#         r_whatsapp = []
+#         for i in data:
+#             check = frappe.db.count("Wati Webhook Template Sent", {"reminder_id": i.reminder_id})
+#             if check <= 3:
+#                 equipments = frappe.db.get_list("Whatsapp Equipment", {"parent": i.name}, ["equipment_name"])
                 
-                if i.whatsapp_no not in r_whatsapp:
-                    lowmtbs.append("whatsapp_message_details", {
-                        "whatsapp_no": i.whatsapp_no[-10:],
-                        "template_name": "compliance_update",
-                        "supplier_name": i.doc_name,
-                        "doc_type": "Supplier",
-                        "doc_name": i.doc_name,
-                    })
-                    r_whatsapp.append(i.whatsapp_no)
+#                 if i.whatsapp_no not in r_whatsapp:
+#                     lowmtbs.append("whatsapp_message_details", {
+#                         "whatsapp_no": i.whatsapp_no[-10:],
+#                         "template_name": "compliance_update",
+#                         "supplier_name": i.doc_name,
+#                         "doc_type": "Supplier",
+#                         "doc_name": i.doc_name,
+#                     })
+#                     r_whatsapp.append(i.whatsapp_no)
 
 
-                wtsw = frappe.new_doc("Wati Webhook Template Sent")
-                wtsw.whatsapp_no = i.whatsapp_no if i.whatsapp_no else ''
-                wtsw.template_name = 'compliance_update'
-                wtsw.doc_type = i.doc_type
-                wtsw.doc_name = i.doc_name
-                wtsw.date = today()
-                wtsw.reminder_id = i.reminder_id
-                for equipment in equipments:
-                    child_row = wtsw.append("whatsapp_equipment", {})
-                    child_row.equipment_name = equipment["equipment_name"]
+#                 wtsw = frappe.new_doc("Wati Webhook Template Sent")
+#                 wtsw.whatsapp_no = i.whatsapp_no if i.whatsapp_no else ''
+#                 wtsw.template_name = 'compliance_update'
+#                 wtsw.doc_type = i.doc_type
+#                 wtsw.doc_name = i.doc_name
+#                 wtsw.date = today()
+#                 wtsw.reminder_id = i.reminder_id
+#                 for equipment in equipments:
+#                     child_row = wtsw.append("whatsapp_equipment", {})
+#                     child_row.equipment_name = equipment["equipment_name"]
 
-                wtsw.insert(ignore_permissions=True)
-                frappe.db.commit()
-        if lowmtbs.whatsapp_message_details:
-            lowmtbs.insert(ignore_permissions=True)
-            frappe.db.commit()
+#                 wtsw.insert(ignore_permissions=True)
+#                 frappe.db.commit()
+#         if lowmtbs.whatsapp_message_details:
+#             lowmtbs.insert(ignore_permissions=True)
+#             frappe.db.commit()
 
 
 #####################  send reminder message from list using scheduler ###################################
