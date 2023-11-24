@@ -1999,31 +1999,31 @@ def send_messages_from_list_of_reminder(name=""):
 
 
     # send report to migoo managment
-    from frappe.utils import get_url
-    numbers = ['9879832427', '8401265878', '7990915950', '9313086301', '9724547104', '8347718490', '9886107360', '9708618353', '9898019009']
-    report = f"{get_url()}/api/method/frappe.utils.print_format.download_pdf?doctype=List%20of%20WhatsApp%20Messages%20to%20be%20Sent&name={name}"
-    payload = {
-                "broadcast_name": "sent_pdf",
-                "template_name": "sent_pdf",
-                "parameters": [{
-                            "name": "pdf_link",
-                            "value": f"{report}"
-                        },
-                        {
-                            "name": "doctype_name",
-                            "value": "equipment reminder whatsapp list report"
-                        }],
-            }
-    for number in numbers:
+    # from frappe.utils import get_url
+    # numbers = ['9879832427', '8401265878', '7990915950', '9313086301', '9724547104', '8347718490', '9886107360', '9708618353', '9898019009']
+    # report = f"{get_url()}/api/method/frappe.utils.print_format.download_pdf?doctype=List%20of%20WhatsApp%20Messages%20to%20be%20Sent&name={name}"
+    # payload = {
+    #             "broadcast_name": "sent_pdf",
+    #             "template_name": "sent_pdf",
+    #             "parameters": [{
+    #                         "name": "pdf_link",
+    #                         "value": f"{report}"
+    #                     },
+    #                     {
+    #                         "name": "doctype_name",
+    #                         "value": "equipment reminder whatsapp list report"
+    #                     }],
+    #         }
+    # for number in numbers:
 
-        url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{number}"
-        response = requests.post(url, json=payload, headers=headers)
+    #     url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{number}"
+    #     response = requests.post(url, json=payload, headers=headers)
        
-        test = frappe.new_doc("testing")
-        test.number = number
-        test.template_name = "sent_pdf"
-        test.insert(ignore_permissions=True)
-        frappe.db.commit()
+    #     test = frappe.new_doc("testing")
+    #     test.number = number
+    #     test.template_name = "sent_pdf"
+    #     test.insert(ignore_permissions=True)
+    #     frappe.db.commit()
 
 
 ############################## send again message if not answer was received #############################
