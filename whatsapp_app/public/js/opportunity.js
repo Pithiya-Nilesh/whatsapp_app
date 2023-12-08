@@ -1,6 +1,6 @@
 
 frappe.ui.form.on("Opportunity", {
-    refresh: function (frm) {
+    onload: function (frm) {
         var f_name = cur_frm.doc.contact_person;
 
         var container = $('<div class="custom-container">').appendTo(frm.wrapper);
