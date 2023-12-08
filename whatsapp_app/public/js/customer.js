@@ -1,5 +1,5 @@
 frappe.ui.form.on("Customer", {
-    onload: function (frm) {
+    refresh: function (frm) {
         var f_name = cur_frm.doc.customer_name;
 
         var container = $('<div class="custom-container">').appendTo(frm.wrapper);
