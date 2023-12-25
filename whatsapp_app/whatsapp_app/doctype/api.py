@@ -1430,23 +1430,686 @@ def get_compliance_template_count(whatsapp_no, template_name):
         
 ########################## New UI Code Start ###########################
 
+# @frappe.whitelist(allow_guest=True)
+# def generate_pdf_and_store_data():
+#     enable_cron = frappe.db.get_single_value('Custom Settings', 'enable_cron_job')
+#     if enable_cron == 1:
+#         if frappe.db.get_single_value('WhatsApp Api', 'disabled'):
+#                 return 'Your WhatsApp api key is not set or may be disabled'
+        
+#         # send first template
+#         lowmtbs = frappe.new_doc("List of WhatsApp Messages to be Sent")
+
+#         name = frappe.db.sql("""
+
+#         with insurance as (
+#             select 
+#                 name,
+#                 supplier,
+#                 supplier_email,
+#                 supplier_name,
+#                 equipment_main_category,
+#                 register_no,
+#                 CASE
+#                     WHEN rto_register = 'Registered' THEN model
+#                     ELSE equipment_model_no
+#                 END AS "model",
+#                 insurance_date as 'insurance_dt',
+#                 DATEDIFF(insurance_date, CURDATE()) as 'insuranceDaysToGo',
+#                 CONCAT('Insurance') AS 'insurances'
+#             from tabItem
+#             where
+#                 insurance_date >= CURDATE()
+#                 AND DATEDIFF(insurance_date, CURDATE()) <= 15
+#         ),
+#         fitness as (
+#             select 
+#                 name,
+#                 supplier,
+#                 supplier_email,
+#                 supplier_name,
+#                 equipment_main_category,
+#                 register_no,
+#                 CASE
+#                     WHEN rto_register = 'Registered' THEN model
+#                     ELSE equipment_model_no
+#                 END AS "model",
+#                 fitness_dt as 'fitness_dt',
+#                 DATEDIFF(fitness_dt, CURDATE()) as 'FitnessDaysToGo',
+#                 CONCAT('Fitness') AS 'fitnesses'
+#             from tabItem
+#             where
+#                 fitness_dt >= CURDATE() 
+#                 AND DATEDIFF(fitness_dt, CURDATE()) <= 15
+#         ),
+#         PUC as (
+#             select 
+#                 name,
+#                 supplier,
+#                 supplier_email,
+#                 supplier_name,
+#                 equipment_main_category,
+#                 register_no,
+#                 CASE
+#                     WHEN rto_register = 'Registered' THEN model
+#                     ELSE equipment_model_no
+#                 END AS "model",
+#                 pollution as 'pollution_dt',
+#                 DATEDIFF(pollution, CURDATE()) as 'PollutionDaysToGo',
+#                 CONCAT('Pollution') AS 'Pollutions'
+#             from tabItem
+#             where
+#                 pollution >= CURDATE()
+#                 AND DATEDIFF(pollution, CURDATE()) <= 15
+#         ),
+#         npermit as (
+#             select
+#                 name,
+#                 supplier,
+#                 supplier_email,
+#                 supplier_name,
+#                 equipment_main_category,
+#                 register_no,
+#                 CASE
+#                     WHEN rto_register = 'Registered' THEN model
+#                     ELSE equipment_model_no
+#                 END AS "model",
+#                 npermit_upto as 'npermit_upto_dt',
+#                 DATEDIFF(npermit_upto, CURDATE()) as 'National_PermitDaysToGo',
+#                 CONCAT('National Permit') AS 'National_Permits'
+#             from tabItem
+#             where
+#                 npermit_upto >= CURDATE()
+#                 AND DATEDIFF(npermit_upto, CURDATE()) <= 15
+#         ),
+#         permit_validity as (
+#             select
+#                 name,
+#                 supplier,
+#                 supplier_email,
+#                 supplier_name,
+#                 equipment_main_category,
+#                 register_no,
+#                 CASE
+#                     WHEN rto_register = 'Registered' THEN model
+#                     ELSE equipment_model_no
+#                 END AS "model",
+#                 permit_validity_upto as 'permit_validity_upto_dt',
+#                 DATEDIFF(permit_validity_upto, CURDATE()) as 'State_PermitDaysToGo',
+#                 CONCAT('State Permit') AS 'State_Permits'
+#             from tabItem
+#             where
+#                 permit_validity_upto >= CURDATE()
+#                 AND DATEDIFF(permit_validity_upto, CURDATE()) <= 15
+#         )
+#         select 
+#             name,
+#             supplier,
+#             supplier_email,
+#             supplier_name,
+#             equipment_main_category,
+#             register_no,
+#             model,
+#             DATE_FORMAT(insurance_dt, '%d-%m-%Y'), 
+#             insurances,
+#             insuranceDaysToGo
+#         from insurance
+#         union
+#         select 
+#             name,
+#             supplier,
+#             supplier_email,
+#             supplier_name,
+#             equipment_main_category,
+#             register_no,
+#             model,
+#             DATE_FORMAT(fitness_dt, '%d-%m-%Y'), 
+#             fitnesses,
+#             FitnessDaysToGo
+#         from fitness
+#         union
+#         select 
+#             name,
+#             supplier,
+#             supplier_email,
+#             supplier_name,
+#             equipment_main_category,
+#             register_no,
+#             model,
+#             DATE_FORMAT(pollution_dt, '%d-%m-%Y'),
+#             Pollutions,
+#             PollutionDaysToGo
+#         from PUC
+#         union
+#         select
+#             name,
+#             supplier,
+#             supplier_email,
+#             supplier_name,
+#             equipment_main_category,
+#             register_no,
+#             model,
+#             DATE_FORMAT(npermit_upto_dt, '%d-%m-%Y'),
+#             National_Permits,
+#             National_PermitDaysToGo
+#         from npermit
+#         union
+#         select
+#             name,
+#             supplier,
+#             supplier_email,
+#             supplier_name,
+#             equipment_main_category,
+#             register_no,
+#             model,
+#             DATE_FORMAT(permit_validity_upto_dt, '%d-%m-%Y'),
+#             State_Permits,
+#             State_PermitDaysToGo
+#         from permit_validity
+            
+#         """)
+
+#     # create a dictionary to store equipment information for each supplier
+#         supplier_dict = defaultdict(list)
+#         reminder_supllier = []
+
+#         for i in name:
+#             equipment_name = i[0]
+#             supplier = i[1]
+#             supplier_email = i[2]
+#             supplier_name =  i[3]
+#             equipment_main_category = i[4]
+#             register_no = i[5]
+#             model = i[6]
+#             date = i[7]
+#             status = i[8]
+#             daystogo = i[9]
+
+#             # add equipment information to supplier dictionary
+#             supplier_dict[supplier].append({
+#                 'equipment_name': equipment_name,
+#                 'supplier_email': supplier_email,
+#                 'supplier_name': supplier_name,
+#                 'equipment_main_category': equipment_main_category,
+#                 'register_no': register_no,
+#                 'model': model,
+#                 'date': date,
+#                 'status': status,
+#                 'daystogo': daystogo
+#             })
+#             if daystogo <= 7:
+#                 reminder_supllier.append(supplier)
+
+
+#         # loop through supplier dictionary and send a single email to each supplier
+#         for supplier, equipment_list in supplier_dict.items():
+
+#             message = '''
+#                 <div>
+#                     <div class="sec-2">
+#                         <h3 style="">Hello, {}</h4>
+#                         <p>We are writing to remind you that your Equipment's documents are set to expire. The details are mentioned below.</p>
+#                         <table border="1px" cellspacing="0" cellpadding="4" style="border-collapse: collapse;">
+#                             <tr style="background-color: #e6992a;">
+#                                 <th style="border: 1px solid black; padding: 4px;">Compliance</th>
+#                                 <th style="border: 1px solid black; padding: 4px;">Valid Till</th>
+#                                 <th style="border: 1px solid black; padding: 4px;">Expiring in</th>
+#                                 <th style="border: 1px solid black; padding: 4px;">Equipment</th>
+#                                 <th style="border: 1px solid black; padding: 4px;">Equipment No</th>
+#                                 <th style="border: 1px solid black; padding: 4px;">Model No</th>
+#                             </tr>
+#                 '''.format(supplier_dict[supplier][0]['supplier_name'])
+
+#             with_reminder = 0
+#             # add equipment information for the current supplier to the email message
+#             for equipment in equipment_list:
+#                 message += '''
+#                             <tr>
+#                                 <td style="border: 1px solid black; padding: 4px; text-align: center;">{}</td>
+#                                 <td style="border: 1px solid black; padding: 4px; text-align: center;">{}</td>
+#                                 <td style="border: 1px solid black; padding: 4px; text-align: center;">{} Days to Go</td>
+#                                 <td style="border: 1px solid black; padding: 4px; text-align: center;">{}</td>
+#                                 <td style="border: 1px solid black; padding: 4px; text-align: center;">{}</td>
+#                                 <td style="border: 1px solid black; padding: 4px; text-align: center;">{}</td>
+#                             </tr>
+#                 '''.format(equipment['status'], equipment['date'], equipment['daystogo'], equipment['equipment_main_category'], equipment['register_no'],
+#                         equipment['model'])
+
+#                 if equipment["daystogo"] <= 7:
+#                     with_reminder = 1
+
+#             message += '''
+#                        </table>
+#                 </div>
+#             </div>
+#                     <p>Get it renewed as soon as possible to avoid further inconvenience.</p>
+#                     <p>Thank you for choosing Migoo. We value your trust and are committed to providing you with the best service possible.
+#                     </p>
+#                     <div><b>Thanks & Regards,</b></div>
+#                     <div><b>Migoo Equipments</b></div> <br>
+#                     <div>
+#                         <table>
+#                             <tr>
+#                                 <td style="border-right: 2.5px solid #e6992a; ">
+#                                 <img
+#                                     src="https://www.migoo.in/files/logo-w250%20(1).png">
+#                                 </td>
+#                                 <td style="padding-left:12px; color: black;">
+#                                     <div style="display: flex; margin-bottom: 2px;"> <img src="https://www.migoo.in/files/call (1).png"
+#                                             height="16px" width="16px" style="margin-top: auto; margin-bottom: auto;">
+#                                         <div style="margin-left: 5px;"> +91 79692 12223 </div>
+#                                     </div>
+#                                     <div style="display: flex; margin-bottom: 2px;"> <img src="https://www.migoo.in/files/email1ead26.png"
+#                                             height="16px" width="16px" style="margin-top: auto; margin-bottom: auto;"> <a
+#                                             style="color: black;" href="mailto:info@migoo.in" style="text-decoration: none;">
+#                                             <div style="margin-left: 5px;">info@migoo.in</div>
+#                                         </a> </div>
+#                                     <div style="display: flex; margin-bottom: 2px;"> <img src="https://www.migoo.in/files/link.png"
+#                                             height="16px" width="16px" style="margin-top: auto; margin-bottom: auto;"> <a
+#                                             style="color: black;" href="https://www.migoo.in">
+#                                             <div style="margin-left: 5px;">www.migoo.in</div>
+#                                         </a> </div>
+#                                     <div style="display: flex; margin-bottom: 2px;"> <img src="https://www.migoo.in/files/location.png"
+#                                             height="16px" width="16px" style="margin-top: auto; margin-bottom: auto;">
+#                                         <div style="margin-left: 5px;">Migved Solutions Private Limited,</div>
+#                                     </div>
+#                                     <div style="margin-left: 20px;"> A-1204, Mondeal Heights, <br> Iskcon Cross Road, S.G.Highway, <br>
+#                                         Ahmedabad-380058 </div>
+#                                     <div style="margin-top: 10px;"> <a
+#                                             href="https://www.facebook.com/people/Migoo-Equipments/100087829991875/?mibextid=ZbWKwL"
+#                                             target="_blank"> <img src="https://www.migoo.in/files/facebook.png" style="height: 20px;"></a>
+#                                         <a href="https://www.instagram.com/migoo_equipment/?igshid=YmMyMTA2M2Y%3D"> <img
+#                                                 src="https://www.migoo.in/files/instagram.png" style="height: 20px;"></a> <a
+#                                             href="https://www.linkedin.com/authwall?trk=bf&trkInfo=AQE3GrOu_soLXAAAAYTnfV7Ak5NhrLNM9IxIvNuvfFL51XjUZjWDRN_WROWhhGDHQfI05HuUk46hX4INHsRvXff6X08bFwXCpC3OG-A7nocY7Rtqb7kN1teuUQMukrXRVO5ai84=&original_referer=&sessionRedirect=https%3A%2F%2Fwww.linkedin.com%2Fin%2Fmigoo-equipments-270563257">
+#                                             <img src="https://www.migoo.in/files/linkedin.png" style="height: 20px;"></a> <a
+#                                             href="https://twitter.com/MigooEquipments"> <img
+#                                                 src="https://www.migoo.in/files/twitter-sign.png" style="height: 20px;"></a>
+#                                     </div>
+#                                 </td>
+#                             </tr>
+#                         </table>
+#                     </div>
+
+#             <br>
+#             <div>
+
+#                 <div style="display: flex; margin-bottom: 2px;">
+#                     <img
+#                         src="https://lh4.googleusercontent.com/Tg-ugYQdUjAPJTtdSu3Rc8pYT0hONyb7dbg-Z0LN2iYvKbhazcdWIu_Vyn7-m7IIPdU0fd9VwxdDKm90nE6tVaAeQ4_b13OV79O7w9sPJiJP4YOqt2juD4XWgjK4v4E5TmIVuOsY3dDyuQ7p3-B4ndw">
+#                     <div style="color: green; margin-left: 5px;">Consider The Environment. Think Before You Print.</div>
+#                 </div>
+#             </div>
+#                 '''                           
+#             #     print("\n", supplier_dict, "\n")
+#             # return supplier_dict
+#             s_name = frappe.db.get_value("Supplier", filters={'name': supplier}, fieldname=["name_of_suppier", "whatsapp_no"])  
+#             # print("\n", s_name, "\n")
+#             if s_name is None:
+#                 continue
+#             name_of_supplier = s_name[0]
+#             whatsapp_no = s_name[1]
+
+#             file_path = name_of_supplier.replace(" ", "_").lower() + '.pdf'
+#             pdf = weasyprint.HTML(string=message).write_pdf()
+            
+#             with open(file_path, 'wb') as f:
+#                 f.write(pdf)
+                
+#             delete_file(f"/files/{file_path}")
+#             save_file_on_filesystem(file_path, content=pdf)
+
+#             # create a new document
+#             from frappe.utils import today
+
+#             doc = frappe.get_doc({
+#                 'doctype': 'Sent File',
+#                 'file_path': file_path,
+#                 'sent_date': today()
+#             })
+#             doc.insert(ignore_permissions=True)
+#             frappe.db.commit()
+
+#             template = 'compalince_update_remainders_in_cc'
+#             number = whatsapp_no
+#             from frappe.utils import get_url
+#             site_url = get_url()
+#             file_link = site_url + '/files/' + file_path
+            
+#             if with_reminder == 0:
+#                 message_count = get_compliance_template_count(number, template)
+#                 if message_count == 0:
+#                     lowmtbs.append("whatsapp_message_details", {
+#                         "whatsapp_no": number,
+#                         "pdf_link": file_link,
+#                         "template_name": template,
+#                         "supplier_name": name_of_supplier,
+#                         "doc_type": "Supplier",
+#                         "doc_name": supplier,
+#                         "type": "14_days_reminder"
+#                     })
+#             else:
+#                 # send reminder template
+#                 whatsapp_no = frappe.db.get_value("Supplier", filters={'name': supplier}, fieldname=["whatsapp_no"])  
+#                 if whatsapp_no is None:
+#                     continue
+
+#                 message_count = get_compliance_template_count(number, template)
+#                 r_message_count = get_compliance_template_count(number, "compliance_update")
+
+#                 if message_count == 0:
+#                     if r_message_count == 0:
+#                         lowmtbs.append("whatsapp_message_details", {
+#                             "whatsapp_no": number,
+#                             "pdf_link": file_link,
+#                             "template_name": template,
+#                             "supplier_name": name_of_supplier,
+#                             "doc_type": "Supplier",
+#                             "doc_name": supplier,
+#                             "type": "14_days_reminder",
+#                             "with_reminder": 1
+#                         })
+
+#                         from frappe.utils import random_string
+#                         wtsw = frappe.new_doc("Wati Webhook Template Sent")
+#                         wtsw.whatsapp_no = '91'+whatsapp_no if whatsapp_no else ''
+#                         wtsw.template_name = 'compliance_update'
+#                         wtsw.doc_type = "Supplier"
+#                         wtsw.doc_name = supplier
+#                         wtsw.date = add_to_date(datetime.now(), days=7, as_string=True, as_datetime=True)
+#                         wtsw.reminder_id = random_string(40)
+
+#                         for equipment in equipment_list:
+#                             child_row = wtsw.append("whatsapp_equipment", {})
+#                             child_row.equipment_name = equipment["equipment_name"]
+
+#                         wtsw.insert(ignore_permissions=True)
+#                         frappe.db.commit()
+#                     else:
+#                         lowmtbs.append("whatsapp_message_details", {
+#                             "whatsapp_no": number,
+#                             "pdf_link": file_link,
+#                             "template_name": template,
+#                             "supplier_name": name_of_supplier,
+#                             "doc_type": "Supplier",
+#                             "doc_name": supplier,
+#                             "type": "14_days_reminder",
+#                         })
+
+#         if lowmtbs.whatsapp_message_details:
+#             lowmtbs.insert(ignore_permissions=True)
+#             frappe.db.commit()
+    
+
+# @frappe.whitelist(allow_guest=True)
+# def send_messages_from_list_of_reminder(name=""):
+#     if frappe.db.get_single_value('WhatsApp Api', 'disabled'):
+#         return frappe.msgprint('Your WhatsApp api key is not set or may be disabled')
+
+#     access_token, api_endpoint, name_type, version = whatsapp_keys_details()
+#     headers = {
+#         "Content-Type": "text/json",
+#         "Authorization": access_token
+#     }
+    
+#     lowmtbs = frappe.get_doc("List of WhatsApp Messages to be Sent", name)
+    
+#     # whatsapp_details = lowmtbs.whatsapp_message_details
+#     if lowmtbs.sent == 0 and lowmtbs.is_reminder == 0:
+#         reminder_list = []
+#         sent_wp_no = []
+#         for wmd in lowmtbs.whatsapp_message_details:
+#             if wmd.type == "14_days_reminder" and wmd.whatsapp_no not in sent_wp_no:
+#                 payload = {
+#                     "broadcast_name": wmd.template_name,
+#                     "template_name": wmd.template_name,
+#                     "parameters": [
+#                         {
+#                             "name": "supp_name",
+#                             "value": wmd.supplier_name
+#                         },
+#                         {
+#                             "name": "pdf_link",
+#                             "value": wmd.pdf_link
+#                         }
+#                     ],
+#                 }
+
+#                 test = frappe.new_doc("testing")
+#                 test.number = wmd.whatsapp_no
+#                 test.template_name = wmd.template_name
+#                 test.insert(ignore_permissions=True)
+#                 frappe.db.commit()
+                
+#                 url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{wmd.whatsapp_no}"
+#                 response = requests.post(url, json=payload, headers=headers)
+#                 data = json.loads(response.text)
+
+#                 if "result" in data and data["result"]:
+#                     log = frappe.new_doc("Whatsapp Message Daily Limit Log")
+#                     log.whatsapp_no = wmd.whatsapp_no
+#                     log.template_name = wmd.template_name
+#                     log.insert()
+#                     frappe.db.commit()
+
+#                     wmcl = frappe.new_doc("Whatsapp Message Compliance Log")
+#                     wmcl.whatsapp_no = wmd.whatsapp_no
+#                     wmcl.template_name = wmd.template_name
+#                     wmcl.sent_date = today()
+#                     wmcl.insert(ignore_permissions=True)
+
+#                     # set comment whatsapp message sent
+#                     # comment(wmd.whatsapp_no, template_name=wmd.template_name, bt=[
+#                     #     {
+#                     #         "name": "supp_name",
+#                     #         "value": wmd.supplier_name
+#                     #     },
+#                     #     {
+#                     #         "name": "pdf_link",
+#                     #         "value": wmd.pdf_link
+#                     #     }
+#                     # ])
+
+#                     from whatsapp_app.api import set_comment
+#                     content = f"<div class='card'><b style='color: green' class='px-2 pt-2'>Whatsapp Compliance Template Sent: </b> <a href='{wmd.pdf_link}' class='px-2 pb-2'>{wmd.pdf_link}</span></div>"
+#                     set_comment("Supplier", wmd.doc_name, "Administrator", content)
+
+#                 sent_wp_no.append(wmd.whatsapp_no)
+
+#             if wmd.with_reminder == 1:
+#                 reminder_list.append(wmd.whatsapp_no)
+#                 sleep(2)
+
+
+#         for number in frappe.utils.unique(reminder_list):
+#             payload = {
+#                     "broadcast_name": "compliance_update",
+#                     "template_name": "compliance_update",
+#                     "parameters": [],
+#                 }
+
+#             url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{number}"
+#             response = requests.post(url, json=payload, headers=headers)
+#             if "result" in data and data["result"]:
+#                 log = frappe.new_doc("Whatsapp Message Daily Limit Log")
+#                 log.whatsapp_no = number
+#                 log.template_name = "compliance_update"
+#                 log.insert()
+#                 frappe.db.commit()
+
+#                 wmcl = frappe.new_doc("Whatsapp Message Compliance Log")
+#                 wmcl.whatsapp_no = number
+#                 wmcl.template_name = "compliance_update"
+#                 wmcl.sent_date = today()
+#                 wmcl.insert(ignore_permissions=True)
+
+#                 # # set comment whatsapp message sent
+#                 # from whatsapp_app.api import set_comment
+#                 # content = f"<div class='card'><b style='color: green' class='px-2 pt-2'>Whatsapp Reminder Template Sent: </b> <span class='px-2 pb-2'>{wmd.pdf_link}</span></div>"
+#                 # set_comment("Supplier", wmd.doc_name, "Administrator", content)
+
+#             test = frappe.new_doc("testing")
+#             test.number = number
+#             test.template_name = "compliance_update"
+#             test.insert(ignore_permissions=True)
+#             frappe.db.commit()
+
+#         lowmtbs.sent = 1
+#         lowmtbs.sent_date = today()
+#         lowmtbs.sent_by = frappe.session.user
+#         lowmtbs.save()
+#         frappe.db.commit()
+
+#     elif lowmtbs.sent == 0 and lowmtbs.is_reminder == 1:
+#         sent_r_wp_no = []
+#         for wmd in lowmtbs.whatsapp_message_details:
+#             if wmd.whatsapp_no not in sent_r_wp_no:
+#                 url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber={wmd.whatsapp_no}"
+#                 payload = {
+#                     "broadcast_name": "compliance_update",
+#                     "template_name": "compliance_update",
+#                     "parameters": []
+#                 }
+                
+#                 response = requests.post(url, json=payload, headers=headers)
+#                 data = json.loads(response.text)
+
+#                 if "result" in data and data["result"]:
+#                     log = frappe.new_doc("Whatsapp Message Daily Limit Log")
+#                     log.whatsapp_no = wmd.whatsapp_no
+#                     log.template_name = "compliance_update"
+#                     log.insert()
+#                     frappe.db.commit()
+
+#                     wmcl = frappe.new_doc("Whatsapp Message Compliance Log")
+#                     wmcl.whatsapp_no = wmd.whatsapp_no
+#                     wmcl.template_name = "compliance_update"
+#                     wmcl.sent_date = today()
+#                     wmcl.insert(ignore_permissions=True)
+                
+#                 sent_r_wp_no.append(wmd.whatsapp_no)
+#                 test = frappe.new_doc("testing")
+#                 test.number = wmd.whatsapp_no
+#                 test.template_name = "compliance_update"
+#                 test.insert(ignore_permissions=True)
+#                 frappe.db.commit()
+
+#         lowmtbs.sent = 1
+#         lowmtbs.sent_date = today()
+#         lowmtbs.sent_by = frappe.session.user
+#         lowmtbs.save()
+#         frappe.db.commit()
+
+
+#     # send report to migoo managment
+#     from frappe.utils import get_url
+#     # numbers = ['8401265878', '7990915950', '9313086301', '9724547104', '8347718490', '9886107360', '9708618353', '9898019009']
+#     numbers = ['9886107360', '9724547104', '9313086301', '7990915950', '8401265878']
+#     report = f"{get_url()}/api/method/frappe.utils.print_format.download_pdf?doctype=List%20of%20WhatsApp%20Messages%20to%20be%20Sent&name={name}"
+#     payload = {
+#                 "broadcast_name": "sent_pdf",
+#                 "template_name": "sent_pdf",
+#                 "parameters": [{
+#                             "name": "pdf_link",
+#                             "value": f"{report}"
+#                         },
+#                         {
+#                             "name": "doctype_name",
+#                             "value": "equipment reminder whatsapp list report"
+#                         }],
+#             }
+#     for number in numbers:
+
+#         url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{number}"
+#         response = requests.post(url, json=payload, headers=headers)
+       
+#         test = frappe.new_doc("testing")
+#         test.number = number
+#         test.template_name = "sent_pdf"
+#         test.insert(ignore_permissions=True)
+#         frappe.db.commit()
+
+
+############################## send again message if not answer was received #############################
+
+# @frappe.whitelist(allow_guest=True)
+# def send_remider_if_not_repliyed():
+#     # scheduler event
+#     enable_cron = frappe.db.get_single_value('Custom Settings', 'enable_cron_job')
+#     if enable_cron == 1:
+#         if frappe.db.get_single_value('WhatsApp Api', 'disabled'):
+#                 return 'Your WhatsApp api key is not set or may be disabled'
+
+#         # data = frappe.db.get_list("Wati Webhook Template Sent", filters=[["date", "=", frappe.utils.add_days(frappe.utils.now_datetime(), -6)], ["replied_text", "in", ["No", "whatsapp_no"]]], fields=["name", "whatsapp_no", "doc_type", "doc_name", "template_name"])
+#         data = frappe.db.get_list("Wati Webhook Template Sent", filters=[["date", "=", frappe.utils.add_days(frappe.utils.now_datetime(), -3)], ["replied_text", "in", ["No", ""]]], fields=["name", "whatsapp_no", "doc_type", "doc_name", "template_name", "reminder_id"])
+#         lowmtbs = frappe.new_doc("List of WhatsApp Messages to be Sent")
+#         lowmtbs.is_reminder = 1
+#         r_whatsapp = []
+#         for i in data:
+#             check = frappe.db.count("Wati Webhook Template Sent", {"reminder_id": i.reminder_id})
+#             if check <= 3:
+#                 equipments = frappe.db.get_list("Whatsapp Equipment", {"parent": i.name}, ["equipment_name"])
+                
+#                 if i.whatsapp_no not in r_whatsapp:
+#                     lowmtbs.append("whatsapp_message_details", {
+#                         "whatsapp_no": i.whatsapp_no[-10:],
+#                         "template_name": "compliance_update",
+#                         "supplier_name": i.doc_name,
+#                         "doc_type": "Supplier",
+#                         "doc_name": i.doc_name,
+#                     })
+#                     r_whatsapp.append(i.whatsapp_no)
+
+
+#                 wtsw = frappe.new_doc("Wati Webhook Template Sent")
+#                 wtsw.whatsapp_no = i.whatsapp_no if i.whatsapp_no else ''
+#                 wtsw.template_name = 'compliance_update'
+#                 wtsw.doc_type = i.doc_type
+#                 wtsw.doc_name = i.doc_name
+#                 wtsw.date = today()
+#                 wtsw.reminder_id = i.reminder_id
+#                 for equipment in equipments:
+#                     child_row = wtsw.append("whatsapp_equipment", {})
+#                     child_row.equipment_name = equipment["equipment_name"]
+
+#                 wtsw.insert(ignore_permissions=True)
+#                 frappe.db.commit()
+#         if lowmtbs.whatsapp_message_details:
+#             lowmtbs.insert(ignore_permissions=True)
+#             frappe.db.commit()
+
+
+#####################  send reminder message from list using scheduler ###################################
+
 @frappe.whitelist(allow_guest=True)
-def generate_pdf_and_store_data():
+def send_whatsapp_reminder_using_scheduler():
     enable_cron = frappe.db.get_single_value('Custom Settings', 'enable_cron_job')
     if enable_cron == 1:
-        if frappe.db.get_single_value('WhatsApp Api', 'disabled'):
-                return 'Your WhatsApp api key is not set or may be disabled'
-        
-        # send first template
-        lowmtbs = frappe.new_doc("List of WhatsApp Messages to be Sent")
+        names = frappe.db.get_list("List of WhatsApp Messages to be Sent", filters={"date": today(), "sent": 0}, fields=["name"], pluck='name')
+        for name in names:
+            send_messages_from_list_of_reminder(name)
 
-        name = frappe.db.sql("""
 
-        with insurance as (
-            select 
+#### new compliance change code after dec meeting remove yes/no template. ####
+            
+import frappe
+from frappe.utils import nowdate, formatdate, nowtime
+from datetime import datetime, timedelta
+from collections import defaultdict
+import requests
+
+
+@frappe.whitelist()
+def send_insurance_whatsapp():
+    enable_cron = frappe.db.get_single_value('Custom Settings', 'enable_cron_job')
+    if enable_cron == 1:
+        name = frappe.db.sql(
+        """
+        WITH CTE AS (
+            SELECT
                 name,
                 supplier,
                 supplier_email,
+                whatsapp_no,
                 supplier_name,
                 equipment_main_category,
                 register_no,
@@ -1454,19 +2117,22 @@ def generate_pdf_and_store_data():
                     WHEN rto_register = 'Registered' THEN model
                     ELSE equipment_model_no
                 END AS "model",
-                insurance_date as 'insurance_dt',
-                DATEDIFF(insurance_date, CURDATE()) as 'insuranceDaysToGo',
-                CONCAT('Insurance') AS 'insurances'
-            from tabItem
-            where
+                insurance_date AS 'date',
+                DATEDIFF(insurance_date, CURDATE()) AS 'daysToGo',
+                'Insurance' AS 'type'
+            FROM
+                tabItem
+            WHERE
                 insurance_date >= CURDATE()
                 AND DATEDIFF(insurance_date, CURDATE()) <= 15
-        ),
-        fitness as (
-            select 
+
+            UNION ALL
+
+            SELECT
                 name,
                 supplier,
                 supplier_email,
+                whatsapp_no,
                 supplier_name,
                 equipment_main_category,
                 register_no,
@@ -1474,19 +2140,22 @@ def generate_pdf_and_store_data():
                     WHEN rto_register = 'Registered' THEN model
                     ELSE equipment_model_no
                 END AS "model",
-                fitness_dt as 'fitness_dt',
-                DATEDIFF(fitness_dt, CURDATE()) as 'FitnessDaysToGo',
-                CONCAT('Fitness') AS 'fitnesses'
-            from tabItem
-            where
-                fitness_dt >= CURDATE() 
+                fitness_dt AS 'date',
+                DATEDIFF(fitness_dt, CURDATE()) AS 'daysToGo',
+                'Fitness' AS 'type'
+            FROM
+                tabItem
+            WHERE
+                fitness_dt >= CURDATE()
                 AND DATEDIFF(fitness_dt, CURDATE()) <= 15
-        ),
-        PUC as (
-            select 
+
+            UNION ALL
+
+            SELECT
                 name,
                 supplier,
                 supplier_email,
+                whatsapp_no,
                 supplier_name,
                 equipment_main_category,
                 register_no,
@@ -1494,262 +2163,224 @@ def generate_pdf_and_store_data():
                     WHEN rto_register = 'Registered' THEN model
                     ELSE equipment_model_no
                 END AS "model",
-                pollution as 'pollution_dt',
-                DATEDIFF(pollution, CURDATE()) as 'PollutionDaysToGo',
-                CONCAT('Pollution') AS 'Pollutions'
-            from tabItem
-            where
+                pollution AS 'date',
+                DATEDIFF(pollution, CURDATE()) AS 'daysToGo',
+                'Pollution' AS 'type'
+            FROM
+                tabItem
+            WHERE
                 pollution >= CURDATE()
                 AND DATEDIFF(pollution, CURDATE()) <= 15
-        ),
-        npermit as (
-            select
-                name,
-                supplier,
-                supplier_email,
-                supplier_name,
-                equipment_main_category,
-                register_no,
+
+            UNION ALL 
+
+            SELECT 
+                equipment_id,
+                cl.supplier,
+                cl.supplier_email,
+                whatsapp_no,
+                cl.supplier_name,
+                cld.equipment_sub_category,
+                equipment_no as register_no,
                 CASE
                     WHEN rto_register = 'Registered' THEN model
                     ELSE equipment_model_no
                 END AS "model",
-                npermit_upto as 'npermit_upto_dt',
-                DATEDIFF(npermit_upto, CURDATE()) as 'National_PermitDaysToGo',
-                CONCAT('National Permit') AS 'National_Permits'
-            from tabItem
-            where
-                npermit_upto >= CURDATE()
-                AND DATEDIFF(npermit_upto, CURDATE()) <= 15
-        ),
-        permit_validity as (
-            select
-                name,
-                supplier,
-                supplier_email,
-                supplier_name,
-                equipment_main_category,
-                register_no,
-                CASE
-                    WHEN rto_register = 'Registered' THEN model
-                    ELSE equipment_model_no
-                END AS "model",
-                permit_validity_upto as 'permit_validity_upto_dt',
-                DATEDIFF(permit_validity_upto, CURDATE()) as 'State_PermitDaysToGo',
-                CONCAT('State Permit') AS 'State_Permits'
-            from tabItem
-            where
-                permit_validity_upto >= CURDATE()
-                AND DATEDIFF(permit_validity_upto, CURDATE()) <= 15
+                valid_till AS 'date',
+                DATEDIFF(valid_till, CURDATE()) AS 'daysToGo',
+                compliance_type AS 'type'
+            FROM `tabCompliance Log Detail` cld
+            INNER JOIN `tabItem` i ON i.name = cld.equipment_id
+            INNER JOIN `tabCompliance Log` cl ON cl.name = cld.parent
+            WHERE valid_till = DATE_SUB(CURDATE(), INTERVAL (DAYOFWEEK(CURDATE()) + 5) % 7 DAY)
         )
-        select 
-            name,
-            supplier,
-            supplier_email,
-            supplier_name,
-            equipment_main_category,
-            register_no,
-            model,
-            DATE_FORMAT(insurance_dt, '%d-%m-%Y'), 
-            insurances,
-            insuranceDaysToGo
-        from insurance
-        union
-        select 
-            name,
-            supplier,
-            supplier_email,
-            supplier_name,
-            equipment_main_category,
-            register_no,
-            model,
-            DATE_FORMAT(fitness_dt, '%d-%m-%Y'), 
-            fitnesses,
-            FitnessDaysToGo
-        from fitness
-        union
-        select 
-            name,
-            supplier,
-            supplier_email,
-            supplier_name,
-            equipment_main_category,
-            register_no,
-            model,
-            DATE_FORMAT(pollution_dt, '%d-%m-%Y'),
-            Pollutions,
-            PollutionDaysToGo
-        from PUC
-        union
-        select
-            name,
-            supplier,
-            supplier_email,
-            supplier_name,
-            equipment_main_category,
-            register_no,
-            model,
-            DATE_FORMAT(npermit_upto_dt, '%d-%m-%Y'),
-            National_Permits,
-            National_PermitDaysToGo
-        from npermit
-        union
-        select
-            name,
-            supplier,
-            supplier_email,
-            supplier_name,
-            equipment_main_category,
-            register_no,
-            model,
-            DATE_FORMAT(permit_validity_upto_dt, '%d-%m-%Y'),
-            State_Permits,
-            State_PermitDaysToGo
-        from permit_validity
-            
-        """)
 
-    # create a dictionary to store equipment information for each supplier
+        SELECT
+            name,
+            supplier,
+            supplier_email,
+            supplier_name,
+            equipment_main_category,
+            register_no,
+            model,
+            DATE_FORMAT(date, '%d-%m-%Y') AS 'date',
+            type,
+            daysToGo,
+            whatsapp_no
+        FROM
+            CTE
+        GROUP BY type, date, register_no
+        ORDER BY supplier;
+
+   """
+    )
+       
+
         supplier_dict = defaultdict(list)
-        reminder_supllier = []
 
+        equipment_ids = []
+
+        print("\n\n name", name)
         for i in name:
             equipment_name = i[0]
             supplier = i[1]
             supplier_email = i[2]
-            supplier_name =  i[3]
+            supplier_name = i[3]
             equipment_main_category = i[4]
             register_no = i[5]
             model = i[6]
             date = i[7]
             status = i[8]
             daystogo = i[9]
+            whatsapp_no = i[10]
+            equipment_ids.append(i[0])
 
-            # add equipment information to supplier dictionary
-            supplier_dict[supplier].append({
-                'equipment_name': equipment_name,
-                'supplier_email': supplier_email,
-                'supplier_name': supplier_name,
-                'equipment_main_category': equipment_main_category,
-                'register_no': register_no,
-                'model': model,
-                'date': date,
-                'status': status,
-                'daystogo': daystogo
-            })
-            if daystogo <= 7:
-                reminder_supllier.append(supplier)
+            print("\n\n name", )
 
+            supplier_dict[supplier].append(
+                {
+                    "equipment_name": equipment_name,
+                    "supplier_email": supplier_email,
+                    "supplier_name": supplier_name,
+                    "equipment_main_category": equipment_main_category,
+                    "register_no": register_no,
+                    "model": model,
+                    "date": date,
+                    "status": status,
+                    "daystogo": daystogo,
+                    "supplier": supplier,
+                    "whatsapp_no": whatsapp_no
+                }
+            )
 
-        # loop through supplier dictionary and send a single email to each supplier
+        lowmtbs = frappe.new_doc("List of WhatsApp Messages to be Sent")
+
         for supplier, equipment_list in supplier_dict.items():
 
+            # message = """
+            #     <div>
+            #         <div class="sec-2">
+            #             <h3 style="">Hello, {}</h4>
+            #             <p>We hope this message finds you well. We are writing to remind you that your Equipment's documents are set to expire. The details are mentioned below.</p>
+            #             <table border=1px cellspacing="0" cellpadding="4";>
+            #                 <tr style="background-color: #e6992a;">
+            #                     <th>Compliance</th>
+            #                     <th>Valid Till</th>
+            #                     <th>Expiring in</th>
+            #                     <th>Equipment</th>
+            #                     <th>Equipment No</th>
+            #                     <th>Model No</th>
+            #                 </tr>
+            #     """.format(
+            #     supplier_dict[supplier][0]["supplier_name"]
+            # )
+
             message = '''
-                <div>
-                    <div class="sec-2">
-                        <h3 style="">Hello, {}</h4>
-                        <p>We are writing to remind you that your Equipment's documents are set to expire. The details are mentioned below.</p>
-                        <table border="1px" cellspacing="0" cellpadding="4" style="border-collapse: collapse;">
-                            <tr style="background-color: #e6992a;">
-                                <th style="border: 1px solid black; padding: 4px;">Compliance</th>
-                                <th style="border: 1px solid black; padding: 4px;">Valid Till</th>
-                                <th style="border: 1px solid black; padding: 4px;">Expiring in</th>
-                                <th style="border: 1px solid black; padding: 4px;">Equipment</th>
-                                <th style="border: 1px solid black; padding: 4px;">Equipment No</th>
-                                <th style="border: 1px solid black; padding: 4px;">Model No</th>
-                            </tr>
-                '''.format(supplier_dict[supplier][0]['supplier_name'])
-
-            with_reminder = 0
-            # add equipment information for the current supplier to the email message
-            for equipment in equipment_list:
-                message += '''
-                            <tr>
-                                <td style="border: 1px solid black; padding: 4px; text-align: center;">{}</td>
-                                <td style="border: 1px solid black; padding: 4px; text-align: center;">{}</td>
-                                <td style="border: 1px solid black; padding: 4px; text-align: center;">{} Days to Go</td>
-                                <td style="border: 1px solid black; padding: 4px; text-align: center;">{}</td>
-                                <td style="border: 1px solid black; padding: 4px; text-align: center;">{}</td>
-                                <td style="border: 1px solid black; padding: 4px; text-align: center;">{}</td>
-                            </tr>
-                '''.format(equipment['status'], equipment['date'], equipment['daystogo'], equipment['equipment_main_category'], equipment['register_no'],
-                        equipment['model'])
-
-                if equipment["daystogo"] <= 7:
-                    with_reminder = 1
-
-            message += '''
-                       </table>
-                </div>
-            </div>
-                    <p>Get it renewed as soon as possible to avoid further inconvenience.</p>
-                    <p>Thank you for choosing Migoo. We value your trust and are committed to providing you with the best service possible.
-                    </p>
-                    <div><b>Thanks & Regards,</b></div>
-                    <div><b>Migoo Equipments</b></div> <br>
                     <div>
-                        <table>
+                        <div class="sec-2">
+                            <h3 style="">Hello, {}</h4>
+                        <p>We hope this message finds you well. We are writing to remind you that your Equipment's documents are set to expire. The details are mentioned below.</p>
+                            <table border="1px" cellspacing="0" cellpadding="4" style="border-collapse: collapse;">
+                                <tr style="background-color: #e6992a;">
+                                    <th style="border: 1px solid black; padding: 4px;">Compliance</th>
+                                    <th style="border: 1px solid black; padding: 4px;">Valid Till</th>
+                                    <th style="border: 1px solid black; padding: 4px;">Expiring in</th>
+                                    <th style="border: 1px solid black; padding: 4px;">Equipment</th>
+                                    <th style="border: 1px solid black; padding: 4px;">Equipment No</th>
+                                    <th style="border: 1px solid black; padding: 4px;">Model No</th>
+                                </tr>
+                    '''.format(supplier_dict[supplier][0]['supplier_name'])
+
+            for equipment in equipment_list:
+                message += """
+
                             <tr>
-                                <td style="border-right: 2.5px solid #e6992a; ">
-                                <img
-                                    src="https://www.migoo.in/files/logo-w250%20(1).png">
-                                </td>
-                                <td style="padding-left:12px; color: black;">
-                                    <div style="display: flex; margin-bottom: 2px;"> <img src="https://www.migoo.in/files/call (1).png"
-                                            height="16px" width="16px" style="margin-top: auto; margin-bottom: auto;">
-                                        <div style="margin-left: 5px;"> +91 79692 12223 </div>
-                                    </div>
-                                    <div style="display: flex; margin-bottom: 2px;"> <img src="https://www.migoo.in/files/email1ead26.png"
-                                            height="16px" width="16px" style="margin-top: auto; margin-bottom: auto;"> <a
-                                            style="color: black;" href="mailto:info@migoo.in" style="text-decoration: none;">
-                                            <div style="margin-left: 5px;">info@migoo.in</div>
-                                        </a> </div>
-                                    <div style="display: flex; margin-bottom: 2px;"> <img src="https://www.migoo.in/files/link.png"
-                                            height="16px" width="16px" style="margin-top: auto; margin-bottom: auto;"> <a
-                                            style="color: black;" href="https://www.migoo.in">
-                                            <div style="margin-left: 5px;">www.migoo.in</div>
-                                        </a> </div>
-                                    <div style="display: flex; margin-bottom: 2px;"> <img src="https://www.migoo.in/files/location.png"
-                                            height="16px" width="16px" style="margin-top: auto; margin-bottom: auto;">
-                                        <div style="margin-left: 5px;">Migved Solutions Private Limited,</div>
-                                    </div>
-                                    <div style="margin-left: 20px;"> A-1204, Mondeal Heights, <br> Iskcon Cross Road, S.G.Highway, <br>
-                                        Ahmedabad-380058 </div>
-                                    <div style="margin-top: 10px;"> <a
-                                            href="https://www.facebook.com/people/Migoo-Equipments/100087829991875/?mibextid=ZbWKwL"
-                                            target="_blank"> <img src="https://www.migoo.in/files/facebook.png" style="height: 20px;"></a>
-                                        <a href="https://www.instagram.com/migoo_equipment/?igshid=YmMyMTA2M2Y%3D"> <img
-                                                src="https://www.migoo.in/files/instagram.png" style="height: 20px;"></a> <a
-                                            href="https://www.linkedin.com/authwall?trk=bf&trkInfo=AQE3GrOu_soLXAAAAYTnfV7Ak5NhrLNM9IxIvNuvfFL51XjUZjWDRN_WROWhhGDHQfI05HuUk46hX4INHsRvXff6X08bFwXCpC3OG-A7nocY7Rtqb7kN1teuUQMukrXRVO5ai84=&original_referer=&sessionRedirect=https%3A%2F%2Fwww.linkedin.com%2Fin%2Fmigoo-equipments-270563257">
-                                            <img src="https://www.migoo.in/files/linkedin.png" style="height: 20px;"></a> <a
-                                            href="https://twitter.com/MigooEquipments"> <img
-                                                src="https://www.migoo.in/files/twitter-sign.png" style="height: 20px;"></a>
-                                    </div>
-                                </td>
-                            </tr>
+                                    <td style="border: 1px solid black; padding: 4px; text-align: center;">{}</td>
+                                    <td style="border: 1px solid black; padding: 4px; text-align: center;">{}</td>
+                                    <td style="border: 1px solid black; padding: 4px; text-align: center;">{} Days to Go</td>
+                                    <td style="border: 1px solid black; padding: 4px; text-align: center;">{}</td>
+                                    <td style="border: 1px solid black; padding: 4px; text-align: center;">{}</td>
+                                    <td style="border: 1px solid black; padding: 4px; text-align: center;">{}</td>
+                                </tr>
+                                
+                """.format(
+                    equipment["status"],
+                    equipment["date"],
+                    equipment["daystogo"],
+                    equipment["equipment_main_category"],
+                    equipment["register_no"],
+                    equipment["model"],
+                )
+            message += '''
                         </table>
                     </div>
-
-            <br>
-            <div>
-
-                <div style="display: flex; margin-bottom: 2px;">
-                    <img
-                        src="https://lh4.googleusercontent.com/Tg-ugYQdUjAPJTtdSu3Rc8pYT0hONyb7dbg-Z0LN2iYvKbhazcdWIu_Vyn7-m7IIPdU0fd9VwxdDKm90nE6tVaAeQ4_b13OV79O7w9sPJiJP4YOqt2juD4XWgjK4v4E5TmIVuOsY3dDyuQ7p3-B4ndw">
-                    <div style="color: green; margin-left: 5px;">Consider The Environment. Think Before You Print.</div>
                 </div>
-            </div>
-                '''                           
-            #     print("\n", supplier_dict, "\n")
-            # return supplier_dict
-            s_name = frappe.db.get_value("Supplier", filters={'name': supplier}, fieldname=["name_of_suppier", "whatsapp_no"])  
-            # print("\n", s_name, "\n")
-            if s_name is None:
-                continue
-            name_of_supplier = s_name[0]
-            whatsapp_no = s_name[1]
+                        <p>Get it renewed as soon as possible to avoid further inconvenience.</p>
+                        <p>Thank you for choosing Migoo. We value your trust and are committed to providing you with the best service possible.
+                        </p>
+                        <div><b>Thanks & Regards,</b></div>
+                        <div><b>Migoo Equipments</b></div> <br>
+                        <div>
+                            <table>
+                                <tr>
+                                    <td style="border-right: 2.5px solid #e6992a; ">
+                                    <img
+                                        src="https://www.migoo.in/files/logo-w250%20(1).png">
+                                    </td>
+                                    <td style="padding-left:12px; color: black;">
+                                        <div style="display: flex; margin-bottom: 2px;"> <img src="https://www.migoo.in/files/call (1).png"
+                                                height="16px" width="16px" style="margin-top: auto; margin-bottom: auto;">
+                                            <div style="margin-left: 5px;"> +91 79692 12223 </div>
+                                        </div>
+                                        <div style="display: flex; margin-bottom: 2px;"> <img src="https://www.migoo.in/files/email1ead26.png"
+                                                height="16px" width="16px" style="margin-top: auto; margin-bottom: auto;"> <a
+                                                style="color: black;" href="mailto:info@migoo.in" style="text-decoration: none;">
+                                                <div style="margin-left: 5px;">info@migoo.in</div>
+                                            </a> </div>
+                                        <div style="display: flex; margin-bottom: 2px;"> <img src="https://www.migoo.in/files/link.png"
+                                                height="16px" width="16px" style="margin-top: auto; margin-bottom: auto;"> <a
+                                                style="color: black;" href="https://www.migoo.in">
+                                                <div style="margin-left: 5px;">www.migoo.in</div>
+                                            </a> </div>
+                                        <div style="display: flex; margin-bottom: 2px;"> <img src="https://www.migoo.in/files/location.png"
+                                                height="16px" width="16px" style="margin-top: auto; margin-bottom: auto;">
+                                            <div style="margin-left: 5px;">Migved Solutions Private Limited,</div>
+                                        </div>
+                                        <div style="margin-left: 20px;"> A-1204, Mondeal Heights, <br> Iskcon Cross Road, S.G.Highway, <br>
+                                            Ahmedabad-380058 </div>
+                                        <div style="margin-top: 10px;"> <a
+                                                href="https://www.facebook.com/people/Migoo-Equipments/100087829991875/?mibextid=ZbWKwL"
+                                                target="_blank"> <img src="https://www.migoo.in/files/facebook.png" style="height: 20px;"></a>
+                                            <a href="https://www.instagram.com/migoo_equipment/?igshid=YmMyMTA2M2Y%3D"> <img
+                                                    src="https://www.migoo.in/files/instagram.png" style="height: 20px;"></a> <a
+                                                href="https://www.linkedin.com/authwall?trk=bf&trkInfo=AQE3GrOu_soLXAAAAYTnfV7Ak5NhrLNM9IxIvNuvfFL51XjUZjWDRN_WROWhhGDHQfI05HuUk46hX4INHsRvXff6X08bFwXCpC3OG-A7nocY7Rtqb7kN1teuUQMukrXRVO5ai84=&original_referer=&sessionRedirect=https%3A%2F%2Fwww.linkedin.com%2Fin%2Fmigoo-equipments-270563257">
+                                                <img src="https://www.migoo.in/files/linkedin.png" style="height: 20px;"></a> <a
+                                                href="https://twitter.com/MigooEquipments"> <img
+                                                    src="https://www.migoo.in/files/twitter-sign.png" style="height: 20px;"></a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
 
-            file_path = name_of_supplier.replace(" ", "_").lower() + '.pdf'
+                <br>
+                <div>
+
+                    <div style="display: flex; margin-bottom: 2px;">
+                        <img
+                            src="https://lh4.googleusercontent.com/Tg-ugYQdUjAPJTtdSu3Rc8pYT0hONyb7dbg-Z0LN2iYvKbhazcdWIu_Vyn7-m7IIPdU0fd9VwxdDKm90nE6tVaAeQ4_b13OV79O7w9sPJiJP4YOqt2juD4XWgjK4v4E5TmIVuOsY3dDyuQ7p3-B4ndw">
+                        <div style="color: green; margin-left: 5px;">Consider The Environment. Think Before You Print.</div>
+                    </div>
+                </div>
+                    '''  
+        
+
+        
+            # print("\n\n message", message, "\n\n")
+            # return message
+
+            
+            file_path = supplier_dict[supplier][0]["supplier_name"].replace(" ", "_").lower() + '.pdf'
             pdf = weasyprint.HTML(string=message).write_pdf()
             
             with open(file_path, 'wb') as f:
@@ -1769,76 +2400,29 @@ def generate_pdf_and_store_data():
             doc.insert(ignore_permissions=True)
             frappe.db.commit()
 
-            template = 'compalince_update_remainders_in_cc'
-            number = whatsapp_no
+
             from frappe.utils import get_url
             site_url = get_url()
             file_link = site_url + '/files/' + file_path
+
+            supplier_name = supplier_dict[supplier][0]["supplier_name"]
+            supplier = supplier_dict[supplier][0]["supplier"]
+            whatsapp_no = supplier_dict[supplier][0]["whatsapp_no"]
+            template = "compalince_update_remainders_in_cc"
             
-            if with_reminder == 0:
-                message_count = get_compliance_template_count(number, template)
-                if message_count == 0:
-                    lowmtbs.append("whatsapp_message_details", {
-                        "whatsapp_no": number,
-                        "pdf_link": file_link,
-                        "template_name": template,
-                        "supplier_name": name_of_supplier,
-                        "doc_type": "Supplier",
-                        "doc_name": supplier,
-                        "type": "14_days_reminder"
-                    })
-            else:
-                # send reminder template
-                whatsapp_no = frappe.db.get_value("Supplier", filters={'name': supplier}, fieldname=["whatsapp_no"])  
-                if whatsapp_no is None:
-                    continue
+            lowmtbs.append("whatsapp_message_details", {
+                "whatsapp_no": whatsapp_no,
+                "pdf_link": file_link,
+                "template_name": template,
+                "supplier_name": supplier_name,
+                "doc_type": "Supplier",
+                "doc_name": supplier,
+            })
 
-                message_count = get_compliance_template_count(number, template)
-                r_message_count = get_compliance_template_count(number, "compliance_update")
+        lowmtbs.insert(ignore_permissions=True)
+        frappe.db.commit()
+        send_whatsapp_reminder_using_scheduler()
 
-                if message_count == 0:
-                    if r_message_count == 0:
-                        lowmtbs.append("whatsapp_message_details", {
-                            "whatsapp_no": number,
-                            "pdf_link": file_link,
-                            "template_name": template,
-                            "supplier_name": name_of_supplier,
-                            "doc_type": "Supplier",
-                            "doc_name": supplier,
-                            "type": "14_days_reminder",
-                            "with_reminder": 1
-                        })
-
-                        from frappe.utils import random_string
-                        wtsw = frappe.new_doc("Wati Webhook Template Sent")
-                        wtsw.whatsapp_no = '91'+whatsapp_no if whatsapp_no else ''
-                        wtsw.template_name = 'compliance_update'
-                        wtsw.doc_type = "Supplier"
-                        wtsw.doc_name = supplier
-                        wtsw.date = add_to_date(datetime.now(), days=7, as_string=True, as_datetime=True)
-                        wtsw.reminder_id = random_string(40)
-
-                        for equipment in equipment_list:
-                            child_row = wtsw.append("whatsapp_equipment", {})
-                            child_row.equipment_name = equipment["equipment_name"]
-
-                        wtsw.insert(ignore_permissions=True)
-                        frappe.db.commit()
-                    else:
-                        lowmtbs.append("whatsapp_message_details", {
-                            "whatsapp_no": number,
-                            "pdf_link": file_link,
-                            "template_name": template,
-                            "supplier_name": name_of_supplier,
-                            "doc_type": "Supplier",
-                            "doc_name": supplier,
-                            "type": "14_days_reminder",
-                        })
-
-        if lowmtbs.whatsapp_message_details:
-            lowmtbs.insert(ignore_permissions=True)
-            frappe.db.commit()
-    
 
 @frappe.whitelist(allow_guest=True)
 def send_messages_from_list_of_reminder(name=""):
@@ -1854,144 +2438,49 @@ def send_messages_from_list_of_reminder(name=""):
     lowmtbs = frappe.get_doc("List of WhatsApp Messages to be Sent", name)
     
     # whatsapp_details = lowmtbs.whatsapp_message_details
-    if lowmtbs.sent == 0 and lowmtbs.is_reminder == 0:
-        reminder_list = []
+    if lowmtbs.sent == 0:
         sent_wp_no = []
         for wmd in lowmtbs.whatsapp_message_details:
-            if wmd.type == "14_days_reminder" and wmd.whatsapp_no not in sent_wp_no:
-                payload = {
-                    "broadcast_name": wmd.template_name,
-                    "template_name": wmd.template_name,
-                    "parameters": [
-                        {
-                            "name": "supp_name",
-                            "value": wmd.supplier_name
-                        },
-                        {
-                            "name": "pdf_link",
-                            "value": wmd.pdf_link
-                        }
-                    ],
-                }
+            if wmd.whatsapp_no not in sent_wp_no:
+                if check_daily_message_limit_for_user(wmd.whatsapp_no, "compalince_update_remainders_in_cc"):
+                    
+                    payload = {
+                        "broadcast_name": wmd.template_name,
+                        "template_name": wmd.template_name,
+                        "parameters": [
+                            {
+                                "name": "supp_name",
+                                "value": wmd.supplier_name
+                            },
+                            {
+                                "name": "pdf_link",
+                                "value": wmd.pdf_link
+                            }
+                        ],
+                    }
 
-                test = frappe.new_doc("testing")
-                test.number = wmd.whatsapp_no
-                test.template_name = wmd.template_name
-                test.insert(ignore_permissions=True)
-                frappe.db.commit()
-                
-                url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{wmd.whatsapp_no}"
-                response = requests.post(url, json=payload, headers=headers)
-                data = json.loads(response.text)
-
-                if "result" in data and data["result"]:
-                    log = frappe.new_doc("Whatsapp Message Daily Limit Log")
-                    log.whatsapp_no = wmd.whatsapp_no
-                    log.template_name = wmd.template_name
-                    log.insert()
+                    test = frappe.new_doc("testing")
+                    test.number = wmd.whatsapp_no
+                    test.template_name = wmd.template_name
+                    test.insert(ignore_permissions=True)
                     frappe.db.commit()
+                    
+                    url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{wmd.whatsapp_no}"
+                    response = requests.post(url, json=payload, headers=headers)
+                    data = json.loads(response.text)
 
-                    wmcl = frappe.new_doc("Whatsapp Message Compliance Log")
-                    wmcl.whatsapp_no = wmd.whatsapp_no
-                    wmcl.template_name = wmd.template_name
-                    wmcl.sent_date = today()
-                    wmcl.insert(ignore_permissions=True)
+                    if "result" in data and data["result"]:
+                        log = frappe.new_doc("Whatsapp Message Daily Limit Log")
+                        log.whatsapp_no = wmd.whatsapp_no
+                        log.template_name = wmd.template_name
+                        log.insert()
+                        frappe.db.commit()
 
-                    # set comment whatsapp message sent
-                    # comment(wmd.whatsapp_no, template_name=wmd.template_name, bt=[
-                    #     {
-                    #         "name": "supp_name",
-                    #         "value": wmd.supplier_name
-                    #     },
-                    #     {
-                    #         "name": "pdf_link",
-                    #         "value": wmd.pdf_link
-                    #     }
-                    # ])
+                        from whatsapp_app.api import set_comment
+                        content = f"<div class='card'><b style='color: green' class='px-2 pt-2'>Whatsapp Compliance Template Sent: </b> <a href='{wmd.pdf_link}' class='px-2 pb-2'>{wmd.pdf_link}</span></div>"
+                        set_comment("Supplier", wmd.doc_name, "Administrator", content)
 
-                    from whatsapp_app.api import set_comment
-                    content = f"<div class='card'><b style='color: green' class='px-2 pt-2'>Whatsapp Compliance Template Sent: </b> <a href='{wmd.pdf_link}' class='px-2 pb-2'>{wmd.pdf_link}</span></div>"
-                    set_comment("Supplier", wmd.doc_name, "Administrator", content)
-
-                sent_wp_no.append(wmd.whatsapp_no)
-
-            if wmd.with_reminder == 1:
-                reminder_list.append(wmd.whatsapp_no)
-                sleep(2)
-
-
-        for number in frappe.utils.unique(reminder_list):
-            payload = {
-                    "broadcast_name": "compliance_update",
-                    "template_name": "compliance_update",
-                    "parameters": [],
-                }
-
-            url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{number}"
-            response = requests.post(url, json=payload, headers=headers)
-            if "result" in data and data["result"]:
-                log = frappe.new_doc("Whatsapp Message Daily Limit Log")
-                log.whatsapp_no = number
-                log.template_name = "compliance_update"
-                log.insert()
-                frappe.db.commit()
-
-                wmcl = frappe.new_doc("Whatsapp Message Compliance Log")
-                wmcl.whatsapp_no = number
-                wmcl.template_name = "compliance_update"
-                wmcl.sent_date = today()
-                wmcl.insert(ignore_permissions=True)
-
-                # # set comment whatsapp message sent
-                # from whatsapp_app.api import set_comment
-                # content = f"<div class='card'><b style='color: green' class='px-2 pt-2'>Whatsapp Reminder Template Sent: </b> <span class='px-2 pb-2'>{wmd.pdf_link}</span></div>"
-                # set_comment("Supplier", wmd.doc_name, "Administrator", content)
-
-            test = frappe.new_doc("testing")
-            test.number = number
-            test.template_name = "compliance_update"
-            test.insert(ignore_permissions=True)
-            frappe.db.commit()
-
-        lowmtbs.sent = 1
-        lowmtbs.sent_date = today()
-        lowmtbs.sent_by = frappe.session.user
-        lowmtbs.save()
-        frappe.db.commit()
-
-    elif lowmtbs.sent == 0 and lowmtbs.is_reminder == 1:
-        sent_r_wp_no = []
-        for wmd in lowmtbs.whatsapp_message_details:
-            if wmd.whatsapp_no not in sent_r_wp_no:
-                url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber={wmd.whatsapp_no}"
-                payload = {
-                    "broadcast_name": "compliance_update",
-                    "template_name": "compliance_update",
-                    "parameters": []
-                }
-                
-                response = requests.post(url, json=payload, headers=headers)
-                data = json.loads(response.text)
-
-                if "result" in data and data["result"]:
-                    log = frappe.new_doc("Whatsapp Message Daily Limit Log")
-                    log.whatsapp_no = wmd.whatsapp_no
-                    log.template_name = "compliance_update"
-                    log.insert()
-                    frappe.db.commit()
-
-                    wmcl = frappe.new_doc("Whatsapp Message Compliance Log")
-                    wmcl.whatsapp_no = wmd.whatsapp_no
-                    wmcl.template_name = "compliance_update"
-                    wmcl.sent_date = today()
-                    wmcl.insert(ignore_permissions=True)
-                
-                sent_r_wp_no.append(wmd.whatsapp_no)
-                test = frappe.new_doc("testing")
-                test.number = wmd.whatsapp_no
-                test.template_name = "compliance_update"
-                test.insert(ignore_permissions=True)
-                frappe.db.commit()
+                    sent_wp_no.append(wmd.whatsapp_no)
 
         lowmtbs.sent = 1
         lowmtbs.sent_date = today()
@@ -2000,89 +2489,30 @@ def send_messages_from_list_of_reminder(name=""):
         frappe.db.commit()
 
 
-    # send report to migoo managment
-    from frappe.utils import get_url
-    # numbers = ['8401265878', '7990915950', '9313086301', '9724547104', '8347718490', '9886107360', '9708618353', '9898019009']
-    numbers = ['9886107360', '9724547104', '9313086301', '7990915950', '8401265878']
-    report = f"{get_url()}/api/method/frappe.utils.print_format.download_pdf?doctype=List%20of%20WhatsApp%20Messages%20to%20be%20Sent&name={name}"
-    payload = {
-                "broadcast_name": "sent_pdf",
-                "template_name": "sent_pdf",
-                "parameters": [{
-                            "name": "pdf_link",
-                            "value": f"{report}"
-                        },
-                        {
-                            "name": "doctype_name",
-                            "value": "equipment reminder whatsapp list report"
-                        }],
-            }
-    for number in numbers:
+    # # send report to migoo managment
+    # from frappe.utils import get_url
+    # # numbers = ['8401265878', '7990915950', '9313086301', '9724547104', '8347718490', '9886107360', '9708618353', '9898019009']
+    # numbers = ['9886107360', '9724547104', '9313086301', '7990915950', '8401265878']
+    # report = f"{get_url()}/api/method/frappe.utils.print_format.download_pdf?doctype=List%20of%20WhatsApp%20Messages%20to%20be%20Sent&name={name}"
+    # payload = {
+    #             "broadcast_name": "sent_pdf",
+    #             "template_name": "sent_pdf",
+    #             "parameters": [{
+    #                         "name": "pdf_link",
+    #                         "value": f"{report}"
+    #                     },
+    #                     {
+    #                         "name": "doctype_name",
+    #                         "value": "equipment reminder whatsapp list report"
+    #                     }],
+    #         }
+    # for number in numbers:
 
-        url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{number}"
-        response = requests.post(url, json=payload, headers=headers)
+    #     url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{number}"
+    #     response = requests.post(url, json=payload, headers=headers)
        
-        test = frappe.new_doc("testing")
-        test.number = number
-        test.template_name = "sent_pdf"
-        test.insert(ignore_permissions=True)
-        frappe.db.commit()
-
-
-############################## send again message if not answer was received #############################
-
-@frappe.whitelist(allow_guest=True)
-def send_remider_if_not_repliyed():
-    # scheduler event
-    enable_cron = frappe.db.get_single_value('Custom Settings', 'enable_cron_job')
-    if enable_cron == 1:
-        if frappe.db.get_single_value('WhatsApp Api', 'disabled'):
-                return 'Your WhatsApp api key is not set or may be disabled'
-
-        # data = frappe.db.get_list("Wati Webhook Template Sent", filters=[["date", "=", frappe.utils.add_days(frappe.utils.now_datetime(), -6)], ["replied_text", "in", ["No", "whatsapp_no"]]], fields=["name", "whatsapp_no", "doc_type", "doc_name", "template_name"])
-        data = frappe.db.get_list("Wati Webhook Template Sent", filters=[["date", "=", frappe.utils.add_days(frappe.utils.now_datetime(), -3)], ["replied_text", "in", ["No", ""]]], fields=["name", "whatsapp_no", "doc_type", "doc_name", "template_name", "reminder_id"])
-        lowmtbs = frappe.new_doc("List of WhatsApp Messages to be Sent")
-        lowmtbs.is_reminder = 1
-        r_whatsapp = []
-        for i in data:
-            check = frappe.db.count("Wati Webhook Template Sent", {"reminder_id": i.reminder_id})
-            if check <= 3:
-                equipments = frappe.db.get_list("Whatsapp Equipment", {"parent": i.name}, ["equipment_name"])
-                
-                if i.whatsapp_no not in r_whatsapp:
-                    lowmtbs.append("whatsapp_message_details", {
-                        "whatsapp_no": i.whatsapp_no[-10:],
-                        "template_name": "compliance_update",
-                        "supplier_name": i.doc_name,
-                        "doc_type": "Supplier",
-                        "doc_name": i.doc_name,
-                    })
-                    r_whatsapp.append(i.whatsapp_no)
-
-
-                wtsw = frappe.new_doc("Wati Webhook Template Sent")
-                wtsw.whatsapp_no = i.whatsapp_no if i.whatsapp_no else ''
-                wtsw.template_name = 'compliance_update'
-                wtsw.doc_type = i.doc_type
-                wtsw.doc_name = i.doc_name
-                wtsw.date = today()
-                wtsw.reminder_id = i.reminder_id
-                for equipment in equipments:
-                    child_row = wtsw.append("whatsapp_equipment", {})
-                    child_row.equipment_name = equipment["equipment_name"]
-
-                wtsw.insert(ignore_permissions=True)
-                frappe.db.commit()
-        if lowmtbs.whatsapp_message_details:
-            lowmtbs.insert(ignore_permissions=True)
-            frappe.db.commit()
-
-
-#####################  send reminder message from list using scheduler ###################################
-@frappe.whitelist(allow_guest=True)
-def send_whatsapp_reminder_using_scheduler():
-    enable_cron = frappe.db.get_single_value('Custom Settings', 'enable_cron_job')
-    if enable_cron == 1:
-        names = frappe.db.get_list("List of WhatsApp Messages to be Sent", filters={"date": today(), "sent": 0}, fields=["name"], pluck='name')
-        for name in names:
-            send_messages_from_list_of_reminder(name)
+    #     test = frappe.new_doc("testing")
+    #     test.number = number
+    #     test.template_name = "sent_pdf"
+    #     test.insert(ignore_permissions=True)
+    #     frappe.db.commit()
