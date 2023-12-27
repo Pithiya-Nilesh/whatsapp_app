@@ -2410,14 +2410,15 @@ def send_insurance_whatsapp():
             whatsapp_no = supplier_dict[supplier][0]["whatsapp_no"]
             template = "compalince_update_remainders_in_cc"
             
-            lowmtbs.append("whatsapp_message_details", {
-                "whatsapp_no": whatsapp_no,
-                "pdf_link": file_link,
-                "template_name": template,
-                "supplier_name": supplier_name,
-                "doc_type": "Supplier",
-                "doc_name": supplier,
-            })
+            if check_daily_message_limit_for_user(whatsapp_no, "compalince_update_remainders_in_cc"):
+                lowmtbs.append("whatsapp_message_details", {
+                    "whatsapp_no": whatsapp_no,
+                    "pdf_link": file_link,
+                    "template_name": template,
+                    "supplier_name": supplier_name,
+                    "doc_type": "Supplier",
+                    "doc_name": supplier,
+                })
 
         lowmtbs.insert(ignore_permissions=True)
         frappe.db.commit()
@@ -2465,20 +2466,22 @@ def send_messages_from_list_of_reminder(name=""):
                     test.insert(ignore_permissions=True)
                     frappe.db.commit()
                     
-                    url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{wmd.whatsapp_no}"
-                    response = requests.post(url, json=payload, headers=headers)
-                    data = json.loads(response.text)
+                    # url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{wmd.whatsapp_no}"
+                    # response = requests.post(url, json=payload, headers=headers)
+                    # data = json.loads(response.text)
 
-                    if "result" in data and data["result"]:
-                        log = frappe.new_doc("Whatsapp Message Daily Limit Log")
-                        log.whatsapp_no = wmd.whatsapp_no
-                        log.template_name = wmd.template_name
-                        log.insert()
-                        frappe.db.commit()
+                    # if "result" in data and data["result"]:
+                    # tab start
+                    log = frappe.new_doc("Whatsapp Message Daily Limit Log")
+                    log.whatsapp_no = wmd.whatsapp_no
+                    log.template_name = wmd.template_name
+                    log.insert()
+                    frappe.db.commit()
 
-                        from whatsapp_app.api import set_comment
-                        content = f"<div class='card'><b style='color: green' class='px-2 pt-2'>Whatsapp Compliance Template Sent: </b> <a href='{wmd.pdf_link}' class='px-2 pb-2'>{wmd.pdf_link}</span></div>"
-                        set_comment("Supplier", wmd.doc_name, "Administrator", content)
+                    from whatsapp_app.api import set_comment
+                    content = f"<div class='card'><b style='color: green' class='px-2 pt-2'>Whatsapp Compliance Template Sent: </b> <a href='{wmd.pdf_link}' class='px-2 pb-2'>{wmd.pdf_link}</span></div>"
+                    set_comment("Supplier", wmd.doc_name, "Administrator", content)
+                    # tab end
 
                     sent_wp_no.append(wmd.whatsapp_no)
 
