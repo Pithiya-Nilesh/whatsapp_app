@@ -332,7 +332,30 @@ def check_status(number):
 
 @frappe.whitelist()
 def get_template_list(doctype):
-    return frappe.db.get_list("Templates", filters={"template_doctype": ['in', [doctype, '']], "status": "APPROVED"}, pluck = "name")
+    # from frappe.permissions import get_roles
+
+    # Get the roles of the user
+    user_roles = frappe.get_roles(frappe.session.user)
+
+    print("user role", user_roles)
+    final_template_list = []
+
+
+    t_list = frappe.db.get_list("Templates", filters={"template_doctype": ['in', [doctype, '']], "status": "APPROVED"}, pluck = "name")
+    for i in t_list:
+        doc = frappe.get_doc("Templates", i)
+        if doc.wati_templates_role:
+            for j in doc.wati_templates_role:
+                    if j.role in user_roles:
+                        final_template_list.append(doc.name)
+        else:
+            final_template_list.append(doc.name)
+
+    return list(set(final_template_list))
+
+        
+
+    # return frappe.db.get_list("Templates", filters={"template_doctype": ['in', [doctype, '']], "status": "APPROVED"}, pluck = "name")
 
 
 @frappe.whitelist(allow_guest=True)

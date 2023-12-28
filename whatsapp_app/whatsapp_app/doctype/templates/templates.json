@@ -11,6 +11,7 @@
   "template_doctype",
   "status",
   "sample",
+  "wati_templates_role",
   "image",
   "table"
  ],
@@ -24,6 +25,7 @@
   {
    "fieldname": "table",
    "fieldtype": "Table",
+   "hidden": 1,
    "label": "Table",
    "options": "Parameters"
   },
@@ -37,6 +39,7 @@
   {
    "fieldname": "template_doctype",
    "fieldtype": "Select",
+   "hidden": 1,
    "label": "Doctype",
    "options": "\nLead\nSupplier\nOpportunity\nCustomer\nRaw Data\nEquipment"
   },
@@ -50,11 +53,17 @@
    "fieldname": "image",
    "fieldtype": "Image",
    "label": "Image"
+  },
+  {
+   "fieldname": "wati_templates_role",
+   "fieldtype": "Table",
+   "label": "Wati Templates Role",
+   "options": "Wati Templates Role"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-07-12 17:47:29.664350",
+ "modified": "2023-12-28 12:32:54.088674",
  "modified_by": "Administrator",
  "module": "Whatsapp App",
  "name": "Templates",
