@@ -2422,7 +2422,7 @@ def send_insurance_whatsapp():
 
         lowmtbs.insert(ignore_permissions=True)
         frappe.db.commit()
-        send_whatsapp_reminder_using_scheduler()
+        # send_whatsapp_reminder_using_scheduler()
 
 
 @frappe.whitelist(allow_guest=True)

@@ -152,7 +152,7 @@ scheduler_events = {
 
     "send_insurance_reminder_daily_create_pdf": {
        "0 10 * * *": [
-          "whatsapp_app.whatsapp_app.doctype.api.generate_pdf_and_store_data"
+          "whatsapp_app.whatsapp_app.doctype.api.send_insurance_whatsapp"
         ]
     },
 
