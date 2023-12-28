@@ -2379,46 +2379,46 @@ def send_insurance_whatsapp():
             # print("\n\n message", message, "\n\n")
             # return message
 
-            
-            file_path = supplier_dict[supplier][0]["supplier_name"].replace(" ", "_").lower() + '.pdf'
-            pdf = weasyprint.HTML(string=message).write_pdf()
-            
-            with open(file_path, 'wb') as f:
-                f.write(pdf)
+            if supplier_dict[supplier][0]["supplier_name"]:
+                file_path = supplier_dict[supplier][0]["supplier_name"].replace(" ", "_").lower() + '.pdf'
+                pdf = weasyprint.HTML(string=message).write_pdf()
                 
-            delete_file(f"/files/{file_path}")
-            save_file_on_filesystem(file_path, content=pdf)
+                with open(file_path, 'wb') as f:
+                    f.write(pdf)
+                    
+                delete_file(f"/files/{file_path}")
+                save_file_on_filesystem(file_path, content=pdf)
 
-            # create a new document
-            from frappe.utils import today
+                # create a new document
+                from frappe.utils import today
 
-            doc = frappe.get_doc({
-                'doctype': 'Sent File',
-                'file_path': file_path,
-                'sent_date': today()
-            })
-            doc.insert(ignore_permissions=True)
-            frappe.db.commit()
-
-
-            from frappe.utils import get_url
-            site_url = get_url()
-            file_link = site_url + '/files/' + file_path
-
-            supplier_name = supplier_dict[supplier][0]["supplier_name"]
-            supplier = supplier_dict[supplier][0]["supplier"]
-            whatsapp_no = supplier_dict[supplier][0]["whatsapp_no"]
-            template = "compalince_update_remainders_in_cc"
-            
-            if check_daily_message_limit_for_user(whatsapp_no, "compalince_update_remainders_in_cc"):
-                lowmtbs.append("whatsapp_message_details", {
-                    "whatsapp_no": whatsapp_no,
-                    "pdf_link": file_link,
-                    "template_name": template,
-                    "supplier_name": supplier_name,
-                    "doc_type": "Supplier",
-                    "doc_name": supplier,
+                doc = frappe.get_doc({
+                    'doctype': 'Sent File',
+                    'file_path': file_path,
+                    'sent_date': today()
                 })
+                doc.insert(ignore_permissions=True)
+                frappe.db.commit()
+
+
+                from frappe.utils import get_url
+                site_url = get_url()
+                file_link = site_url + '/files/' + file_path
+
+                supplier_name = supplier_dict[supplier][0]["supplier_name"]
+                supplier = supplier_dict[supplier][0]["supplier"]
+                whatsapp_no = supplier_dict[supplier][0]["whatsapp_no"]
+                template = "compalince_update_remainders_in_cc"
+                
+                if check_daily_message_limit_for_user(whatsapp_no, "compalince_update_remainders_in_cc"):
+                    lowmtbs.append("whatsapp_message_details", {
+                        "whatsapp_no": whatsapp_no,
+                        "pdf_link": file_link,
+                        "template_name": template,
+                        "supplier_name": supplier_name,
+                        "doc_type": "Supplier",
+                        "doc_name": supplier,
+                    })
 
         lowmtbs.insert(ignore_permissions=True)
         frappe.db.commit()
