@@ -73,7 +73,7 @@ frappe.ui.form.on("Customer", {
 
 
         var buttonElement1 = $("<button>").text("Template");
-
+        buttonElement1.attr("id", "send_template");
         buttonElement1.css({
             height: "25px",
             backgroundColor: "#128c7e",
@@ -103,6 +103,8 @@ frappe.ui.form.on("Customer", {
         });
 
         var buttonElement = $("<button>");
+        buttonElement.attr("id", "send_message");
+
 
         var iconElement = $("<i>")
             .addClass("fa fa-paper-plane");
@@ -1328,6 +1330,38 @@ frappe.ui.form.on("Customer", {
 
                             }
                         });
+
+        
+                    setTimeout(function() {
+                            frappe.call({
+                                method: "frappe.client.get_list",
+                                args: {
+                                    doctype: "Customer",
+                                    fields: ["_assign"],
+                                    filters: {
+                                        "name": frm.doc.name
+                                    },
+                                    as_dict: false
+                                },
+                                callback: function(response) {
+                                    var assign_list = response.message[0]._assign;
+                                    if (assign_list.includes(frappe.session.user)) {
+                                        // console.log("yes", assign_list)
+                                    }
+                                    else if (frappe.user.has_role("System Manager")){
+                                        // console.log("yes", assign_list)
+                                    }
+                                    else{
+                                        var send_template = document.getElementById("send_template")
+                                        send_template.disabled = true;
+                                        var send_message = docuemnt.getElementById("send_message")
+                                        send_message.disabled = true;
+                                        // console.log("no", assign_list)
+                                    }
+                                }
+                            });
+                        }, 1000);
+
                     }
                 );
             }
