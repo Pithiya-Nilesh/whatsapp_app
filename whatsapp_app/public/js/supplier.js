@@ -1358,7 +1358,7 @@ frappe.ui.form.on("Supplier", {
                                 }
                             });
                         }, 1000);
-
+                        
                     }
                 );
             }

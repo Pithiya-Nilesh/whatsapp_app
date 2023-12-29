@@ -2489,21 +2489,21 @@ def send_messages_from_list_of_reminder(name=""):
                     test.insert(ignore_permissions=True)
                     frappe.db.commit()
                     
-                    # url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{wmd.whatsapp_no}"
-                    # response = requests.post(url, json=payload, headers=headers)
-                    # data = json.loads(response.text)
+                    url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{wmd.whatsapp_no}"
+                    response = requests.post(url, json=payload, headers=headers)
+                    data = json.loads(response.text)
 
-                    # if "result" in data and data["result"]:
+                    if "result" in data and data["result"]:
                     # tab start
-                    log = frappe.new_doc("Whatsapp Message Daily Limit Log")
-                    log.whatsapp_no = wmd.whatsapp_no
-                    log.template_name = wmd.template_name
-                    log.insert()
-                    frappe.db.commit()
+                        log = frappe.new_doc("Whatsapp Message Daily Limit Log")
+                        log.whatsapp_no = wmd.whatsapp_no
+                        log.template_name = wmd.template_name
+                        log.insert()
+                        frappe.db.commit()
 
-                    from whatsapp_app.api import set_comment
-                    content = f"<div class='card'><b style='color: green' class='px-2 pt-2'>Whatsapp Compliance Template Sent: </b> <a href='{wmd.pdf_link}' class='px-2 pb-2'>{wmd.pdf_link}</span></div>"
-                    set_comment("Supplier", wmd.doc_name, "Administrator", content)
+                        from whatsapp_app.api import set_comment
+                        content = f"<div class='card'><b style='color: green' class='px-2 pt-2'>Whatsapp Compliance Template Sent: </b> <a href='{wmd.pdf_link}' class='px-2 pb-2'>{wmd.pdf_link}</span></div>"
+                        set_comment("Supplier", wmd.doc_name, "Administrator", content)
                     # tab end
 
                     sent_wp_no.append(wmd.whatsapp_no)
@@ -2515,30 +2515,30 @@ def send_messages_from_list_of_reminder(name=""):
         frappe.db.commit()
 
 
-    # # send report to migoo managment
-    # from frappe.utils import get_url
-    # # numbers = ['8401265878', '7990915950', '9313086301', '9724547104', '8347718490', '9886107360', '9708618353', '9898019009']
-    # numbers = ['9886107360', '9724547104', '9313086301', '7990915950', '8401265878']
-    # report = f"{get_url()}/api/method/frappe.utils.print_format.download_pdf?doctype=List%20of%20WhatsApp%20Messages%20to%20be%20Sent&name={name}"
-    # payload = {
-    #             "broadcast_name": "sent_pdf",
-    #             "template_name": "sent_pdf",
-    #             "parameters": [{
-    #                         "name": "pdf_link",
-    #                         "value": f"{report}"
-    #                     },
-    #                     {
-    #                         "name": "doctype_name",
-    #                         "value": "equipment reminder whatsapp list report"
-    #                     }],
-    #         }
-    # for number in numbers:
+    # send report to migoo managment
+    from frappe.utils import get_url
+    # numbers = ['8401265878', '7990915950', '9313086301', '9724547104', '8347718490', '9886107360', '9708618353', '9898019009']
+    numbers = ['9886107360', '9724547104', '9313086301', '7990915950', '8401265878']
+    report = f"{get_url()}/api/method/frappe.utils.print_format.download_pdf?doctype=List%20of%20WhatsApp%20Messages%20to%20be%20Sent&name={name}"
+    payload = {
+                "broadcast_name": "sent_pdf",
+                "template_name": "sent_pdf",
+                "parameters": [{
+                            "name": "pdf_link",
+                            "value": f"{report}"
+                        },
+                        {
+                            "name": "doctype_name",
+                            "value": "equipment reminder whatsapp list report"
+                        }],
+            }
+    for number in numbers:
 
-    #     url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{number}"
-    #     response = requests.post(url, json=payload, headers=headers)
+        url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{number}"
+        response = requests.post(url, json=payload, headers=headers)
        
-    #     test = frappe.new_doc("testing")
-    #     test.number = number
-    #     test.template_name = "sent_pdf"
-    #     test.insert(ignore_permissions=True)
-    #     frappe.db.commit()
+        test = frappe.new_doc("testing")
+        test.number = number
+        test.template_name = "sent_pdf"
+        test.insert(ignore_permissions=True)
+        frappe.db.commit()
