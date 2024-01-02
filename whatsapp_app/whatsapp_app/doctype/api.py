@@ -2450,7 +2450,6 @@ def send_insurance_whatsapp():
                                 </tr>
                             </table>
                         </div>
-
                 <br>
                 <div>
 
@@ -2557,8 +2556,8 @@ def send_messages_from_list_of_reminder(name=""):
                     frappe.db.commit()
                     
                     url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{wmd.whatsapp_no}"
-                    response = requests.post(url, json=payload, headers=headers)
-                    data = json.loads(response.text)
+                    # response = requests.post(url, json=payload, headers=headers)
+                    # data = json.loads(response.text)
 
                     # if "result" in data and data["result"]:
                     # # tab start
