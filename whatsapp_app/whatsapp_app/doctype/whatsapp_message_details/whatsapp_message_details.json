@@ -10,6 +10,7 @@
   "whatsapp_no",
   "pdf_link",
   "template_name",
+  "is_company",
   "with_reminder",
   "doc_type",
   "doc_name",
@@ -54,7 +55,7 @@
    "fieldname": "supplier_name",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Supplier Name"
+   "label": "Supplier Name / Company Name"
   },
   {
    "fieldname": "type",
@@ -66,14 +67,20 @@
    "default": "0",
    "fieldname": "with_reminder",
    "fieldtype": "Check",
-   "in_list_view": 1,
    "label": "With Reminder"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_company",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Is Company ?"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2023-11-03 13:17:17.945932",
+ "modified": "2024-01-02 12:45:20.274540",
  "modified_by": "Administrator",
  "module": "Whatsapp App",
  "name": "Whatsapp Message Details",

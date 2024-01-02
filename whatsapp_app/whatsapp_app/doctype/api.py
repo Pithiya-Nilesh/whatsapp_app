@@ -2233,7 +2233,8 @@ def send_insurance_whatsapp():
         FROM
             CTE
         GROUP BY type, date, register_no
-        ORDER BY supplier;
+        ORDER BY supplier,
+        DATE(date) asc;
 
    """
     )
@@ -2243,7 +2244,6 @@ def send_insurance_whatsapp():
 
         equipment_ids = []
 
-        print("\n\n name", name)
         for i in name:
             equipment_name = i[0]
             supplier = i[1]
@@ -2258,7 +2258,6 @@ def send_insurance_whatsapp():
             whatsapp_no = i[10]
             equipment_ids.append(i[0])
 
-            print("\n\n name", )
 
             supplier_dict[supplier].append(
                 {
@@ -2298,7 +2297,68 @@ def send_insurance_whatsapp():
             #     supplier_dict[supplier][0]["supplier_name"]
             # )
 
-            message = '''
+            supp_data = get_supplier_or_company_name(supplier_dict[supplier][0]['supplier'])
+            supplier_name = supp_data['supplier_name']
+            is_company = supp_data["is_company"]
+
+            header_image_url = "https://www.migoo.in/files/migoo-logo-black-high.png"
+            footer_image_url = get_footer_advertisement_url()
+
+            css = f"""
+            <style>
+                @page {{
+                    size: A4 portrait;
+                    margin-top: 6em;
+                    margin-bottom: 16em;
+                    margin-left: 3em;
+                    margin-right: 3em;
+                    
+                    @top-right {{
+                        width: 100%;
+                        height: 70px;
+                        left: 50;
+                        right: 0;
+                        background-position: right;
+                        content: "";
+                        background-image: url({header_image_url}); 
+                        background-size: contain; 
+                        background-repeat: no-repeat; 
+                    }}
+
+                    @bottom-center {{
+                        width: 100%;
+                        height: 95%;
+                        left: 0;
+                        right: 0;
+                        content: "";
+                        background-image: url({footer_image_url});
+                        background-size: 100% 100%; /* This will cover the entire width and height while maintaining aspect ratio */
+                        background-repeat: no-repeat;
+                    }}
+                }}
+            
+                body {{
+                    margin: 0; /* Remove the body margin to avoid additional space */
+                }}
+
+            </style>                
+            """
+
+            message = f"""
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <title>{supplier_name}</title>
+                    
+                        {css}
+                        
+                        </style>
+                    </head>
+                    <body>
+                
+            """
+
+            message += '''
                     <div>
                         <div class="sec-2">
                             <h3 style="">Hello, {}</h4>
@@ -2312,32 +2372,36 @@ def send_insurance_whatsapp():
                                     <th style="border: 1px solid black; padding: 4px;">Equipment No</th>
                                     <th style="border: 1px solid black; padding: 4px;">Model No</th>
                                 </tr>
-                    '''.format(supplier_dict[supplier][0]['supplier_name'])
+                    '''.format(supplier_name)
 
             for equipment in equipment_list:
+                
                 message += """
-
                             <tr>
                                     <td style="border: 1px solid black; padding: 4px; text-align: center;">{}</td>
                                     <td style="border: 1px solid black; padding: 4px; text-align: center;">{}</td>
-                                    <td style="border: 1px solid black; padding: 4px; text-align: center;">{} Days to Go</td>
+                                    <td style="border: 1px solid black; padding: 4px; text-align: center; background-color: {}">{} Days to Go</td>
                                     <td style="border: 1px solid black; padding: 4px; text-align: center;">{}</td>
                                     <td style="border: 1px solid black; padding: 4px; text-align: center;">{}</td>
-                                    <td style="border: 1px solid black; padding: 4px; text-align: center;">{}</td>
-                                </tr>
+                                    <td style="border: 1px solid black; padding: 4px; text-align: center; font-size: 12px;">{}</td>
+                            </tr>                           
                                 
                 """.format(
                     equipment["status"],
                     equipment["date"],
+                    get_row_background_color(equipment["daystogo"]),
                     equipment["daystogo"],
                     equipment["equipment_main_category"],
                     equipment["register_no"],
                     equipment["model"],
                 )
+
+
             message += '''
                         </table>
                     </div>
                 </div>
+                <div>
                         <p>Get it renewed as soon as possible to avoid further inconvenience.</p>
                         <p>Thank you for choosing Migoo. We value your trust and are committed to providing you with the best service possible.
                         </p>
@@ -2353,8 +2417,9 @@ def send_insurance_whatsapp():
                                     <td style="padding-left:12px; color: black;">
                                         <div style="display: flex; margin-bottom: 2px;"> <img src="https://www.migoo.in/files/call (1).png"
                                                 height="16px" width="16px" style="margin-top: auto; margin-bottom: auto;">
-                                            <div style="margin-left: 5px;"> +91 79692 12223 </div>
+                                            <div style="margin-left: 5px;"> +91 79692 12223 <br> +91 98255 32427</div>
                                         </div>
+                                        
                                         <div style="display: flex; margin-bottom: 2px;"> <img src="https://www.migoo.in/files/email1ead26.png"
                                                 height="16px" width="16px" style="margin-top: auto; margin-bottom: auto;"> <a
                                                 style="color: black;" href="mailto:info@migoo.in" style="text-decoration: none;">
@@ -2395,15 +2460,17 @@ def send_insurance_whatsapp():
                         <div style="color: green; margin-left: 5px;">Consider The Environment. Think Before You Print.</div>
                     </div>
                 </div>
+                </div>
+                </body>
+                </html>
                     '''  
-        
-
+            
         
             # print("\n\n message", message, "\n\n")
             # return message
 
             if supplier_dict[supplier][0]["supplier_name"]:
-                file_path = supplier_dict[supplier][0]["supplier_name"].replace(" ", "_").lower() + '.pdf'
+                file_path = supplier_name.replace(" ", "_").lower() + '.pdf'
                 pdf = weasyprint.HTML(string=message).write_pdf()
                 
                 with open(file_path, 'wb') as f:
@@ -2428,7 +2495,6 @@ def send_insurance_whatsapp():
                 site_url = get_url()
                 file_link = site_url + '/files/' + file_path
 
-                supplier_name = supplier_dict[supplier][0]["supplier_name"]
                 supplier = supplier_dict[supplier][0]["supplier"]
                 whatsapp_no = supplier_dict[supplier][0]["whatsapp_no"]
                 template = "compalince_update_remainders_in_cc"
@@ -2441,11 +2507,12 @@ def send_insurance_whatsapp():
                         "supplier_name": supplier_name,
                         "doc_type": "Supplier",
                         "doc_name": supplier,
+                        "is_company": is_company
                     })
 
         lowmtbs.insert(ignore_permissions=True)
         frappe.db.commit()
-        send_whatsapp_reminder_using_scheduler()
+        # send_whatsapp_reminder_using_scheduler()
 
 
 @frappe.whitelist(allow_guest=True)
@@ -2493,18 +2560,18 @@ def send_messages_from_list_of_reminder(name=""):
                     response = requests.post(url, json=payload, headers=headers)
                     data = json.loads(response.text)
 
-                    if "result" in data and data["result"]:
-                    # tab start
-                        log = frappe.new_doc("Whatsapp Message Daily Limit Log")
-                        log.whatsapp_no = wmd.whatsapp_no
-                        log.template_name = wmd.template_name
-                        log.insert()
-                        frappe.db.commit()
+                    # if "result" in data and data["result"]:
+                    # # tab start
+                    #     log = frappe.new_doc("Whatsapp Message Daily Limit Log")
+                    #     log.whatsapp_no = wmd.whatsapp_no
+                    #     log.template_name = wmd.template_name
+                    #     log.insert()
+                    #     frappe.db.commit()
 
-                        from whatsapp_app.api import set_comment
-                        content = f"<div class='card'><b style='color: green' class='px-2 pt-2'>Whatsapp Compliance Template Sent: </b> <a href='{wmd.pdf_link}' class='px-2 pb-2'>{wmd.pdf_link}</span></div>"
-                        set_comment("Supplier", wmd.doc_name, "Administrator", content)
-                    # tab end
+                    #     from whatsapp_app.api import set_comment
+                    #     content = f"<div class='card'><b style='color: green' class='px-2 pt-2'>Whatsapp Compliance Template Sent: </b> <a href='{wmd.pdf_link}' class='px-2 pb-2'>{wmd.pdf_link}</span></div>"
+                    #     set_comment("Supplier", wmd.doc_name, "Administrator", content)
+                    # # tab end
 
                     sent_wp_no.append(wmd.whatsapp_no)
 
@@ -2515,30 +2582,63 @@ def send_messages_from_list_of_reminder(name=""):
         frappe.db.commit()
 
 
-    # send report to migoo managment
-    from frappe.utils import get_url
-    # numbers = ['8401265878', '7990915950', '9313086301', '9724547104', '8347718490', '9886107360', '9708618353', '9898019009']
-    numbers = ['9886107360', '9724547104', '9313086301', '7990915950', '8401265878']
-    report = f"{get_url()}/api/method/frappe.utils.print_format.download_pdf?doctype=List%20of%20WhatsApp%20Messages%20to%20be%20Sent&name={name}"
-    payload = {
-                "broadcast_name": "sent_pdf",
-                "template_name": "sent_pdf",
-                "parameters": [{
-                            "name": "pdf_link",
-                            "value": f"{report}"
-                        },
-                        {
-                            "name": "doctype_name",
-                            "value": "equipment reminder whatsapp list report"
-                        }],
-            }
-    for number in numbers:
+    # # send report to migoo managment
+    # from frappe.utils import get_url
+    # # numbers = ['8401265878', '7990915950', '9313086301', '9724547104', '8347718490', '9886107360', '9708618353', '9898019009']
+    # numbers = ['9886107360', '9724547104', '9313086301', '7990915950', '8401265878']
+    # report = f"{get_url()}/api/method/frappe.utils.print_format.download_pdf?doctype=List%20of%20WhatsApp%20Messages%20to%20be%20Sent&name={name}"
+    # payload = {
+    #             "broadcast_name": "sent_pdf",
+    #             "template_name": "sent_pdf",
+    #             "parameters": [{
+    #                         "name": "pdf_link",
+    #                         "value": f"{report}"
+    #                     },
+    #                     {
+    #                         "name": "doctype_name",
+    #                         "value": "equipment reminder whatsapp list report"
+    #                     }],
+    #         }
+    # for number in numbers:
 
-        url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{number}"
-        response = requests.post(url, json=payload, headers=headers)
+    #     url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{number}"
+    #     response = requests.post(url, json=payload, headers=headers)
        
-        test = frappe.new_doc("testing")
-        test.number = number
-        test.template_name = "sent_pdf"
-        test.insert(ignore_permissions=True)
-        frappe.db.commit()
+    #     test = frappe.new_doc("testing")
+    #     test.number = number
+    #     test.template_name = "sent_pdf"
+    #     test.insert(ignore_permissions=True)
+    #     frappe.db.commit()
+        
+        
+def get_row_background_color(days_to_go):
+    try:
+        days_to_go = int(days_to_go)
+        if days_to_go <= 00:
+            return "#FF0000"
+        elif days_to_go <= 7:
+            return "#FFA500"
+        else:
+            return "green"
+    except ValueError:
+        return "#FFFFFF"
+    
+def get_footer_advertisement_url():
+    enable = frappe.db.get_single_value("Advertisement", "enable")
+    if enable == 1:
+        from frappe.utils import get_url 
+        url = get_url() + frappe.db.get_single_value("Advertisement", "advertisement_image")
+        print("\n\n url", url)
+        return url.replace(' ', '%20')
+    else:
+        return ""
+    
+
+def get_supplier_or_company_name(supplier):
+    if supplier:
+        doc = frappe.get_doc("Supplier", supplier)
+    
+        if doc.supplier_type == "Company":
+            return {"supplier_name": doc.company_name, "is_company": 1}
+        else:
+            return {"supplier_name": doc.name_of_suppier, "is_company": 0}
