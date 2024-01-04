@@ -2614,24 +2614,22 @@ def get_row_background_color(days_to_go):
     try:
         days_to_go = int(days_to_go)
         if days_to_go <= 00:
-            return "#FF0000"
+            return "#FF5555"
         elif days_to_go <= 7:
-            return "#FFA500"
+            return "#FFCD71"
         else:
-            return "green"
+            return "72CB72"
     except ValueError:
         return "#FFFFFF"
     
 def get_footer_advertisement_url():
     enable = frappe.db.get_single_value("Advertisement", "enable")
     if enable == 1:
-        from frappe.utils import get_url 
+        from frappe.utils import get_url
         url = get_url() + frappe.db.get_single_value("Advertisement", "advertisement_image")
-        print("\n\n url", url)
         return url.replace(' ', '%20')
     else:
         return ""
-    
 
 def get_supplier_or_company_name(supplier):
     if supplier:
