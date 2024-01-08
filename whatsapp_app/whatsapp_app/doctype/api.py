@@ -2619,7 +2619,7 @@ def get_row_background_color(days_to_go):
         elif days_to_go <= 7:
             return "#FFCD71"
         else:
-            return "72CB72"
+            return "#72CB72"
     except ValueError:
         return "#FFFFFF"
     
