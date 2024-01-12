@@ -2141,7 +2141,8 @@ def send_insurance_whatsapp():
                     ELSE equipment_model_no
                 END AS "model",
                 insurance_date AS 'date',
-                DATEDIFF(insurance_date, CURDATE()) AS 'daysToGo',
+                LPAD(DATEDIFF(insurance_date, CURDATE()), 2, '0') AS 'daysToGo',
+
                 'Insurance' AS 'type'
             FROM
                 tabItem
@@ -2164,7 +2165,8 @@ def send_insurance_whatsapp():
                     ELSE equipment_model_no
                 END AS "model",
                 fitness_dt AS 'date',
-                DATEDIFF(fitness_dt, CURDATE()) AS 'daysToGo',
+                LPAD(DATEDIFF(fitness_dt, CURDATE()), 2, '0') AS 'daysToGo',
+                # DATEDIFF(fitness_dt, CURDATE()) AS 'daysToGo',
                 'Fitness' AS 'type'
             FROM
                 tabItem
@@ -2187,7 +2189,8 @@ def send_insurance_whatsapp():
                     ELSE equipment_model_no
                 END AS "model",
                 pollution AS 'date',
-                DATEDIFF(pollution, CURDATE()) AS 'daysToGo',
+                 LPAD(DATEDIFF(pollution, CURDATE()), 2, '0') AS 'daysToGo',
+                # DATEDIFF(pollution, CURDATE()) AS 'daysToGo',
                 'Pollution' AS 'type'
             FROM
                 tabItem
@@ -2195,9 +2198,9 @@ def send_insurance_whatsapp():
                 pollution >= CURDATE()
                 AND DATEDIFF(pollution, CURDATE()) <= 15
 
-            UNION ALL 
+            UNION ALL
 
-            SELECT 
+            SELECT
                 equipment_id,
                 cl.supplier,
                 cl.supplier_email,
@@ -2210,13 +2213,17 @@ def send_insurance_whatsapp():
                     ELSE equipment_model_no
                 END AS "model",
                 valid_till AS 'date',
-                DATEDIFF(valid_till, CURDATE()) AS 'daysToGo',
+                CASE
+                        WHEN valid_till < CURDATE() THEN 'Expired'
+                       
+                       ELSE LPAD(DATEDIFF(valid_till, CURDATE()), 2, '0')
+                    END AS "daysToGo",
                 compliance_type AS 'type'
             FROM `tabCompliance Log Detail` cld
             INNER JOIN `tabItem` i ON i.name = cld.equipment_id
             INNER JOIN `tabCompliance Log` cl ON cl.name = cld.parent
-            WHERE valid_till = DATE_SUB(CURDATE(), INTERVAL (DAYOFWEEK(CURDATE()) + 5) % 7 DAY)
-        )
+            WHERE cl.date = DATE_SUB(CURDATE(), INTERVAL (DAYOFWEEK(CURDATE()) + 5) % 7 DAY)
+                            )
 
         SELECT
             name,
@@ -2232,9 +2239,12 @@ def send_insurance_whatsapp():
             whatsapp_no
         FROM
             CTE
-        GROUP BY type, date, register_no
-        ORDER BY supplier,
-        DATE(date) asc;
+           
+           
+        GROUP BY type, date(date), register_no
+   
+   ORDER BY supplier,
+    DATE(date) asc;
 
    """
     )
@@ -2374,29 +2384,52 @@ def send_insurance_whatsapp():
                                     <th style="border: 1px solid black; padding: 4px;">Model No</th>
                                 </tr>
                     '''.format(supplier_name)
+            
 
             for equipment in equipment_list:
+                if equipment['daystogo'] == 'Expired':
+                     message += """
+                                <tr>
+                                        <td style="border: 1px solid black; padding: 4px; text-align: center;">{}</td>
+                                        <td style="border: 1px solid black; padding: 4px; text-align: center;">{}</td>
+                                        <td style="border: 1px solid black; padding: 4px; text-align: center; background-color: {}">{}</td>
+                                        <td style="border: 1px solid black; padding: 4px; text-align: center;">{}</td>
+                                        <td style="border: 1px solid black; padding: 4px; text-align: center;">{}</td>
+                                        <td style="border: 1px solid black; padding: 4px; text-align: center; font-size: 12px;">{}</td>
+                                </tr>                           
+                                    
+                    """.format(
+                        equipment["status"],
+                        equipment["date"],
+                        get_row_background_color(equipment["daystogo"]),
+                        equipment["daystogo"],
+                        equipment["equipment_main_category"],
+                        equipment["register_no"],
+                        equipment["model"],
+                    )
+           
+               
+                else:
                 
-                message += """
-                            <tr>
-                                    <td style="border: 1px solid black; padding: 4px; text-align: center;">{}</td>
-                                    <td style="border: 1px solid black; padding: 4px; text-align: center;">{}</td>
-                                    <td style="border: 1px solid black; padding: 4px; text-align: center; background-color: {}">{} Days to Go</td>
-                                    <td style="border: 1px solid black; padding: 4px; text-align: center;">{}</td>
-                                    <td style="border: 1px solid black; padding: 4px; text-align: center;">{}</td>
-                                    <td style="border: 1px solid black; padding: 4px; text-align: center; font-size: 12px;">{}</td>
-                            </tr>                           
-                                
-                """.format(
-                    equipment["status"],
-                    equipment["date"],
-                    get_row_background_color(equipment["daystogo"]),
-                    equipment["daystogo"],
-                    equipment["equipment_main_category"],
-                    equipment["register_no"],
-                    equipment["model"],
-                )
-
+                    message += """
+                                <tr>
+                                        <td style="border: 1px solid black; padding: 4px; text-align: center;">{}</td>
+                                        <td style="border: 1px solid black; padding: 4px; text-align: center;">{}</td>
+                                        <td style="border: 1px solid black; padding: 4px; text-align: center; background-color: {}">{} Days to Go</td>
+                                        <td style="border: 1px solid black; padding: 4px; text-align: center;">{}</td>
+                                        <td style="border: 1px solid black; padding: 4px; text-align: center;">{}</td>
+                                        <td style="border: 1px solid black; padding: 4px; text-align: center; font-size: 12px;">{}</td>
+                                </tr>                           
+                                    
+                    """.format(
+                        equipment["status"],
+                        equipment["date"],
+                        get_row_background_color(equipment["daystogo"]),
+                        equipment["daystogo"],
+                        equipment["equipment_main_category"],
+                        equipment["register_no"],
+                        equipment["model"],
+                    )
 
             message += '''
                         </table>
@@ -2613,10 +2646,9 @@ def send_messages_from_list_of_reminder(name=""):
         
 def get_row_background_color(days_to_go):
     try:
-        days_to_go = int(days_to_go)
-        if days_to_go <= 00:
+        if days_to_go == 'Expired' or int(days_to_go) <= 0:
             return "#FF5555"
-        elif days_to_go <= 7:
+        elif int(days_to_go) <= 7:
             return "#FFCD71"
         else:
             return "#72CB72"
