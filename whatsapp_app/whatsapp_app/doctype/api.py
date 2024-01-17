@@ -2545,7 +2545,7 @@ def send_insurance_whatsapp():
 
         lowmtbs.insert(ignore_permissions=True)
         frappe.db.commit()
-        # send_whatsapp_reminder_using_scheduler()
+        send_whatsapp_reminder_using_scheduler()
 
 
 @frappe.whitelist(allow_guest=True)
@@ -2583,11 +2583,11 @@ def send_messages_from_list_of_reminder(name=""):
                         ],
                     }
 
-                    test = frappe.new_doc("testing")
-                    test.number = wmd.whatsapp_no
-                    test.template_name = wmd.template_name
-                    test.insert(ignore_permissions=True)
-                    frappe.db.commit()
+                    # test = frappe.new_doc("testing")
+                    # test.number = wmd.whatsapp_no
+                    # test.template_name = wmd.template_name
+                    # test.insert(ignore_permissions=True)
+                    # frappe.db.commit()
                     
                     url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{wmd.whatsapp_no}"
                     response = requests.post(url, json=payload, headers=headers)
@@ -2637,11 +2637,11 @@ def send_messages_from_list_of_reminder(name=""):
         url = f"{api_endpoint}/{name_type}/{version}/sendTemplateMessage?whatsappNumber=91{number}"
         response = requests.post(url, json=payload, headers=headers)
        
-        test = frappe.new_doc("testing")
-        test.number = number
-        test.template_name = "sent_pdf"
-        test.insert(ignore_permissions=True)
-        frappe.db.commit()
+        # test = frappe.new_doc("testing")
+        # test.number = number
+        # test.template_name = "sent_pdf"
+        # test.insert(ignore_permissions=True)
+        # frappe.db.commit()
         
         
 def get_row_background_color(days_to_go):
