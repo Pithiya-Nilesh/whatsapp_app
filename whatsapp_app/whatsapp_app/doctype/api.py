@@ -1199,7 +1199,7 @@ def get_img(phone):
 #         doc.insert(ignore_permissions=True)
 #         frappe.db.commit()
 
-#         template = 'compalince_update_remainders_in_cc'
+#         template = 'compliance_reminder_pdf_whatsapp'
 #         number = whatsapp_no
 #         access_token, api_endpoint, name_type, version = whatsapp_keys_details()
 #         headers = {
@@ -1792,7 +1792,7 @@ def get_compliance_template_count(whatsapp_no, template_name):
 #             doc.insert(ignore_permissions=True)
 #             frappe.db.commit()
 
-#             template = 'compalince_update_remainders_in_cc'
+#             template = 'compliance_reminder_pdf_whatsapp'
 #             number = whatsapp_no
 #             from frappe.utils import get_url
 #             site_url = get_url()
@@ -2530,9 +2530,9 @@ def send_insurance_whatsapp():
 
                 supplier = supplier_dict[supplier][0]["supplier"]
                 whatsapp_no = supplier_dict[supplier][0]["whatsapp_no"]
-                template = "compalince_update_remainders_in_cc"
+                template = "compliance_reminder_pdf_whatsapp"
                 
-                if check_daily_message_limit_for_user(whatsapp_no, "compalince_update_remainders_in_cc"):
+                if check_daily_message_limit_for_user(whatsapp_no, "compliance_reminder_pdf_whatsapp"):
                     lowmtbs.append("whatsapp_message_details", {
                         "whatsapp_no": whatsapp_no,
                         "pdf_link": file_link,
@@ -2566,7 +2566,7 @@ def send_messages_from_list_of_reminder(name=""):
         sent_wp_no = []
         for wmd in lowmtbs.whatsapp_message_details:
             if wmd.whatsapp_no not in sent_wp_no:
-                if check_daily_message_limit_for_user(wmd.whatsapp_no, "compalince_update_remainders_in_cc"):
+                if check_daily_message_limit_for_user(wmd.whatsapp_no, "compliance_reminder_pdf_whatsapp"):
                     
                     payload = {
                         "broadcast_name": wmd.template_name,
