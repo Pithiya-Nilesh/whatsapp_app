@@ -1,10 +1,35 @@
-frappe.listview_settings['Supplier'].onload = function(listview) {
+frappe.listview_settings['Supplier'] = {
+  get_indicator: function (doc) {
+    var indicator = [(doc.verify), frappe.utils.guess_colour(doc.verify), "verify,=," + doc.verify];
+    if (doc.verify == "Verify") {
+      indicator[1] = "green";
+    }
+    if (doc.verify == "Not Verify") {
+      indicator[1] = "red";
+    }
+    return indicator;
+  },
+  onload: function (doc) {
+    if (frappe.user.has_role("Vendor") === true) {
+
+      $('.btn-primary').hide();
+    }
+  },
+  refresh: function (listview) {
+    if (frappe.user.has_role("Vendor") === true) {
+      $(".btn-primary").hide();
+    }
+  }
+};
+
+
+frappe.listview_settings['Supplier'].onload = function (listview) {
   const currentUserRoles = frappe.user_roles;
   const hasWhatsAppManagerRole = currentUserRoles.includes('WhatsApp Manager');
   const isAdmin = currentUserRoles.includes('Administrator');
 
   if (hasWhatsAppManagerRole || isAdmin) {
-    listview.page.add_action_item(__("Send Whatsapp Template"), function() {
+    listview.page.add_action_item(__("Send Whatsapp Template"), function () {
       test(listview);
     });
   }
@@ -13,7 +38,7 @@ frappe.listview_settings['Supplier'].onload = function(listview) {
 
 function test(listview) {
   let names = [];
-  $.each(listview.get_checked_items(), function(key, value) {
+  $.each(listview.get_checked_items(), function (key, value) {
     names.push(value.name);
   });
   if (names.length === 0) {
@@ -36,12 +61,12 @@ function test(listview) {
             'filters': {
               'name': ['in', template]
             },
-            'fields': ['name', 'status','sample'],
-            'limit_start': 0,  
-            'limit_page_length': 0  
+            'fields': ['name', 'status', 'sample'],
+            'limit_start': 0,
+            'limit_page_length': 0
           },
 
-          callback: function(response) {
+          callback: function (response) {
             if (response.message) {
               const templateData = response.message;
               const customerDoctype = doctype;
@@ -68,7 +93,7 @@ function test(listview) {
                     fieldname: 'select_template',
                     fieldtype: 'Select',
                     options: template,
-                    onchange: function() {
+                    onchange: function () {
                       const selectedValue = this.get_value();
                       const previousValue = this.last_value;
                       if (selectedValue && selectedValue !== previousValue) {
@@ -84,9 +109,9 @@ function test(listview) {
                             doctype_field: ''
                           }));
                           renderTable(variableData);
-                          } else {
-                            renderTable([]);
-                          }
+                        } else {
+                          renderTable([]);
+                        }
                       }
                     }
                   }
@@ -100,7 +125,7 @@ function test(listview) {
                     frappe.msgprint('Please select a template.');
                     return;
                   }
-                    
+
                   const tableData = getTableData();
                   const dataList = tableData.map(row => ({
                     name: row.variable_name,
@@ -109,9 +134,9 @@ function test(listview) {
                   }));
 
                   if (dataList.length === 0) {
-                        frappe.msgprint('Nothing to send whatsapp message here!');
-                        return;
-                     }
+                    frappe.msgprint('Nothing to send whatsapp message here!');
+                    return;
+                  }
 
                   const hasEmptyValue = dataList.some(row => !row.value);
                   if (hasEmptyValue) {
@@ -124,14 +149,14 @@ function test(listview) {
                   d1.hide();
                 }
               });
- 
+
               const tableSection = $('<div>').appendTo(d1.body);
 
               function renderTable(data) {
                 tableSection.empty();
                 if (data.length === 0) {
-                    const noDataMessage = $('<p>').text('No dynamic variable is available in this template').appendTo(tableSection);
-                    return;
+                  const noDataMessage = $('<p>').text('No dynamic variable is available in this template').appendTo(tableSection);
+                  return;
                 }
 
                 const table = $('<table class="table table-bordered" id="tabledata">').appendTo(tableSection);
@@ -162,13 +187,13 @@ function test(listview) {
 
                     selectField.val(doctypeField);
                   } else {
-                      $('<input type="text">')
-                        .val(variableValue)
-                        .css({ width: '200px', height: '30px' })  // Set the desired width and height
-                        .appendTo(variableValueInput);
-                    }
+                    $('<input type="text">')
+                      .val(variableValue)
+                      .css({ width: '200px', height: '30px' })  // Set the desired width and height
+                      .appendTo(variableValueInput);
+                  }
 
-                  dynamicCheckbox.on('change', function() {
+                  dynamicCheckbox.on('change', function () {
                     const isChecked = $(this).is(':checked');
                     row.is_dynamic = isChecked ? 1 : 0;
                     if (isChecked) {
@@ -188,7 +213,7 @@ function test(listview) {
                     }
                   });
 
-                  variableValueInput.on('change', function() {
+                  variableValueInput.on('change', function () {
                     const selectedValue = $(this).val();
                     if (isDynamic) {
                       row.doctype_field = selectedValue;
@@ -199,52 +224,52 @@ function test(listview) {
                 });
               }
 
-           function showConfirmDialog(listview) {
-              const selectedCustomerNames = listview.get_checked_items().map(item => item.name);
-              const selectTemplateValue = d1.get_value('select_template');
-              const selectedTemplateData = templateData.find(template => template.name === selectTemplateValue);
-              const templateSample = selectedTemplateData ? selectedTemplateData.sample : '';
-              const tableData = getTableData();
-              const dataList = tableData.map(row => ({
-                              name: row.variable_name,
-                              is_dynamic: row.is_dynamic ? 1 : 0,
-                              value: row.is_dynamic ? row.doctype_field : row.variable_value
-              }));
-              console.log(selectedCustomerNames)
-            
-             const updatedTemplateSample = selectedTemplateData.sample.replace(/{{([^{}]+)}}/g, (match, variable) => {
-             const variableRow = dataList.find(row => row.name === variable);
-             if (variableRow && variableRow.is_dynamic) {
-                   return `{{ ${variableRow.value} }}`;
-                 } else if (variableRow) {
-                   return variableRow.value;
-                 } else {
-                   return match;
-                 }
-               });
-               
-   
-              frappe.call({
-                method: 'frappe.client.get_list',
-                args: {
-                  doctype: 'Supplier',
-                  filters: { name: ['in', selectedCustomerNames] },
-                  fields: ['name', 'whatsapp_no', 'supplier_name'], // Include 'whatsapp_no' field
-                  limit_start: 0,
-                  limit_page_length: 0
-                },
-                callback: function(response) {                 
-                    
-                  if (response.message) {
-                    const selectedCustomers = response.message;
-                    const whatsappNos = selectedCustomers.map(customer => customer.whatsapp_no);
-            
-                    const confirmDialog = new frappe.ui.Dialog({
-                      title: 'Whatsapp Message',
-                      fields: [
-                        {
-                          fieldtype: 'HTML',
-                          options: `
+              function showConfirmDialog(listview) {
+                const selectedCustomerNames = listview.get_checked_items().map(item => item.name);
+                const selectTemplateValue = d1.get_value('select_template');
+                const selectedTemplateData = templateData.find(template => template.name === selectTemplateValue);
+                const templateSample = selectedTemplateData ? selectedTemplateData.sample : '';
+                const tableData = getTableData();
+                const dataList = tableData.map(row => ({
+                  name: row.variable_name,
+                  is_dynamic: row.is_dynamic ? 1 : 0,
+                  value: row.is_dynamic ? row.doctype_field : row.variable_value
+                }));
+                console.log(selectedCustomerNames)
+
+                const updatedTemplateSample = selectedTemplateData.sample.replace(/{{([^{}]+)}}/g, (match, variable) => {
+                  const variableRow = dataList.find(row => row.name === variable);
+                  if (variableRow && variableRow.is_dynamic) {
+                    return `{{ ${variableRow.value} }}`;
+                  } else if (variableRow) {
+                    return variableRow.value;
+                  } else {
+                    return match;
+                  }
+                });
+
+
+                frappe.call({
+                  method: 'frappe.client.get_list',
+                  args: {
+                    doctype: 'Supplier',
+                    filters: { name: ['in', selectedCustomerNames] },
+                    fields: ['name', 'whatsapp_no', 'supplier_name'], // Include 'whatsapp_no' field
+                    limit_start: 0,
+                    limit_page_length: 0
+                  },
+                  callback: function (response) {
+
+                    if (response.message) {
+                      const selectedCustomers = response.message;
+                      const whatsappNos = selectedCustomers.map(customer => customer.whatsapp_no);
+
+                      const confirmDialog = new frappe.ui.Dialog({
+                        title: 'Whatsapp Message',
+                        fields: [
+                          {
+                            fieldtype: 'HTML',
+                            options: `
                             <div class="template-preview">
                               <h5>Template Sample</h5>
                               <div class="sample-data">${updatedTemplateSample.replace(/\n/g, '<br>')}</div>
@@ -272,127 +297,127 @@ function test(listview) {
                               </tbody>
                             </table>
                           `,
-                        },
-                      ],
-                      primary_action_label: 'Confirm',
-                      primary_action() {
-                        const selectedCustomerName = Array.from(confirmDialog.body.querySelectorAll('input.row-checkbox:checked')).map(checkbox => {
-                          const row = checkbox.closest('tr');
-                          return row.querySelector('td:nth-child(2)').textContent.trim();
-                        });
-            
-                        if (selectedCustomerName.length === 0) {
-                          frappe.msgprint('Please select a supplier to send the WhatsApp message.');
-                          return;
-                        }
-            
-                        const sendConfirmationDialog = new frappe.ui.Dialog({
-                          title: 'Confirmation',
-                          fields: [
-                            {
-                              fieldtype: 'HTML',
-                              options: `<div>Do you want to send the WhatsApp message?</div>`,
+                          },
+                        ],
+                        primary_action_label: 'Confirm',
+                        primary_action() {
+                          const selectedCustomerName = Array.from(confirmDialog.body.querySelectorAll('input.row-checkbox:checked')).map(checkbox => {
+                            const row = checkbox.closest('tr');
+                            return row.querySelector('td:nth-child(2)').textContent.trim();
+                          });
+
+                          if (selectedCustomerName.length === 0) {
+                            frappe.msgprint('Please select a supplier to send the WhatsApp message.');
+                            return;
+                          }
+
+                          const sendConfirmationDialog = new frappe.ui.Dialog({
+                            title: 'Confirmation',
+                            fields: [
+                              {
+                                fieldtype: 'HTML',
+                                options: `<div>Do you want to send the WhatsApp message?</div>`,
+                              },
+                            ],
+                            primary_action_label: 'Yes',
+                            secondary_action_label: 'No',
+                            primary_action() {
+                              const selectedCustomerNames = Array.from(confirmDialog.body.querySelectorAll('input.row-checkbox:checked')).map(checkbox => {
+                                const row = checkbox.closest('tr');
+                                return row.querySelector('td:nth-child(2)').textContent.trim();
+                              });
+
+                              const tableData = getTableData();
+                              const dataList = tableData.map(row => ({
+                                name: row.variable_name,
+                                is_dynamic: row.is_dynamic ? 1 : 0,
+                                value: row.is_dynamic ? row.doctype_field : row.variable_value
+                              }));
+
+                              frappe.call({
+                                method: 'whatsapp_app.whatsapp_app.doctype.api.send_bulk_whatsapp_message',
+                                args: {
+                                  'template_name': selectTemplateValue,
+                                  'doctype': 'Supplier',
+                                  'name': selectedCustomerNames,
+                                  'data': dataList,
+                                },
+                                freeze: true,
+                                callback: (r) => {
+                                  frappe.msgprint('Message sent');
+                                },
+                                error: (r) => {
+                                  frappe.msgprint('Something went wrong!');
+                                }
+                              });
+
+                              sendConfirmationDialog.hide();
+                              confirmDialog.hide();
                             },
-                          ],
-                          primary_action_label: 'Yes',
-                          secondary_action_label: 'No',
-                          primary_action() {
-                            const selectedCustomerNames = Array.from(confirmDialog.body.querySelectorAll('input.row-checkbox:checked')).map(checkbox => {
-                              const row = checkbox.closest('tr');
-                              return row.querySelector('td:nth-child(2)').textContent.trim();
-                            });
-            
-                            const tableData = getTableData();
-                            const dataList = tableData.map(row => ({
-                              name: row.variable_name,
-                              is_dynamic: row.is_dynamic ? 1 : 0,
-                              value: row.is_dynamic ? row.doctype_field : row.variable_value
-                            }));
-            
-                            frappe.call({
-                              method: 'whatsapp_app.whatsapp_app.doctype.api.send_bulk_whatsapp_message',
-                              args: {
-                                'template_name': selectTemplateValue,
-                                'doctype': 'Supplier',
-                                'name': selectedCustomerNames,
-                                'data': dataList,
-                              },
-                              freeze: true,
-                              callback: (r) => {
-                                frappe.msgprint('Message sent');
-                              },
-                              error: (r) => {
-                                frappe.msgprint('Something went wrong!');
-                              }
-                            });
-            
-                            sendConfirmationDialog.hide();
-                            confirmDialog.hide();
-                          },
-                          secondary_action() {
-                            sendConfirmationDialog.hide();
-                          },
+                            secondary_action() {
+                              sendConfirmationDialog.hide();
+                            },
+                          });
+
+                          sendConfirmationDialog.show();
+                        },
+                      });
+
+
+                      confirmDialog.body.querySelectorAll('.delete-row-btn').forEach(button => {
+                        button.addEventListener('click', function () {
+                          const row = this.closest('tr');
+                          const index = parseInt(this.dataset.index);
+                          row.remove();
                         });
-            
-                        sendConfirmationDialog.show();
-                      },
-                    });
-            
-            
-                    confirmDialog.body.querySelectorAll('.delete-row-btn').forEach(button => {
-                      button.addEventListener('click', function() {
-                        const row = this.closest('tr');
-                        const index = parseInt(this.dataset.index);
-                        row.remove();
                       });
-                    });
-            
-                   const checkboxes = confirmDialog.body.querySelectorAll('.row-checkbox:not([disabled])');
-                    const selectAllCheckbox = confirmDialog.body.querySelector('#select-all-checkbox');
-                
-                    selectAllCheckbox.addEventListener('change', function() {
+
+                      const checkboxes = confirmDialog.body.querySelectorAll('.row-checkbox:not([disabled])');
+                      const selectAllCheckbox = confirmDialog.body.querySelector('#select-all-checkbox');
+
+                      selectAllCheckbox.addEventListener('change', function () {
+                        checkboxes.forEach(checkbox => {
+                          if (!checkbox.disabled) {
+                            checkbox.checked = this.checked;
+                          }
+                        });
+                      });
+
                       checkboxes.forEach(checkbox => {
-                        if (!checkbox.disabled) {
-                          checkbox.checked = this.checked;
-                        }
+                        checkbox.addEventListener('change', function () {
+                          const allChecked = Array.from(checkboxes).every(checkbox => checkbox.checked);
+                          selectAllCheckbox.checked = allChecked;
+                        });
                       });
-                    });
-                    
-                    checkboxes.forEach(checkbox => {
-                      checkbox.addEventListener('change', function() {
-                        const allChecked = Array.from(checkboxes).every(checkbox => checkbox.checked);
-                        selectAllCheckbox.checked = allChecked;
-                      });
-                    });
-                    
-                    confirmDialog.body.querySelectorAll('.eye-icon-btn').forEach(button => {
-                      button.addEventListener('click', function() {
-                        const customerDetailsDialog = new frappe.ui.Dialog({
-                          title: 'Whatsapp Message Preview',
-                          fields: [
-                            {
-                              fieldtype: 'HTML',
-                              options: `
+
+                      confirmDialog.body.querySelectorAll('.eye-icon-btn').forEach(button => {
+                        button.addEventListener('click', function () {
+                          const customerDetailsDialog = new frappe.ui.Dialog({
+                            title: 'Whatsapp Message Preview',
+                            fields: [
+                              {
+                                fieldtype: 'HTML',
+                                options: `
                                 <div class="sample-data">${updatedTemplateSample.replace(/\n/g, '<br>')}</div>
                               `,
+                              },
+                            ],
+                            primary_action_label: 'OK',
+                            primary_action() {
+                              customerDetailsDialog.hide();
                             },
-                          ],
-                          primary_action_label: 'OK',
-                          primary_action() {
-                            customerDetailsDialog.hide();
-                          },
+                          });
+
+                          customerDetailsDialog.show();
+
                         });
-                        
-                        customerDetailsDialog.show();
-    
                       });
-                    });
-                         
-                    confirmDialog.show();
-                      }
-                    },
-              });
-            }
+
+                      confirmDialog.show();
+                    }
+                  },
+                });
+              }
 
               function getTableData() {
                 const table = tableSection.find('#tabledata');
@@ -433,7 +458,7 @@ function test(listview) {
 }
 
 function extractDynamicVariables(templateSample) {
-  const regex = /{{([^{}]+)}}/g; 
+  const regex = /{{([^{}]+)}}/g;
   const matches = [];
   let match;
 
@@ -443,4 +468,3 @@ function extractDynamicVariables(templateSample) {
 
   return matches;
 }
-
