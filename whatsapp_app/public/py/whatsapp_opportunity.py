@@ -67,9 +67,6 @@ def whatsapp_message_send_opportunity(doc, method):
             comment(field_value[0][2], template, json_data)
 
 
-
-
-
 def set_data_in_wati_call_log(number, response):
     f_data = frappe.db.get_value("wati call message log", f"{number}", "data")
     if f_data is not None:
