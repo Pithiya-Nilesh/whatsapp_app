@@ -125,14 +125,12 @@ doctype_list_js = {
 # ---------------
 # Hook on document methods and events
 
-# doc_events = {
-# 	"*": {
-# 		"validate": "whatsapp_app.whatsapp_app.custom.users.allow_whatsapp_welcome_message"
-# 	# 	"on_update": "method",
-# 	# 	"on_cancel": "method",
-# 	# 	"on_trash": "method"
-# 	}
-# }
+# This Call The Todo On Update Time 
+doc_events = {
+	"ToDo": {
+		"on_update": "whatsapp_app.public.py.whatsapp_opportunity.whatsapp_message_send_opportunity",
+	}
+}
 
 # Scheduled Tasks
 # ---------------
