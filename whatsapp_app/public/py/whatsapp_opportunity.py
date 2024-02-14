@@ -17,11 +17,12 @@ def get_the_template():
 
     return matches
 
-@frappe.whitelist()
-def whatsapp_message_send_opportunity(doc, method):
-    if doc.reference_type == "Opportunity" and doc.status == "Open":
-        user_details = frappe.db.sql("select mobile_no,full_name from `tabUser` where name=%s ", (doc.allocated_to), as_dict=True)      
-
+@frappe.whitelist(allow_guest=True)
+def whatsapp_message_send_opportunity(allocated_to, reference_name):    
+    # if doc.reference_type == "Opportunity" and doc.status == "Open":
+        print("\n\n", allocated_to)
+        user_details = frappe.db.sql("select mobile_no,full_name from `tabUser` where name=%s ", (allocated_to), as_dict=True)      
+        print("\n\n\n", user_details, "\n")
         whatsapp_settings = frappe.db.sql(" select field,value from `tabSingles` where doctype=%s", ("WhatsApp Api"), as_dict=True)
         
         for user in user_details:                       
@@ -31,7 +32,7 @@ def whatsapp_message_send_opportunity(doc, method):
             # # URL OF THE API
             url = f"{whatsapp_settings[2].value}/{whatsapp_settings[11].value}/{whatsapp_settings[14].value}/sendTemplateMessage?whatsappNumber=91{user.mobile_no}"
             
-            field_value = frappe.db.sql(" select custom_opportunity_name, industry, contact_mobile,contact_email,custom_equipment_name,source  from `tabOpportunity` where name=%s",doc.reference_name)  
+            field_value = frappe.db.sql(" select custom_opportunity_name, industry, contact_mobile,contact_email,custom_equipment_name,request_type  from `tabOpportunity` where name=%s",reference_name)  
     
             new_list = field_value[0][:1] + (user.full_name,) + field_value[0][1:]
 
