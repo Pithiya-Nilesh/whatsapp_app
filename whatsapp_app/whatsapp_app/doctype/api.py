@@ -2618,7 +2618,8 @@ def send_messages_from_list_of_reminder(name=""):
     # send report to migoo managment
     from frappe.utils import get_url
     # numbers = ['8401265878', '7990915950', '9313086301', '9724547104', '8347718490', '9886107360', '9708618353', '9898019009']
-    numbers = ['9886107360', '9724547104', '9313086301', '7990915950', '8401265878']
+    # numbers = ['9886107360', '9724547104', '9313086301', '7990915950', '8401265878']
+    numbers = ['9879832427', '9316449980', '8401265878', '9724547104', '7990915950']
     report = f"{get_url()}/api/method/frappe.utils.print_format.download_pdf?doctype=List%20of%20WhatsApp%20Messages%20to%20be%20Sent&name={name}"
     payload = {
                 "broadcast_name": "sent_pdf",
